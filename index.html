@@ -1135,32 +1135,20 @@ Give a concise recommendation (3–5 sentences).`;
   try {
 
     const res = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
+      "https://tools.niug502.workers.dev",
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": "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",
-          "HTTP-Referer": "https://tools.oalfawzan.sa",
-          "X-Title": "Offer Comparator"
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          model: "deepseek/deepseek-chat",
-          messages: [
-            {
-              role: "user",
-              content: prompt
-            }
-          ],
-          max_tokens: 400
-        })
+        body: JSON.stringify({ prompt })
       }
     );
 
     const data = await res.json();
 
     const text =
-      data?.choices?.[0]?.message?.content ||
+      data?.text ||
       t('ai_unavailable');
 
     $('aiText').textContent = text;
