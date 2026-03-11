@@ -4,38 +4,41 @@
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="theme-color" content="#F7F7F5">
+<meta name="theme-color" content="#0a0a0f">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Offer Comparator — tools.oalfawzan.sa</title>
+<title>مقارن عروض العمل — tools.oalfawzan.sa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Noto+Sans+Arabic:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F7F7F5;
-  --surface:#FFFFFF;
-  --surface2:#F2F2EF;
-  --border:#E5E5E0;
-  --border2:#D0D0C8;
-  --text:#1A1A1A;
-  --muted:#888880;
-  --muted2:#555550;
-  --current:#0A8A5F;
-  --new:#1A5CDB;
-  --danger:#C0392B;
-  --warn:#B8730A;
-  --sans:'Plus Jakarta Sans',sans-serif;
+  --bg:#0a0a0f;
+  --surface:#111118;
+  --surface2:#1a1a24;
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(255,255,255,.16);
+  --text:#f0f0f5;
+  --muted:#6b6b80;
+  --muted2:#a3a3bd;
+  --current:#00c896;
+  --new:#007AFF;
+  --danger:#ff6b6b;
+  --warn:#f3b14b;
+  --sans:'Syne',sans-serif;
+  --arabic:'Noto Sans Arabic',sans-serif;
+  --mono:'DM Mono',monospace;
   --r:12px;
   --tap:44px;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+  --shadow:none;
+  --shadow-md:none;
 }
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;font-size:15px;line-height:1.5}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
 
 /* ── RTL / Arabic ── */
-[dir="rtl"]{font-family:'Noto Sans Arabic',var(--sans)}
-[dir="rtl"] *{font-family:'Noto Sans Arabic',var(--sans)}
+[dir="rtl"]{font-family:var(--arabic)}
+[dir="rtl"] *{font-family:var(--arabic)}
 [dir="rtl"] .amount-input,[dir="rtl"] .factor-weight-input{direction:ltr;text-align:right}
 [dir="rtl"] .total-vals,[dir="rtl"] .overall-vals{flex-direction:row-reverse}
 [dir="rtl"] .header-actions{flex-direction:row-reverse}
@@ -44,7 +47,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 [dir="rtl"] .factor-score-bar{flex-direction:row-reverse}
 
 /* ── Layout ── */
-.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px;position:relative;z-index:1}
 @media(min-width:480px){.wrap{padding:0 24px}}
 
 /* ── Header ── */
@@ -317,8 +320,8 @@ footer a:hover{color:var(--text)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
-<body style="background:#F7F7F5;color:#1A1A1A">
-<div class="wrap" style="background:#F7F7F5">
+<body>
+<div class="wrap">
 
   <header>
     <a href="https://tools.oalfawzan.sa" class="logo">tools.<span>oalfawzan.sa</span></a>
@@ -604,13 +607,9 @@ let popupSide = null, popupEditId = null;
 
 // ── Init ──────────────────────────────────────────────────────────
 function init() {
-  // Load saved language
-  const savedLang = localStorage.getItem('offer_lang') || 'ar';
-  currentLang = savedLang;
-  document.documentElement.setAttribute('dir', savedLang === 'ar' ? 'rtl' : 'ltr');
-  document.documentElement.setAttribute('lang', savedLang === 'ar' ? 'ar' : 'en');
-  const lBtn = $('langBtn');
-  if (lBtn) { lBtn.textContent = savedLang === 'ar' ? 'EN' : 'عربي'; lBtn.classList.toggle('ar-active', savedLang === 'ar'); }
+  // Always start in Arabic by default
+  currentLang = 'ar';
+  applyLang('ar');
 
   try {
     const saved = localStorage.getItem('offer_v31');
