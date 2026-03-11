@@ -1070,45 +1070,107 @@ function calculate() {
 
 // ── AI ────────────────────────────────────────────────────────────
 async function getAI(a, b, pg, pn, py) {
-  $('aiText').innerHTML = '<div class="dot-pulse"><span></span><span></span><span></span></div>';
+
+  $('aiText').innerHTML =
+    '<div class="dot-pulse"><span></span><span></span><span></span></div>';
+
   const fmt = n => Math.round(n).toLocaleString('en-SA');
   const coA = state.coA || t('current_company');
   const coB = state.coB || t('new_company');
 
-  // Build qualitative factors summary
+  // ── Build qualitative factors summary ──
   const factors = state.factors || [];
   let qualSection = '';
+
   if (factors.length) {
-    const totalWeight = factors.reduce((s, f) => s + (f.weight || 0), 0) || 1;
-    const scoreA = factors.reduce((s, f) => s + (f.scoreA * f.weight / totalWeight), 0);
-    const scoreB = factors.reduce((s, f) => s + (f.scoreB * f.weight / totalWeight), 0);
+
+    const totalWeight =
+      factors.reduce((s, f) => s + (f.weight || 0), 0) || 1;
+
+    const scoreA =
+      factors.reduce((s, f) => s + (f.scoreA * f.weight / totalWeight), 0);
+
+    const scoreB =
+      factors.reduce((s, f) => s + (f.scoreB * f.weight / totalWeight), 0);
+
     const rows = factors.map(f =>
       `  - ${tFactorName(f)}: ${coA}=${f.scoreA}/10, ${coB}=${f.scoreB}/10 (weight ${f.weight}%)`
     ).join('\n');
-    qualSection = `\n\nQualitative Factors (weighted scores — ${coA}: ${scoreA.toFixed(1)}/10, ${coB}: ${scoreB.toFixed(1)}/10):\n${rows}`;
+
+    qualSection =
+`\n\nQualitative Factors (weighted scores — ${coA}: ${scoreA.toFixed(1)}/10, ${coB}: ${scoreB.toFixed(1)}/10):
+${rows}`;
+
   }
 
-  const prompt = `You are a sharp career and compensation advisor. A professional in Saudi Arabia is comparing two job offers.
+  const prompt = `You are a sharp career and compensation advisor.
 
-${coA}: Gross SAR ${fmt(a.gross)}/mo | Net SAR ${fmt(a.net)}/mo | Overall monthly SAR ${fmt(a.overallSal)} | Overall with benefits/year SAR ${fmt(a.yearBenefits)} | Overall with benefits/month SAR ${fmt(a.overallBen)}
+A professional in Saudi Arabia is comparing two job offers.
 
-${coB}: Gross SAR ${fmt(b.gross)}/mo | Net SAR ${fmt(b.net)}/mo | Overall monthly SAR ${fmt(b.overallSal)} | Overall with benefits/year SAR ${fmt(b.yearBenefits)} | Overall with benefits/month SAR ${fmt(b.overallBen)}
+${coA}:
+Gross SAR ${fmt(a.gross)}/mo
+Net SAR ${fmt(a.net)}/mo
+Overall monthly SAR ${fmt(a.overallSal)}
+Overall with benefits/year SAR ${fmt(a.yearBenefits)}
+Overall with benefits/month SAR ${fmt(a.overallBen)}
 
-Salary changes: Gross ${(pg*100).toFixed(1)}% | Net ${(pn*100).toFixed(1)}% | Overall with benefits ${(py*100).toFixed(1)}%${qualSection}
+${coB}:
+Gross SAR ${fmt(b.gross)}/mo
+Net SAR ${fmt(b.net)}/mo
+Overall monthly SAR ${fmt(b.overallSal)}
+Overall with benefits/year SAR ${fmt(b.yearBenefits)}
+Overall with benefits/month SAR ${fmt(b.overallBen)}
 
-${t('ai_lang_instruction')} ${t('ai_prompt_suffix')}`;
+Salary changes:
+Gross ${(pg*100).toFixed(1)}%
+Net ${(pn*100).toFixed(1)}%
+Overall with benefits ${(py*100).toFixed(1)}%
+${qualSection}
+
+${t('ai_lang_instruction')}
+${t('ai_prompt_suffix')}
+
+Give a concise recommendation (3–5 sentences).`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, messages:[{ role:'user', content:prompt }] })
-    });
+
+    const res = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "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",
+          "HTTP-Referer": "https://tools.oalfawzan.sa",
+          "X-Title": "Offer Comparator"
+        },
+        body: JSON.stringify({
+          model: "deepseek/deepseek-chat",
+          messages: [
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          max_tokens: 400
+        })
+      }
+    );
+
     const data = await res.json();
-    $('aiText').textContent = data.content?.map(b => b.text||'').join('') || t('ai_unavailable');
-  } catch {
+
+    const text =
+      data?.choices?.[0]?.message?.content ||
+      t('ai_unavailable');
+
+    $('aiText').textContent = text;
+
+  } catch (err) {
+
     $('aiText').textContent = t('ai_unavailable');
+
   }
+
 }
 
 // ── Persist ───────────────────────────────────────────────────────
