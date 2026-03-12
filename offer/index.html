@@ -631,11 +631,20 @@ const DEFAULTS = {
 let state = deepClone(DEFAULTS);
 let popupSide = null, popupEditId = null;
 
+function ensureSingleCompareRowOnMobile() {
+  // Guard against merge regressions where inline CTA misses `inline-compare` class.
+  const rows = document.querySelectorAll('.action-row');
+  if (rows.length >= 2 && !rows[0].classList.contains('inline-compare')) {
+    rows[0].classList.add('inline-compare');
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────
 function init() {
   // Always start in Arabic by default
   currentLang = 'ar';
   applyLang('ar');
+  ensureSingleCompareRowOnMobile();
 
   try {
     const saved = localStorage.getItem('offer_v31');
