@@ -36,6 +36,20 @@
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --mobile-cta-offset:112px;
 }
+:root[data-theme="light"]{
+  --bg:#f7f8fc;
+  --surface:#ffffff;
+  --surface2:#eef2f7;
+  --border:rgba(16,24,40,.12);
+  --border2:rgba(16,24,40,.24);
+  --text:#111827;
+  --muted:#667085;
+  --muted2:#475467;
+  --current:#069c6b;
+  --new:#005fcb;
+  --danger:#d92d20;
+  --warn:#b54708;
+}
 html{-webkit-text-size-adjust:100%;background:var(--bg);overflow-x:clip}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;min-height:100dvh;overflow-x:clip;-webkit-tap-highlight-color:transparent;font-size:15px;line-height:1.5}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
@@ -392,6 +406,7 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
     <a href="https://tools.oalfawzan.sa" class="logo">tools.<span>oalfawzan.sa</span></a>
     <div class="header-actions">
       <button class="lang-btn" id="langBtn" onclick="toggleLang()">عربي</button>
+      <button class="lang-btn" id="themeBtn" onclick="toggleTheme()">☀️</button>
       <button class="btn-ghost" id="saveBtn" onclick="saveData()">Save</button>
       <div class="menu-wrap">
         <button class="btn-ghost" onclick="toggleMenu()" id="menuBtn">⋯</button>
@@ -804,6 +819,7 @@ function ensureSingleCompareRowOnMobile() {
 function init() {
   // Always start in Arabic by default
   currentLang = 'ar';
+  applyTheme(currentTheme);
   applyLang('ar');
   ensureSingleCompareRowOnMobile();
 
@@ -1637,6 +1653,7 @@ const STRINGS = {
 };
 
 let currentLang = 'ar';
+let currentTheme = localStorage.getItem('tools_theme') || 'dark';
 
 function t(key) {
   return (STRINGS[currentLang][key] || STRINGS.en[key] || key);
@@ -1666,6 +1683,8 @@ function applyLang(lang) {
     btn.textContent = isAr ? 'EN' : 'عربي';
     btn.classList.toggle('ar-active', isAr);
   }
+  const themeBtn = $('themeBtn');
+  if (themeBtn) themeBtn.textContent = currentTheme === 'light' ? '🌙' : '☀️';
 
   // Header buttons
   const btnReset = $('btnReset');
@@ -1706,6 +1725,16 @@ function applyLang(lang) {
 
 function toggleLang() {
   applyLang(currentLang === 'en' ? 'ar' : 'en');
+}
+function applyTheme(theme) {
+  currentTheme = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('tools_theme', currentTheme);
+  const themeBtn = $('themeBtn');
+  if (themeBtn) themeBtn.textContent = currentTheme === 'light' ? '🌙' : '☀️';
+}
+function toggleTheme() {
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
 }
 
 function saveData() {

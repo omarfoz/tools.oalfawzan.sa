@@ -10,6 +10,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--danger:#ff5f6d;--sans:'Syne',sans-serif;--arabic:'Noto Sans Arabic',sans-serif;--mono:'DM Mono',monospace}
+:root[data-theme="light"]{--bg:#f7f8fc;--surface:#ffffff;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b;--danger:#d92d20}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}html[lang="ar"] body{font-family:var(--arabic)}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
 .wrap{max-width:1020px;margin:0 auto;padding:0 20px 34px;position:relative;z-index:1}
@@ -34,6 +35,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
   <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
   <div class="header-actions">
     <button class="lang-btn" id="langBtn" type="button">EN</button>
+    <button class="lang-btn" id="themeBtn" type="button">☀️</button>
     <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
   </div>
 </header>
@@ -57,10 +59,11 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 </div>
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'JSON Formatter — tools.oalfawzan.sa',meta:'منسق JSON سريع للنسخ والتحقق.',tag:'// أداة',heading:'JSON Formatter',desc:'ألصق JSON، ثم نسّقه أو صغّره وتحقق من صحته فورًا.',format:'تنسيق',minify:'تصغير',copy:'نسخ الناتج',clear:'مسح',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',placeholder:'{"project":"tools"}',ok:'JSON صالح.',copyOk:'تم النسخ.',empty:'لا يوجد JSON للإخراج.',invalid:'JSON غير صالح: '},
-  en:{lang:'en',dir:'ltr',title:'JSON Formatter — tools.oalfawzan.sa',meta:'Fast JSON formatter and validator.',tag:'// TOOL',heading:'JSON Formatter',desc:'Paste JSON, then format, minify, and validate instantly.',format:'Format',minify:'Minify',copy:'Copy Output',clear:'Clear',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',placeholder:'{"project":"tools"}',ok:'Valid JSON.',copyOk:'Copied.',empty:'No output to copy.',invalid:'Invalid JSON: '}
+  ar:{lang:'ar',dir:'rtl',title:'JSON Formatter — tools.oalfawzan.sa',meta:'منسق JSON سريع للنسخ والتحقق.',tag:'// أداة',heading:'JSON Formatter',desc:'ألصق JSON، ثم نسّقه أو صغّره وتحقق من صحته فورًا.',format:'تنسيق',minify:'تصغير',copy:'نسخ الناتج',clear:'مسح',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',placeholder:'{"project":"tools"}',ok:'JSON صالح.',copyOk:'تم النسخ.',empty:'لا يوجد JSON للإخراج.',invalid:'JSON غير صالح: '},
+  en:{lang:'en',dir:'ltr',title:'JSON Formatter — tools.oalfawzan.sa',meta:'Fast JSON formatter and validator.',tag:'// TOOL',heading:'JSON Formatter',desc:'Paste JSON, then format, minify, and validate instantly.',format:'Format',minify:'Minify',copy:'Copy Output',clear:'Clear',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',placeholder:'{"project":"tools"}',ok:'Valid JSON.',copyOk:'Copied.',empty:'No output to copy.',invalid:'Invalid JSON: '}
 };
 let currentLang=localStorage.getItem('tools_lang')||'ar';
+let currentTheme=localStorage.getItem('tools_theme')||'dark';
 const input=document.getElementById('inputJson');const output=document.getElementById('outputJson');const status=document.getElementById('status');
 function parseJSON(){const raw=input.value.trim();if(!raw) throw new Error('empty');return JSON.parse(raw)}
 function setStatus(msg,isError=false){status.classList.toggle('error',isError);status.textContent=msg}
@@ -77,6 +80,7 @@ function applyLang(lang){
   document.getElementById('minifyBtn').textContent=s.minify;document.getElementById('copyBtn').textContent=s.copy;
   document.getElementById('clearBtn').textContent=s.clear;document.getElementById('backLink').textContent=s.back;
   document.getElementById('builtBy').textContent=s.builtBy;document.getElementById('langBtn').textContent=s.langBtn;
+  document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
   input.placeholder=s.placeholder;setStatus('');localStorage.setItem('tools_lang',lang);
 }
 document.getElementById('formatBtn').addEventListener('click',formatJSON);
@@ -84,6 +88,9 @@ document.getElementById('minifyBtn').addEventListener('click',minifyJSON);
 document.getElementById('copyBtn').addEventListener('click',copyOut);
 document.getElementById('clearBtn').addEventListener('click',clearAll);
 document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
+function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight)}
+document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
+applyTheme(currentTheme);
 applyLang(currentLang);
 </script>
 </body>
