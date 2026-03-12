@@ -288,7 +288,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:4px 0}
 .popup-check{width:18px;height:18px;accent-color:var(--new);cursor:pointer;flex-shrink:0}
 .popup-check-label{font-size:.82rem;color:var(--muted2);cursor:pointer;font-weight:500}
 .pct-row{display:flex;gap:8px;align-items:center}
-.pct-row input{width:80px;flex:none}
+.pct-row input{width:clamp(60px,20vw,80px);flex:none}
 .pct-row select{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 10px;color:var(--text);font-family:inherit;font-size:.85rem;outline:none;min-height:var(--tap);cursor:pointer}
 .pct-row select:focus{border-color:var(--new)}
 .pct-row span{font-size:.78rem;color:var(--muted2);white-space:nowrap}
@@ -341,16 +341,44 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
   .add-field-btn{white-space:normal;text-align:center;line-height:1.2;padding:6px 10px}
 }
 
-/* Defensive text wrapping to avoid overflow in RTL and long-label cases. */
-.card-label,.cmp-lbl,.overall-label,.summary-label,.total-label,.factors-title,.nat-note,.hero p{overflow-wrap:anywhere}
+/* ── Mode Switcher ── */
+.mode-switcher{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:20px;position:relative}
+.mode-btn{flex:1;padding:10px 16px;min-height:48px;border:none;background:transparent;color:var(--muted2);font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:9px;transition:.2s;position:relative;z-index:1;line-height:1.2;text-align:center}
+.mode-btn .mode-icon{display:block;font-size:1rem;margin-bottom:3px}
+.mode-btn .mode-label{display:block;font-size:.78rem;font-weight:700;letter-spacing:.02em}
+.mode-btn .mode-sub{display:block;font-size:.62rem;color:var(--muted);margin-top:1px;font-weight:400}
+.mode-btn.active-simple{background:#E8F5F0;color:var(--current);box-shadow:0 1px 4px rgba(0,200,150,.12)}
+.mode-btn.active-simple .mode-sub{color:rgba(0,200,150,.7)}
+.mode-btn.active-detailed{background:#EEF3FF;color:var(--new);box-shadow:0 1px 4px rgba(0,122,255,.12)}
+.mode-btn.active-detailed .mode-sub{color:rgba(0,122,255,.7)}
+/* sections hidden by mode */
+.detailed-only{transition:opacity .2s}
+body.mode-simple .detailed-only{display:none!important}
+body.mode-detailed .simple-only{display:none!important}
 
-@media(max-width:420px){
-  .field-row{flex-wrap:wrap;align-items:flex-start}
-  .field-name{flex-basis:100%}
-  .field-amount{width:100%}
-  .card-top{gap:8px;align-items:flex-start}
-  .add-field-btn{white-space:normal;text-align:center;line-height:1.2;padding:6px 10px}
-}
+/* ── Simple Mode Result ── */
+.simple-result{display:none;margin-bottom:10px}
+body.mode-simple .simple-result{display:block}
+body.mode-simple #resultsWrap .breakdown-card{display:none}
+.winner-card{border-radius:var(--r);padding:20px;text-align:center;border:2px solid transparent;margin-bottom:10px;position:relative;overflow:hidden}
+.winner-card.winner-a{background:linear-gradient(135deg,rgba(0,200,150,.08),rgba(0,200,150,.02));border-color:var(--current)}
+.winner-card.winner-b{background:linear-gradient(135deg,rgba(0,122,255,.08),rgba(0,122,255,.02));border-color:var(--new)}
+.winner-card.winner-tie{background:var(--surface);border-color:var(--border2)}
+.winner-label{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.winner-name{font-size:clamp(1.3rem,5vw,2rem);font-weight:800;margin-bottom:4px}
+.winner-name.wc-a{color:var(--current)}
+.winner-name.wc-b{color:var(--new)}
+.winner-uplift{font-size:.82rem;color:var(--muted2);margin-bottom:14px}
+.simple-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.sm-cell{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.sm-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+.sm-vals{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.sm-val{font-size:.85rem;font-weight:700}
+.sm-badge{font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:8px}
+
+/* ── Detailed Mode specific tweaks ── */
+.mode-section-title{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.mode-section-title::before{content:'';width:3px;height:14px;background:var(--new);border-radius:2px;flex-shrink:0}
 
 /* ── Legacy metric cards (hidden but kept) ── */
 .big-metrics{display:none}
@@ -381,11 +409,25 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
     <p><span data-i18n="hero_p">Fully customizable. Rename any field, toggle it on/off, add your own, set a field as % of another. Auto-saves to your browser.</span></p>
   </div>
 
+  <!-- Mode Switcher -->
+  <div class="mode-switcher" role="group" aria-label="Comparison mode">
+    <button class="mode-btn active-simple" id="modeSimpleBtn" onclick="setMode('simple')">
+      <span class="mode-icon">⚡</span>
+      <span class="mode-label" data-i18n="mode_simple_label">Quick Compare</span>
+      <span class="mode-sub" data-i18n="mode_simple_sub">Job Seeker · Fast answer</span>
+    </button>
+    <button class="mode-btn" id="modeDetailedBtn" onclick="setMode('detailed')">
+      <span class="mode-icon">📊</span>
+      <span class="mode-label" data-i18n="mode_detailed_label">Full Analysis</span>
+      <span class="mode-sub" data-i18n="mode_detailed_sub">HR / Finance · Every detail</span>
+    </button>
+  </div>
+
   <div class="company-names">
     <input class="co-name-input current" id="coNameA" type="text" placeholder="" data-i18n-ph="current_company">
     <input class="co-name-input new-co"  id="coNameB" type="text" placeholder="" data-i18n-ph="new_company">
   </div>
-  <div class="nat-unified">
+  <div class="nat-unified detailed-only">
     <div class="nat-col">
       <div class="nat-col-label current-col" id="natLabelA">Current</div>
       <div class="nat-toggle-wrap">
@@ -415,21 +457,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
     <div class="card active-card" id="cardA">
       <div class="card-top">
         <div class="card-label" id="labelA">Current Company</div>
-        <button class="add-field-btn" onclick="openAddField('A')"><span data-i18n="add_field">+ Add Field</span></button>
+        <button class="add-field-btn detailed-only" onclick="openAddField('A')"><span data-i18n="add_field">+ Add Field</span></button>
       </div>
       <div id="fieldsA"></div>
     </div>
     <div class="card" id="cardB">
       <div class="card-top">
         <div class="card-label" id="labelB">New Company</div>
-        <button class="add-field-btn" onclick="openAddField('B')"><span data-i18n="add_field">+ Add Field</span></button>
+        <button class="add-field-btn detailed-only" onclick="openAddField('B')"><span data-i18n="add_field">+ Add Field</span></button>
       </div>
       <div id="fieldsB"></div>
     </div>
   </div>
 
   <!-- Qualitative Factors -->
-  <div class="factors-card">
+  <div class="factors-card detailed-only">
     <div class="factors-header">
       <div>
         <div class="factors-title"><span data-i18n="qualitative_factors">// Qualitative Factors</span></div>
@@ -447,9 +489,64 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
     </div>
   </div>
 
+  <!-- HR Context Panel -->
+  <div class="factors-card detailed-only" id="hrContextCard" style="margin-bottom:10px">
+    <div class="factors-header" style="margin-bottom:12px">
+      <div>
+        <div class="factors-title"><span data-i18n="hr_context_label">Role &amp; Context (optional)</span></div>
+        <div style="font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-top:4px"><span data-i18n="hr_context_hint">Helps the AI give a more tailored recommendation</span></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div style="grid-column:1/-1">
+        <input class="co-name-input" id="hrContext" type="text"
+          data-i18n-ph="hr_context_placeholder"
+          placeholder="e.g. Senior Engineer, 8 yrs exp, Riyadh"
+          style="border-top:none;font-size:.85rem;font-weight:400"
+          oninput="autosave()">
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:6px"><span data-i18n="vacation_lbl">Vacation Days / Year</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <input class="amount-input" id="vacA" type="number" min="0" max="365" placeholder="—"
+            style="text-align:center;border-top:2px solid var(--current)"
+            oninput="autosave()">
+          <input class="amount-input" id="vacB" type="number" min="0" max="365" placeholder="—"
+            style="text-align:center;border-top:2px solid var(--new)"
+            oninput="autosave()">
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:6px"><span data-i18n="notice_lbl">Notice Period (months)</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <input class="amount-input" id="noticeA" type="number" min="0" max="24" placeholder="—"
+            style="text-align:center;border-top:2px solid var(--current)"
+            oninput="autosave()">
+          <input class="amount-input" id="noticeB" type="number" min="0" max="24" placeholder="—"
+            style="text-align:center;border-top:2px solid var(--new)"
+            oninput="autosave()">
+        </div>
+      </div>
+      <div id="vacDiffWrap" style="display:flex;flex-direction:column;justify-content:flex-end;gap:4px">
+        <div class="section-label" style="margin-bottom:6px" data-i18n="vac_diff_lbl">VACATION DIFF</div>
+        <div id="vacDiff" style="font-size:.85rem;font-weight:700;color:var(--muted)">—</div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Gratuity reminder (detailed mode only) -->
+  <div class="detailed-only" style="background:rgba(243,177,75,.07);border:1px solid rgba(243,177,75,.2);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:.85rem;flex-shrink:0">⚠️</span>
+    <div>
+      <span style="font-size:.68rem;font-weight:700;color:var(--warn);letter-spacing:.04em;text-transform:uppercase" data-i18n="gratuity_title">END-OF-SERVICE GRATUITY</span>
+      <div style="font-size:.72rem;color:var(--muted2);margin-top:2px;line-height:1.6" data-i18n="gratuity_note">Not included above. KSA law: ½ month basic per year (first 5 yrs: ⅓ month). Factor this in for long-term offers — especially if switching from a senior role.</div>
+    </div>
+  </div>
+
   <div class="action-row inline-compare">
     <button class="calc-btn" onclick="calculate()"><span data-i18n="compare_btn">Compare Offers</span></button>
-    <button class="export-btn" onclick="exportExcel()" id="exportBtn"><span data-i18n="export_btn">⬇ Export Excel</span></button>
+    <button class="export-btn detailed-only" onclick="exportExcel()" id="exportBtn"><span data-i18n="export_btn">⬇ Export Excel</span></button>
   </div>
 
   <!-- Sticky compare for mobile -->
@@ -460,8 +557,54 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
     </div>
   </div>
 
+  <!-- Simple Mode Result -->
+  <div class="simple-result" id="simpleResult">
+    <div class="winner-card" id="winnerCard">
+      <div class="winner-label" id="winnerLabel">WINNER</div>
+      <div class="winner-name" id="winnerName">—</div>
+      <div class="winner-uplift" id="winnerUplift"></div>
+      <div class="simple-metrics">
+        <div class="sm-cell">
+          <div class="sm-label" data-i18n="net_monthly">NET MONTHLY</div>
+          <div class="sm-vals">
+            <span class="sm-val current-col" id="smNetA">—</span>
+            <span style="color:var(--muted);font-size:.75rem">→</span>
+            <span class="sm-val new-col" id="smNetB">—</span>
+            <span class="sm-badge" id="smNetBadge"></span>
+          </div>
+        </div>
+        <div class="sm-cell">
+          <div class="sm-label" data-i18n="yearly_total">YEARLY TOTAL</div>
+          <div class="sm-vals">
+            <span class="sm-val current-col" id="smYearA">—</span>
+            <span style="color:var(--muted);font-size:.75rem">→</span>
+            <span class="sm-val new-col" id="smYearB">—</span>
+            <span class="sm-badge" id="smYearBadge"></span>
+          </div>
+        </div>
+        <div class="sm-cell" id="smVacCell" style="display:none">
+          <div class="sm-label" data-i18n="vacation_lbl">Vacation Days / Year</div>
+          <div class="sm-vals">
+            <span class="sm-val current-col" id="smVacA">—</span>
+            <span style="color:var(--muted);font-size:.75rem">→</span>
+            <span class="sm-val new-col" id="smVacB">—</span>
+            <span class="sm-badge" id="smVacBadge"></span>
+          </div>
+        </div>
+        <div class="sm-cell" id="smNoticeCell" style="display:none">
+          <div class="sm-label" data-i18n="notice_lbl">Notice Period (months)</div>
+          <div class="sm-vals">
+            <span class="sm-val current-col" id="smNoticeA">—</span>
+            <span style="color:var(--muted);font-size:.75rem">→</span>
+            <span class="sm-val new-col" id="smNoticeB">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Sticky totals bar -->
-  <div id="totalsBar" style="display:none">
+  <div id="totalsBar" style="display:none" class="detailed-only">
     <div class="totals-bar">
       <div class="total-item">
         <div class="total-label"><span data-i18n="net_monthly">NET MONTHLY</span></div>
@@ -496,7 +639,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
   </div>
 
   <!-- Overall salary with benefits -->
-  <div id="overallWrap">
+  <div id="overallWrap" class="detailed-only">
     <div class="overall-card">
       <div class="overall-row">
         <div class="overall-label"><span data-i18n="overall_year">OVERALL SALARY WITH BENEFITS / YEAR</span></div>
@@ -599,10 +742,13 @@ const deepClone = o => JSON.parse(JSON.stringify(o));
 const FIELD_NAMES = {
   a2:'field_basic', a3:'field_housing', a4:'field_transport', a5:'field_special',
   a6:'field_gosi',  a7:'field_annual_bonus', a8:'field_education',
+  a9:'field_medical_ins', a10:'field_flight_ticket',
   b1:'field_basic', b2:'field_housing', b3:'field_transport', b4:'field_social',
   b5:'field_mobile', b6:'field_gosi', b7:'field_perf_bonus', b8:'field_education',
-  b9:'field_phone_bill',
-  f1:'factor_health', f2:'factor_remote',
+  b9:'field_phone_bill', b10:'field_medical_ins', b11:'field_flight_ticket',
+  f1:'factor_health', f2:'factor_remote', f3:'factor_career_growth',
+  f4:'factor_management', f5:'factor_commute', f6:'factor_wlb',
+  f7:'factor_job_security', f8:'factor_brand',
 };
 function tFieldName(f) {
   const key = FIELD_NAMES[f.id];
@@ -625,6 +771,8 @@ const DEFAULTS = {
     { id:'a6', name:'GOSI',                value:0,     isPct:true,  pct:9.75, pctRef:'a2', pctRef2:'a3', isDeduction:true,  isAnnual:false, enabled:true, isGosi:true },
     { id:'a7', name:'Annual Bonus',        value:0,     isPct:true,  pct:200,  pctRef:'a2',isDeduction:false, isAnnual:true,  enabled:true, isMonths:true },
     { id:'a8', name:'Education Allowance', value:15000, isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:true,  enabled:true },
+    { id:'a9', name:'Medical Insurance',   value:5000,  isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:true,  enabled:false },
+    { id:'a10',name:'Annual Flight Ticket',value:3000,  isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:true,  enabled:false },
   ],
   B: [
     { id:'b1', name:'Basic Salary',        value:14500, isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:false, enabled:true },
@@ -635,7 +783,9 @@ const DEFAULTS = {
     { id:'b6', name:'GOSI',                value:0,     isPct:true,  pct:9.75, pctRef:'b1', pctRef2:'b2', isDeduction:true,  isAnnual:false, enabled:true, isGosi:true },
     { id:'b7', name:'Performance Bonus',   value:0,     isPct:true,  pct:200,  pctRef:'b1',isDeduction:false, isAnnual:true,  enabled:true, isMonths:true },
     { id:'b8', name:'Education Allowance', value:15000, isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:true,  enabled:true },
-    { id:'b9', name:'Phone Bill',          value:25000, isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:true,  enabled:true },
+    { id:'b9', name:'Phone Bill',          value:4800,  isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:true,  enabled:true },
+    { id:'b10',name:'Medical Insurance',   value:5000,  isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:true,  enabled:false },
+    { id:'b11',name:'Annual Flight Ticket',value:3000,  isPct:false, pct:0,    pctRef:'',  isDeduction:false, isAnnual:true,  enabled:false },
   ]
 };
 
@@ -668,6 +818,75 @@ function init() {
   updateLabels();
   renderFields('A');
   renderFields('B');
+
+  // Restore HR context fields
+  if (state.hrContext)  $('hrContext').value  = state.hrContext;
+  if (state.vacA != null) $('vacA').value  = state.vacA;
+  if (state.vacB != null) $('vacB').value  = state.vacB;
+  if (state.noticeA != null) $('noticeA').value = state.noticeA;
+  if (state.noticeB != null) $('noticeB').value = state.noticeB;
+  updateVacDiff();
+
+  // Restore nationality buttons to match saved GOSI state
+  ['A','B'].forEach(side => {
+    const gosiId = side === 'A' ? 'a6' : 'b6';
+    const gosi = state[side] && state[side].find(x => x.id === gosiId);
+    const isSaudi = !gosi || gosi.enabled !== false;
+    const nat = isSaudi ? 'saudi' : 'nonsaudi';
+    nationality[side] = nat;
+    const sa = $('nat' + side + '_saudi'), ns = $('nat' + side + '_nonsaudi');
+    if (sa) sa.classList.toggle('active', nat === 'saudi');
+    if (ns) ns.classList.toggle('active', nat === 'nonsaudi');
+    const note = $('natNote' + side);
+    if (note) note.textContent = nat === 'saudi' ? t('gosi_note_saudi') : t('gosi_note_non');
+  });
+
+  $('hrContext').addEventListener('input', e => { state.hrContext = e.target.value; autosave(); });
+  $('vacA').addEventListener('input', e => { state.vacA = +e.target.value || null; autosave(); updateVacDiff(); });
+  $('vacB').addEventListener('input', e => { state.vacB = +e.target.value || null; autosave(); updateVacDiff(); });
+  $('noticeA').addEventListener('input', e => { state.noticeA = +e.target.value || null; autosave(); });
+  $('noticeB').addEventListener('input', e => { state.noticeB = +e.target.value || null; autosave(); });
+
+  // Restore mode
+  try { const m = localStorage.getItem('offer_mode'); if (m === 'detailed') { setMode('detailed'); } else { setMode('simple'); } } catch { setMode('simple'); }
+}
+
+function updateVacDiff() {
+  const va = +$('vacA').value || 0, vb = +$('vacB').value || 0;
+  const el = $('vacDiff');
+  if (!va && !vb) { el.textContent = '—'; el.style.color = 'var(--muted)'; return; }
+  const diff = vb - va;
+  if (diff > 0) { el.textContent = '+' + diff + ' days'; el.style.color = 'var(--current)'; }
+  else if (diff < 0) { el.textContent = diff + ' days'; el.style.color = 'var(--danger)'; }
+  else { el.textContent = '= same'; el.style.color = 'var(--muted)'; }
+}
+
+// ── Mode (Simple / Detailed) ──────────────────────────────────────
+let currentMode = 'simple';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.body.classList.remove('mode-simple', 'mode-detailed');
+  document.body.classList.add('mode-' + mode);
+  $('modeSimpleBtn').className   = 'mode-btn' + (mode === 'simple'   ? ' active-simple'   : '');
+  $('modeDetailedBtn').className = 'mode-btn' + (mode === 'detailed' ? ' active-detailed' : '');
+  // hide any stale results when switching modes
+  $('simpleResult').style.display = 'none';
+  if ($('resultsWrap')) { $('resultsWrap').style.display = 'none'; $('resultsWrap').classList.remove('fadein'); }
+  if ($('totalsBar'))   $('totalsBar').style.display   = 'none';
+  // persist
+  try { localStorage.setItem('offer_mode', mode); } catch {}
+  // update compare button label
+  updateModeLabels();
+}
+
+function updateModeLabels() {
+  // button labels already handled by data-i18n; just refresh the sub-text
+  const sBtns = document.querySelectorAll('[data-i18n="mode_simple_sub"],[data-i18n="mode_detailed_sub"]');
+  sBtns.forEach(el => {
+    const key = el.dataset.i18n;
+    if (STRINGS[currentLang] && STRINGS[currentLang][key]) el.textContent = STRINGS[currentLang][key];
+  });
 }
 
 function updateLabels() {
@@ -882,7 +1101,8 @@ function openEditField(side, id) {
   $('popupConfirmBtn').textContent = t('save_btn');
   $('pName').value = f.name;
   $('pValue').value = f.value;
-  $('pPct').value = f.pct || '';
+  // isMonths stores pct as months*100 (e.g. 2 months → pct=200). Show the real multiplier.
+  $('pPct').value = f.isMonths ? (f.pct / 100) : (f.pct || '');
   $('pIsPct').checked = f.isPct;
   $('pIsDeduction').checked = f.isDeduction;
   $('pIsAnnual').checked = f.isAnnual;
@@ -979,18 +1199,20 @@ function liveUpdate() {
     const a = computeSide('A');
     const b = computeSide('B');
     const fmtK = n => 'SAR ' + Math.round(n).toLocaleString('en-SA');
-    $('oYearA').textContent  = fmtK(a.yearBenefits);
-    $('oYearB').textContent  = fmtK(b.yearBenefits);
-    $('oMonthA').textContent = fmtK(a.overallBen);
-    $('oMonthB').textContent = fmtK(b.overallBen);
-    // badges
-    const py = a.yearBenefits ? (b.yearBenefits - a.yearBenefits) / a.yearBenefits : 0;
-    const bg  = py > 0.005 ? 'rgba(0,200,150,.15)' : py < -0.005 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)';
-    const col = py > 0.005 ? 'var(--current)'      : py < -0.005 ? 'var(--danger)'        : 'var(--muted)';
-    const txt = py > 0.005 ? '+' + (py*100).toFixed(1)+'%' : py < -0.005 ? (py*100).toFixed(1)+'%' : '≈';
-    const badgeStyle = `background:${bg};color:${col}`;
-    $('oYearBadge').textContent  = txt; $('oYearBadge').style.cssText  = `${badgeStyle};font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px`;
-    $('oMonthBadge').textContent = txt; $('oMonthBadge').style.cssText = `${badgeStyle};font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px`;
+    // Detailed mode: update overall card
+    if ($('oYearA') && currentMode === 'detailed') {
+      $('oYearA').textContent  = fmtK(a.yearBenefits);
+      $('oYearB').textContent  = fmtK(b.yearBenefits);
+      $('oMonthA').textContent = fmtK(a.overallBen);
+      $('oMonthB').textContent = fmtK(b.overallBen);
+      const py = a.yearBenefits ? (b.yearBenefits - a.yearBenefits) / a.yearBenefits : 0;
+      const bg  = py > 0.005 ? 'rgba(0,200,150,.15)' : py < -0.005 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)';
+      const col = py > 0.005 ? 'var(--current)'      : py < -0.005 ? 'var(--danger)'        : 'var(--muted)';
+      const txt = py > 0.005 ? '+' + (py*100).toFixed(1)+'%' : py < -0.005 ? (py*100).toFixed(1)+'%' : '≈';
+      const badgeStyle = `background:${bg};color:${col}`;
+      $('oYearBadge').textContent  = txt; $('oYearBadge').style.cssText  = `${badgeStyle};font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px`;
+      $('oMonthBadge').textContent = txt; $('oMonthBadge').style.cssText = `${badgeStyle};font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px`;
+    }
   } catch(e) {}
 }
 
@@ -1002,8 +1224,9 @@ function computeSide(side) {
     if (!f.enabled) return;
     const v = resolveValue(f, fields);
     if (f.isAnnual) {
-      if (f.isMonths) bonusMonthly += v;       // bonus months × basic → yearly
-      else if (!f.isDeduction) annualBenefits += v; // fixed annual benefits
+      if (f.isMonths) bonusMonthly += v;            // bonus months × basic → yearly
+      else if (f.isDeduction) annualBenefits -= v;  // annual deductions reduce total
+      else annualBenefits += v;                     // fixed annual benefits
     } else {
       if (f.isDeduction) deductions += v;
       else gross += v;
@@ -1031,12 +1254,81 @@ function calculate() {
   const pg = a.gross   ? (b.gross   - a.gross)   / a.gross   : 0;
   const pn = a.net     ? (b.net     - a.net)     / a.net     : 0;
   const py = a.yearly  ? (b.yearly  - a.yearly)  / a.yearly  : 0;
-
-  // Populate totals bar
   const fmtK = n => 'SAR ' + Math.round(n).toLocaleString('en-SA');
+
+  // ── SIMPLE MODE ──────────────────────────────────────────────────
+  if (currentMode === 'simple') {
+    const coA = state.coA || t('current');
+    const coB = state.coB || t('new_offer');
+    const card = $('winnerCard');
+    const pctStr = p => (p >= 0 ? '+' : '') + (p * 100).toFixed(1) + '%';
+    const smBadge = (p, el) => {
+      const bg  = p > 0.005 ? 'rgba(0,200,150,.15)' : p < -0.005 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)';
+      const col = p > 0.005 ? 'var(--current)'      : p < -0.005 ? 'var(--danger)'        : 'var(--muted)';
+      const txt = Math.abs(p) > 0.005 ? pctStr(p) : '≈';
+      el.textContent = txt; el.style.cssText = `background:${bg};color:${col};font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:8px`;
+    };
+    // winner
+    card.className = 'winner-card';
+    $('winnerName').style.color = ''; // reset any inline tie-color
+    if (py > 0.005) {
+      card.classList.add('winner-b');
+      $('winnerLabel').textContent = t('winner_label');
+      $('winnerName').textContent  = coB;
+      $('winnerName').className    = 'winner-name wc-b';
+      $('winnerUplift').textContent = '+' + (py*100).toFixed(1) + '% ' + t('winner_higher');
+    } else if (py < -0.005) {
+      card.classList.add('winner-a');
+      $('winnerLabel').textContent = t('winner_label');
+      $('winnerName').textContent  = coA;
+      $('winnerName').className    = 'winner-name wc-a';
+      $('winnerUplift').textContent = Math.abs(py*100).toFixed(1) + '% ' + t('winner_higher');
+    } else {
+      card.classList.add('winner-tie');
+      $('winnerLabel').textContent = t('winner_tied_label');
+      $('winnerName').textContent  = t('winner_tied');
+      $('winnerName').className    = 'winner-name';
+      $('winnerName').style.color  = 'var(--muted2)';
+      $('winnerUplift').textContent = t('winner_tied_sub');
+    }
+    $('smNetA').textContent  = fmtK(a.net);
+    $('smNetB').textContent  = fmtK(b.net);
+    smBadge(pn, $('smNetBadge'));
+    $('smYearA').textContent = fmtK(a.yearBenefits);
+    $('smYearB').textContent = fmtK(b.yearBenefits);
+    smBadge(py, $('smYearBadge'));
+    // vacation — always reset first
+    $('smVacCell').style.display    = 'none';
+    $('smNoticeCell').style.display = 'none';
+    const va = state.vacA, vb = state.vacB;
+    if (va || vb) {
+      $('smVacCell').style.display = '';
+      $('smVacA').textContent = va ? va + ' d' : '—';
+      $('smVacB').textContent = vb ? vb + ' d' : '—';
+      const vacDiff = (vb || 0) - (va || 0);
+      const vacEl = $('smVacBadge');
+      vacEl.textContent = vacDiff > 0 ? '+' + vacDiff + ' d' : vacDiff < 0 ? vacDiff + ' d' : '≈';
+      vacEl.style.cssText = `background:${vacDiff > 0 ? 'rgba(0,200,150,.15)' : vacDiff < 0 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)'};color:${vacDiff > 0 ? 'var(--current)' : vacDiff < 0 ? 'var(--danger)' : 'var(--muted)'};font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:8px`;
+    }
+    // notice
+    const na = state.noticeA, nb = state.noticeB;
+    if (na || nb) {
+      $('smNoticeCell').style.display = '';
+      $('smNoticeA').textContent = na ? na + ' mo' : '—';
+      $('smNoticeB').textContent = nb ? nb + ' mo' : '—';
+    }
+    $('simpleResult').style.display = 'block';
+    $('simpleResult').classList.add('fadein');
+    $('simpleResult').scrollIntoView({ behavior:'smooth', block:'start' });
+    getAI(a, b, pg, pn, py);
+    $('resultsWrap').style.display = 'block';
+    $('resultsWrap').classList.add('fadein');
+    return;
+  }
+
+  // ── DETAILED MODE ────────────────────────────────────────────────
   const pctStr = p => (p >= 0 ? '+' : '') + (p * 100).toFixed(1) + '%';
   const badgeHtml = (p) => {
-    const cls = p > 0.005 ? 'badge-up' : p < -0.005 ? 'badge-dn' : 'badge-eq';
     const txt = p > 0.005 ? pctStr(p) : p < -0.005 ? pctStr(p) : '≈';
     const bg  = p > 0.005 ? 'rgba(0,200,150,.15)' : p < -0.005 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)';
     const col = p > 0.005 ? 'var(--current)' : p < -0.005 ? 'var(--danger)' : 'var(--muted)';
@@ -1127,7 +1419,9 @@ async function getAI(a, b, pg, pn, py) {
   const factors = state.factors || [];
   let qualSection = '';
 
-  if (factors.length) {
+  // Only include factors in prompt when in detailed mode OR when user actually scored them
+  const hasCustomScores = factors.some(f => f.scoreA !== 5 || f.scoreB !== 5);
+  if (factors.length && (currentMode === 'detailed' || hasCustomScores)) {
 
     const totalWeight =
       factors.reduce((s, f) => s + (f.weight || 0), 0) || 1;
@@ -1138,7 +1432,12 @@ async function getAI(a, b, pg, pn, py) {
     const scoreB =
       factors.reduce((s, f) => s + (f.scoreB * f.weight / totalWeight), 0);
 
-    const rows = factors.map(f =>
+    // Only list factors that were actually customised to keep prompt concise
+    const scoredFactors = currentMode === 'detailed'
+      ? factors
+      : factors.filter(f => f.scoreA !== 5 || f.scoreB !== 5);
+
+    const rows = scoredFactors.map(f =>
       `  - ${tFactorName(f)}: ${coA}=${f.scoreA}/10, ${coB}=${f.scoreB}/10 (weight ${f.weight}%)`
     ).join('\n');
 
@@ -1148,28 +1447,17 @@ ${rows}`;
 
   }
 
-  const prompt = `You are a sharp career and compensation advisor.
+  const prompt = `You are a sharp HR and compensation advisor specializing in the Saudi Arabian job market.
 
-A professional in Saudi Arabia is comparing two job offers.
+A professional is comparing two job offers.${state.hrContext ? `\nContext: ${state.hrContext}` : ''}
 
 ${coA}:
-Gross SAR ${fmt(a.gross)}/mo
-Net SAR ${fmt(a.net)}/mo
-Overall monthly SAR ${fmt(a.overallSal)}
-Overall with benefits/year SAR ${fmt(a.yearBenefits)}
-Overall with benefits/month SAR ${fmt(a.overallBen)}
+Gross SAR ${fmt(a.gross)}/mo | Net SAR ${fmt(a.net)}/mo | Annual total SAR ${fmt(a.yearBenefits)}${state.vacA ? ` | Vacation: ${state.vacA} days/yr` : ''}${state.noticeA ? ` | Notice: ${state.noticeA} month(s)` : ''}
 
 ${coB}:
-Gross SAR ${fmt(b.gross)}/mo
-Net SAR ${fmt(b.net)}/mo
-Overall monthly SAR ${fmt(b.overallSal)}
-Overall with benefits/year SAR ${fmt(b.yearBenefits)}
-Overall with benefits/month SAR ${fmt(b.overallBen)}
+Gross SAR ${fmt(b.gross)}/mo | Net SAR ${fmt(b.net)}/mo | Annual total SAR ${fmt(b.yearBenefits)}${state.vacB ? ` | Vacation: ${state.vacB} days/yr` : ''}${state.noticeB ? ` | Notice: ${state.noticeB} month(s)` : ''}
 
-Salary changes:
-Gross ${(pg*100).toFixed(1)}%
-Net ${(pn*100).toFixed(1)}%
-Overall with benefits ${(py*100).toFixed(1)}%
+Financial change: Gross ${(pg*100).toFixed(1)}% | Net ${(pn*100).toFixed(1)}% | Total package ${(py*100).toFixed(1)}%
 ${qualSection}
 
 ${t('ai_lang_instruction')}
@@ -1236,8 +1524,8 @@ const STRINGS = {
     net_monthly_salary:'NET MONTHLY SALARY', qualitative_score:'QUALITATIVE SCORE',
     reset_btn:'↺ Reset', save_btn:'Save', portfolio_btn:'← Portfolio',
     reset_confirm:'Reset everything to defaults?', saved_txt:'✓ Saved',
-    gosi_note_saudi:'GOSI: 9.75% of (Basic + Housing), capped SAR 45,000',
-    gosi_note_non:'Non-Saudi: no GOSI deduction from employee',
+    gosi_note_saudi:'GOSI (employee share): 9.75% of (Basic + Housing), capped SAR 45,000',
+    gosi_note_non:'Non-Saudi: no GOSI deduction from employee salary',
     deduction_toggle:'Deduction — click to toggle', addition_toggle:'Addition — click to mark as deduction',
     weight_lbl:'WEIGHT %', remove_factor:'✕ Remove',
     ai_unavailable:'AI unavailable. The breakdown above tells the full story.',
@@ -1255,15 +1543,28 @@ const STRINGS = {
     multiplier_lbl:'SALARY MULTIPLIER', multiplier_unit:'× basic salaries of',
     pct_unit:'% of',
     built_by:'Built by', figures_note:'Figures are estimates',
+    mode_simple_label:'Quick Compare', mode_simple_sub:'Job Seeker · Fast answer',
+    mode_detailed_label:'Full Analysis', mode_detailed_sub:'HR / Finance · Every detail',
+    winner_label:'WINNER', winner_higher:'higher total package',
+    winner_tied_label:'RESULT', winner_tied:'Roughly Equal', winner_tied_sub:'Both offers are very close financially',
     field_basic:'Basic Salary', field_housing:'Housing Allowance',
     field_transport:'Transport Allowance', field_special:'Special Allowance',
     field_gosi:'GOSI', field_annual_bonus:'Annual Bonus',
     field_education:'Education Allowance', field_social:'Social Allowance',
     field_mobile:'Mobile Allowance', field_perf_bonus:'Performance Bonus',
     field_phone_bill:'Phone Bill',
-    factor_health:'Health Insurance', factor_remote:'Remote Work / Flexibility',
-    ref2_hint_ar:'أضف حقلاً ثانياً (مثلاً: التأمينات = الأساسي + السكن)',
-    ai_lang_instruction:'Respond in English.'
+    field_medical_ins:'Medical Insurance', field_flight_ticket:'Annual Flight Ticket',
+    factor_health:'Health Insurance Quality', factor_remote:'Remote Work / Flexibility',
+    factor_career_growth:'Career Growth & Learning', factor_management:'Management Quality',
+    factor_commute:'Commute & Location', factor_wlb:'Work-Life Balance',
+    factor_job_security:'Job Security & Stability', factor_brand:'Company Brand & Reputation',
+    hr_context_label:'Role & Context (optional)',
+    hr_context_placeholder:'e.g. Senior Engineer, 8 yrs exp, Riyadh',
+    vacation_lbl:'Vacation Days / Year', notice_lbl:'Notice Period (months)',
+    hr_context_hint:'Helps the AI give a more tailored recommendation',
+    vac_diff_lbl:'VACATION DIFF',
+    gratuity_title:'END-OF-SERVICE GRATUITY',
+    gratuity_note:'Not included above. KSA law: ½ month basic per year (first 5 yrs: ⅓ month). Factor this in for long-term offers — especially if switching from a senior role.'
   },
   ar: {
     tool_tag:'// الأداة_01', hero_h1_line1:'مقارنة', hero_h1_line2:'العروض الوظيفية',
@@ -1289,8 +1590,8 @@ const STRINGS = {
     net_monthly_salary:'صافي الراتب الشهري', qualitative_score:'النتيجة النوعية',
     reset_btn:'↺ إعادة تعيين', save_btn:'حفظ', portfolio_btn:'← المعرض',
     reset_confirm:'إعادة تعيين كل شيء إلى الإعدادات الافتراضية؟', saved_txt:'✓ تم الحفظ',
-    gosi_note_saudi:'التأمينات: 9.75% من (الأساسي + السكن)، بحد أقصى 45,000 ريال',
-    gosi_note_non:'غير سعودي: لا يوجد اشتراك تأمينات',
+    gosi_note_saudi:'التأمينات (حصة الموظف): 9.75% من (الأساسي + السكن)، بحد أقصى 45,000 ريال',
+    gosi_note_non:'غير سعودي: لا يوجد اشتراك تأمينات على الموظف',
     deduction_toggle:'خصم — انقر للتبديل', addition_toggle:'إضافة — انقر للتعيين كخصم',
     weight_lbl:'الوزن %', remove_factor:'✕ حذف',
     ai_unavailable:'الذكاء الاصطناعي غير متاح. التفاصيل أعلاه تكفي.',
@@ -1310,13 +1611,28 @@ const STRINGS = {
     multiplier_lbl:'مضاعف الراتب', multiplier_unit:'× أشهر من',
     pct_unit:'% من',
     built_by:'من تطوير', figures_note:'الأرقام تقديرية',
+    mode_simple_label:'مقارنة سريعة', mode_simple_sub:'الباحث عن عمل · جواب فوري',
+    mode_detailed_label:'تحليل شامل', mode_detailed_sub:'HR / المالية · كل التفاصيل',
+    winner_label:'الفائز', winner_higher:'أعلى في الحزمة الإجمالية',
+    winner_tied_label:'النتيجة', winner_tied:'متقاربان', winner_tied_sub:'كلا العرضين متقاربان مالياً',
     field_basic:'الراتب الأساسي', field_housing:'بدل السكن',
     field_transport:'بدل المواصلات', field_special:'البدل الخاص',
     field_gosi:'التأمينات الاجتماعية', field_annual_bonus:'المكافأة السنوية',
     field_education:'بدل التعليم', field_social:'البدل الاجتماعي',
     field_mobile:'بدل الاتصالات', field_perf_bonus:'مكافأة الأداء',
     field_phone_bill:'فاتورة الهاتف',
-    factor_health:'التأمين الصحي', factor_remote:'العمل عن بُعد / المرونة'
+    field_medical_ins:'التأمين الطبي', field_flight_ticket:'تذكرة السفر السنوية',
+    factor_health:'جودة التأمين الصحي', factor_remote:'العمل عن بُعد / المرونة',
+    factor_career_growth:'النمو الوظيفي والتعلم', factor_management:'جودة الإدارة',
+    factor_commute:'التنقل والموقع', factor_wlb:'التوازن بين العمل والحياة',
+    factor_job_security:'الاستقرار الوظيفي', factor_brand:'سمعة الشركة وعلامتها',
+    hr_context_label:'المسمى الوظيفي والسياق (اختياري)',
+    hr_context_placeholder:'مثال: مهندس أول، 8 سنوات خبرة، الرياض',
+    vacation_lbl:'أيام الإجازة / سنة', notice_lbl:'فترة الإشعار (أشهر)',
+    hr_context_hint:'يساعد الذكاء الاصطناعي على تقديم توصية أكثر دقة',
+    vac_diff_lbl:'فرق الإجازة',
+    gratuity_title:'مكافأة نهاية الخدمة',
+    gratuity_note:'غير مشمولة أعلاه. نظام العمل السعودي: نصف شهر لكل سنة (أول 5 سنوات: ثلث شهر). ضعها في الحسبان للعروض طويلة الأمد — خاصةً عند ترك منصب قيادي.'
   }
 };
 
@@ -1382,6 +1698,7 @@ function applyLang(lang) {
   renderFields('B');
   renderFactors();
   updateTabLabels();
+  updateModeLabels();
 
   // Persist lang
   localStorage.setItem('offer_lang', lang);
@@ -1409,12 +1726,17 @@ function resetAll() {
   renderFields('A');
   renderFields('B');
   $('resultsWrap').style.display = 'none';
+  $('simpleResult').style.display = 'none';
   state.factors = deepClone(DEFAULT_FACTORS);
   renderFactors();
   $('totalsBar').style.display = 'none';
   $('oYearA').textContent = '—'; $('oYearB').textContent = '—';
   $('oMonthA').textContent = '—'; $('oMonthB').textContent = '—';
   $('oYearBadge').textContent = ''; $('oMonthBadge').textContent = '';
+  // Clear HR context fields
+  $('hrContext').value = ''; $('vacA').value = ''; $('vacB').value = '';
+  $('noticeA').value = ''; $('noticeB').value = '';
+  updateVacDiff();
 }
 
 // ── Nationality ───────────────────────────────────────────────────
@@ -1422,6 +1744,8 @@ const nationality = { A: 'saudi', B: 'saudi' };
 
 function setNationality(side, nat) {
   nationality[side] = nat;
+  if (!state.nationality) state.nationality = {};
+  state.nationality[side] = nat;
   // Update buttons
   $('nat' + side + '_saudi').classList.toggle('active', nat === 'saudi');
   $('nat' + side + '_nonsaudi').classList.toggle('active', nat === 'nonsaudi');
@@ -1440,8 +1764,14 @@ function setNationality(side, nat) {
 
 // ── Qualitative Factors ──────────────────────────────────────────
 const DEFAULT_FACTORS = [
-  { id:'f1', name:'Health Insurance',       scoreA:5, scoreB:5, weight:10 },
-  { id:'f2', name:'Remote Work / Flexibility', scoreA:5, scoreB:5, weight:10 },
+  { id:'f1', name:'Health Insurance Quality',    scoreA:5, scoreB:5, weight:15 },
+  { id:'f2', name:'Remote Work / Flexibility',   scoreA:5, scoreB:5, weight:15 },
+  { id:'f3', name:'Career Growth & Learning',    scoreA:5, scoreB:5, weight:20 },
+  { id:'f4', name:'Management Quality',          scoreA:5, scoreB:5, weight:15 },
+  { id:'f5', name:'Commute & Location',          scoreA:5, scoreB:5, weight:10 },
+  { id:'f6', name:'Work-Life Balance',           scoreA:5, scoreB:5, weight:10 },
+  { id:'f7', name:'Job Security & Stability',    scoreA:5, scoreB:5, weight:10 },
+  { id:'f8', name:'Company Brand & Reputation',  scoreA:5, scoreB:5, weight:5  },
 ];
 
 
@@ -1573,7 +1903,9 @@ function updateTabLabels() {
 
 // ── Keyboard ──────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') calculate();
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    if (!$('popupOverlay').classList.contains('open')) calculate();
+  }
   if (e.key === 'Escape') closePopup();
 });
 
@@ -1851,6 +2183,20 @@ function resolveValueExport(f, fields) {
   }
   return f.value || 0;
 }
+
+// ── Close dropdown when tapping outside (mobile fix) ────────────
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.menu-wrap')) {
+    const menu = document.getElementById('headerMenu');
+    if (menu) menu.classList.remove('open');
+  }
+});
+document.addEventListener('touchstart', function(e) {
+  if (!e.target.closest('.menu-wrap')) {
+    const menu = document.getElementById('headerMenu');
+    if (menu) menu.classList.remove('open');
+  }
+}, { passive: true });
 </script>
 </body>
 </html>
