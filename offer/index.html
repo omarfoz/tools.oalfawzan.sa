@@ -549,16 +549,6 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
     </div>
   </div>
 
-
-  <!-- Gratuity reminder (detailed mode only) -->
-  <div class="detailed-only" style="background:rgba(243,177,75,.07);border:1px solid rgba(243,177,75,.2);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start">
-    <span style="font-size:.85rem;flex-shrink:0">⚠️</span>
-    <div>
-      <span style="font-size:.68rem;font-weight:700;color:var(--warn);letter-spacing:.04em;text-transform:uppercase" data-i18n="gratuity_title">END-OF-SERVICE GRATUITY</span>
-      <div style="font-size:.72rem;color:var(--muted2);margin-top:2px;line-height:1.6" data-i18n="gratuity_note">Not included above. KSA law: ½ month basic per year (first 5 yrs: ⅓ month). Factor this in for long-term offers — especially if switching from a senior role.</div>
-    </div>
-  </div>
-
   <div class="action-row inline-compare">
     <button class="calc-btn" onclick="calculate()"><span data-i18n="compare_btn">Compare Offers</span></button>
     <button class="export-btn detailed-only" onclick="exportExcel()" id="exportBtn"><span data-i18n="export_btn">⬇ Export Excel</span></button>
@@ -1578,9 +1568,7 @@ const STRINGS = {
     hr_context_placeholder:'e.g. Senior Engineer, 8 yrs exp, Riyadh',
     vacation_lbl:'Vacation Days / Year', notice_lbl:'Notice Period (months)',
     hr_context_hint:'Helps the AI give a more tailored recommendation',
-    vac_diff_lbl:'VACATION DIFF',
-    gratuity_title:'END-OF-SERVICE GRATUITY',
-    gratuity_note:'Not included above. KSA law: ½ month basic per year (first 5 yrs: ⅓ month). Factor this in for long-term offers — especially if switching from a senior role.'
+    vac_diff_lbl:'VACATION DIFF'
   },
   ar: {
     tool_tag:'// الأداة_01', hero_h1_line1:'مقارنة', hero_h1_line2:'العروض الوظيفية',
@@ -1646,9 +1634,7 @@ const STRINGS = {
     hr_context_placeholder:'مثال: مهندس أول، 8 سنوات خبرة، الرياض',
     vacation_lbl:'أيام الإجازة / سنة', notice_lbl:'فترة الإشعار (أشهر)',
     hr_context_hint:'يساعد الذكاء الاصطناعي على تقديم توصية أكثر دقة',
-    vac_diff_lbl:'فرق الإجازة',
-    gratuity_title:'مكافأة نهاية الخدمة',
-    gratuity_note:'غير مشمولة أعلاه. نظام العمل السعودي: نصف شهر لكل سنة (أول 5 سنوات: ثلث شهر). ضعها في الحسبان للعروض طويلة الأمد — خاصةً عند ترك منصب قيادي.'
+    vac_diff_lbl:'فرق الإجازة'
   }
 };
 
