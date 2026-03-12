@@ -20,6 +20,15 @@
     --sans: 'Syne', sans-serif;
     --mono: 'DM Mono', monospace;
 }
+:root[data-theme="light"] {
+    --bg: #f7f8fc;
+    --surface: #ffffff;
+    --border: rgba(16,24,40,0.12);
+    --text: #111827;
+    --muted: #667085;
+    --accent: #005fcb;
+    --green: #069c6b;
+}
 body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
 body::before {
     content: '';
@@ -34,6 +43,7 @@ body::before {
 header { padding: 32px 0 64px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
 .logo { font-size: 0.85rem; font-weight: 600; color: var(--muted); text-decoration: none; letter-spacing: 0.05em; }
 .logo span { color: var(--text); }
+.theme-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;min-height:42px;padding:0 12px;cursor:pointer}
 
 .hero { padding: 0 0 72px; }
 .hero-tag {
@@ -96,7 +106,7 @@ footer a:hover { color: var(--text); }
 <div class="wrap">
     <header>
         <a href="https://tools.oalfawzan.sa" class="logo">tools.<span>oalfawzan.sa</span></a>
-        <a href="https://oalfawzan.sa" class="logo">← Back to portfolio</a>
+        <div style="display:flex;gap:8px;align-items:center"><button class="theme-btn" id="themeBtn" type="button">☀️</button><a href="https://oalfawzan.sa" class="logo">← Back to portfolio</a></div>
     </header>
 
     <div class="hero">
@@ -137,5 +147,11 @@ footer a:hover { color: var(--text); }
         Built by <a href="https://oalfawzan.sa">Omar Alfawzan</a> · tools.oalfawzan.sa
     </footer>
 </div>
+<script>
+let currentTheme=localStorage.getItem('tools_theme')||'dark';
+function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);document.getElementById('themeBtn').textContent=currentTheme==='light'?'🌙':'☀️';}
+document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
+applyTheme(currentTheme);
+</script>
 </body>
 </html>

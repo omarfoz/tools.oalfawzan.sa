@@ -10,6 +10,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--sans:'Syne',sans-serif;--arabic:'Noto Sans Arabic',sans-serif;--mono:'DM Mono',monospace}
+:root[data-theme="light"]{--bg:#f7f8fc;--surface:#ffffff;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
 html[lang="ar"] body{font-family:var(--arabic)}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
@@ -41,6 +42,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
     <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
     <div class="header-actions">
       <button class="lang-btn" id="langBtn" type="button">EN</button>
+      <button class="lang-btn" id="themeBtn" type="button">☀️</button>
       <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
     </div>
   </header>
@@ -70,14 +72,14 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'Wheel of Names — tools.oalfawzan.sa',descMeta:'عجلة أسماء بسيطة لاختيار اسم عشوائي بسرعة.',tag:'// أداة',heading:'Wheel of Names',desc:'أدخل الأسماء (كل اسم في سطر) ثم لف العجلة لاختيار اسم عشوائي.',placeholder:'أحمد\nسارة\nليلى',spin:'لف العجلة',reset:'إعادة تعيين',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',winner:'الاسم المختار: '},
-  en:{lang:'en',dir:'ltr',title:'Wheel of Names — tools.oalfawzan.sa',descMeta:'Simple random name picker wheel.',tag:'// TOOL',heading:'Wheel of Names',desc:'Add names (one per line), spin the wheel, and get a random winner.',placeholder:'Alex\nSara\nLina',spin:'Spin',reset:'Reset',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',winner:'Selected name: '}
+  ar:{lang:'ar',dir:'rtl',title:'Wheel of Names — tools.oalfawzan.sa',descMeta:'عجلة أسماء بسيطة لاختيار اسم عشوائي بسرعة.',tag:'// أداة',heading:'Wheel of Names',desc:'أدخل الأسماء (كل اسم في سطر) ثم لف العجلة لاختيار اسم عشوائي.',placeholder:'أحمد\nسارة\nليلى',spin:'لف العجلة',reset:'إعادة تعيين',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',winner:'الاسم المختار: ',themeDark:'🌙',themeLight:'☀️'},
+  en:{lang:'en',dir:'ltr',title:'Wheel of Names — tools.oalfawzan.sa',descMeta:'Simple random name picker wheel.',tag:'// TOOL',heading:'Wheel of Names',desc:'Add names (one per line), spin the wheel, and get a random winner.',placeholder:'Alex\nSara\nLina',spin:'Spin',reset:'Reset',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',winner:'Selected name: ',themeDark:'🌙',themeLight:'☀️'}
 };
 const canvas=document.getElementById('wheelCanvas');
 const ctx=canvas.getContext('2d');
 const namesInput=document.getElementById('namesInput');
 const resultText=document.getElementById('resultText');
-let rotation=0, spinning=false, currentLang=localStorage.getItem('tools_lang')||'ar';
+let rotation=0, spinning=false, currentLang=localStorage.getItem('tools_lang')||'ar', currentTheme=localStorage.getItem('tools_theme')||'dark';
 const colors=['#007AFF','#00c896','#7f5af0','#ff8a00','#1f9d9d','#d95f5f','#5aa9ff','#9f86ff'];
 
 function getNames(){return namesInput.value.split('\n').map(v=>v.trim()).filter(Boolean).slice(0,20)}
@@ -99,7 +101,7 @@ function drawWheel(){
 }
 
 function pickWinner(){
-  const names=getNames(); if(names.length<2){resultText.textContent=''; return}
+  const names=getNames(); if(names.length<1){resultText.textContent=''; return}
   if(spinning) return;
   spinning=true;
   resultText.textContent='';
@@ -110,8 +112,9 @@ function pickWinner(){
     rotation=start+(end-start)*ease; drawWheel();
     if(p<1) requestAnimationFrame(animate); else{
       spinning=false;
-      const final=((Math.PI*2-(rotation%(Math.PI*2)))%(Math.PI*2));
-      const idx=Math.floor((final/(Math.PI*2))*names.length)%names.length;
+      const normalized=((Math.PI*1.5-(rotation%(Math.PI*2)))%(Math.PI*2)+(Math.PI*2))%(Math.PI*2);
+      const slice=(Math.PI*2)/names.length;
+      const idx=Math.floor(normalized/slice)%names.length;
       resultText.textContent=STRINGS[currentLang].winner+names[idx];
     }
   }
@@ -127,13 +130,16 @@ function applyLang(lang){
   document.getElementById('desc').textContent=s.desc;namesInput.placeholder=s.placeholder;
   document.getElementById('spinBtn').textContent=s.spin;document.getElementById('resetBtn').textContent=s.reset;
   document.getElementById('backLink').textContent=s.back;document.getElementById('builtBy').textContent=s.builtBy;
-  document.getElementById('langBtn').textContent=s.langBtn;localStorage.setItem('tools_lang',lang);
+  document.getElementById('langBtn').textContent=s.langBtn;document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);localStorage.setItem('tools_lang',lang);
 }
+function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight)}
 
 document.getElementById('spinBtn').addEventListener('click',pickWinner);
 document.getElementById('resetBtn').addEventListener('click',resetAll);
 document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
+document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
 namesInput.addEventListener('input',drawWheel);
+applyTheme(currentTheme);
 applyLang(currentLang);
 namesInput.value='';drawWheel();
 </script>

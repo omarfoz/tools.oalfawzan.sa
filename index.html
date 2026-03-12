@@ -10,6 +10,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--sans:'Syne',sans-serif;--arabic:'Noto Sans Arabic',sans-serif;--mono:'DM Mono',monospace;--space:clamp(14px,2.5vw,22px)}
+:root[data-theme="light"]{--bg:#f7f8fc;--surface:#ffffff;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
 html[lang="ar"] body{font-family:var(--arabic)}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
@@ -45,6 +46,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
     <a href="https://tools.oalfawzan.sa" class="logo">tools.<span>oalfawzan.sa</span></a>
     <div class="header-actions">
       <button class="lang-btn" id="langBtn" type="button">EN</button>
+      <button class="lang-btn" id="themeBtn" type="button">☀️</button>
       <a href="https://oalfawzan.sa" class="logo" id="backLink">← العودة للملف الشخصي</a>
     </div>
   </header>
@@ -96,11 +98,18 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'الأدوات — tools.oalfawzan.sa',description:'مجموعة أدوات عملية من عمر الفوزان للمقارنة واتخاذ القرار بسرعة.',tag:'// الأدوات',heroTitle:'أدوات صغيرة.<br><em>قرارات أكبر.</em>',heroDesc:'مجموعة متنامية من الأدوات العملية للقرارات اليومية — مصممة لتكون بسيطة وسريعة ومفيدة فعلًا.',offerName:'مقارن عروض العمل',offerDesc:'قارن بين عرضين وظيفيين جنبًا إلى جنب: صافي الراتب، الإجمالي السنوي، المزايا، وتوصية ذكية.',liveTag:'متاح الآن',wheelName:'عجلة الأسماء',wheelDesc:'أدخل مجموعة أسماء ولف العجلة لاختيار اسم عشوائي بسرعة.',qrName:'مولد QR',qrDesc:'أنشئ رمز QR للنصوص والروابط مع خيار تنزيل الصورة.',jsonName:'منسق JSON',jsonDesc:'نسّق أو صغّر JSON بسرعة مع التحقق من الصحة ونسخ الناتج.',back:'← العودة للملف الشخصي',builtBy:'من تطوير',langBtn:'EN'},
-  en:{lang:'en',dir:'ltr',title:'Tools — tools.oalfawzan.sa',description:'Useful tools by Omar Alfawzan. Quick practical web tools.',tag:'// TOOLS',heroTitle:'Small tools.<br><em>Big decisions.</em>',heroDesc:'A growing collection of practical tools for everyday decisions — built to be simple, fast, and actually useful.',offerName:'Job Offer Comparator',offerDesc:'Compare two job offers side by side: net salary, yearly total, benefits, and an AI recommendation.',liveTag:'LIVE',wheelName:'Wheel of Names',wheelDesc:'Enter multiple names and spin the wheel to pick one at random.',qrName:'QR Generator',qrDesc:'Generate a QR code from text or URLs and download it as an image.',jsonName:'JSON Formatter',jsonDesc:'Format or minify JSON instantly with validation and copy output.',back:'← Back to portfolio',builtBy:'Built by',langBtn:'عربي'}
+  ar:{lang:'ar',dir:'rtl',title:'الأدوات — tools.oalfawzan.sa',description:'مجموعة أدوات عملية من عمر الفوزان للمقارنة واتخاذ القرار بسرعة.',tag:'// الأدوات',heroTitle:'أدوات صغيرة.<br><em>قرارات أكبر.</em>',heroDesc:'مجموعة متنامية من الأدوات العملية للقرارات اليومية — مصممة لتكون بسيطة وسريعة ومفيدة فعلًا.',offerName:'مقارن عروض العمل',offerDesc:'قارن بين عرضين وظيفيين جنبًا إلى جنب: صافي الراتب، الإجمالي السنوي، المزايا، وتوصية ذكية.',liveTag:'متاح الآن',wheelName:'عجلة الأسماء',wheelDesc:'أدخل مجموعة أسماء ولف العجلة لاختيار اسم عشوائي بسرعة.',qrName:'مولد QR',qrDesc:'أنشئ رمز QR للنصوص والروابط مع خيار تنزيل الصورة.',jsonName:'منسق JSON',jsonDesc:'نسّق أو صغّر JSON بسرعة مع التحقق من الصحة ونسخ الناتج.',back:'← العودة للملف الشخصي',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️'},
+  en:{lang:'en',dir:'ltr',title:'Tools — tools.oalfawzan.sa',description:'Useful tools by Omar Alfawzan. Quick practical web tools.',tag:'// TOOLS',heroTitle:'Small tools.<br><em>Big decisions.</em>',heroDesc:'A growing collection of practical tools for everyday decisions — built to be simple, fast, and actually useful.',offerName:'Job Offer Comparator',offerDesc:'Compare two job offers side by side: net salary, yearly total, benefits, and an AI recommendation.',liveTag:'LIVE',wheelName:'Wheel of Names',wheelDesc:'Enter multiple names and spin the wheel to pick one at random.',qrName:'QR Generator',qrDesc:'Generate a QR code from text or URLs and download it as an image.',jsonName:'JSON Formatter',jsonDesc:'Format or minify JSON instantly with validation and copy output.',back:'← Back to portfolio',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️'}
 };
 
 let currentLang=localStorage.getItem('tools_lang')||'ar';
+let currentTheme=localStorage.getItem('tools_theme')||'dark';
+function applyTheme(theme){
+  currentTheme=theme==='light'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',currentTheme);
+  localStorage.setItem('tools_theme',currentTheme);
+  document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight);
+}
 function applyLang(lang){
   const s=STRINGS[lang]||STRINGS.ar;
   currentLang=lang;
@@ -126,9 +135,12 @@ function applyLang(lang){
   document.getElementById('backLink').textContent=s.back;
   document.getElementById('builtBy').textContent=s.builtBy;
   document.getElementById('langBtn').textContent=s.langBtn;
+  document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
   localStorage.setItem('tools_lang',lang);
 }
 document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
+document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
+applyTheme(currentTheme);
 applyLang(currentLang);
 </script>
 </body>
