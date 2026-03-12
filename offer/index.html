@@ -63,6 +63,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 [dir="rtl"] .pct-row{flex-direction:row-reverse}
 [dir="rtl"] .pct-row input,[dir="rtl"] .pct-row select{direction:ltr}
 [dir="rtl"] .factor-score-bar{flex-direction:row-reverse}
+[dir="rtl"] .factor-slider{direction:ltr}
 
 /* ── Layout ── */
 .wrap{max-width:1100px;margin:0 auto;padding:0 16px;position:relative;z-index:1}
@@ -506,20 +507,7 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
 
   <!-- HR Context Panel -->
   <div class="factors-card detailed-only" id="hrContextCard" style="margin-bottom:10px">
-    <div class="factors-header" style="margin-bottom:12px">
-      <div>
-        <div class="factors-title"><span data-i18n="hr_context_label">Role &amp; Context (optional)</span></div>
-        <div style="font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-top:4px"><span data-i18n="hr_context_hint">Helps the AI give a more tailored recommendation</span></div>
-      </div>
-    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-      <div style="grid-column:1/-1">
-        <input class="co-name-input" id="hrContext" type="text"
-          data-i18n-ph="hr_context_placeholder"
-          placeholder="e.g. Senior Engineer, 8 yrs exp, Riyadh"
-          style="border-top:none;font-size:.85rem;font-weight:400"
-          oninput="autosave()">
-      </div>
       <div>
         <div class="section-label" style="margin-bottom:6px"><span data-i18n="vacation_lbl">Vacation Days / Year</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
@@ -825,8 +813,7 @@ function init() {
   renderFields('A');
   renderFields('B');
 
-  // Restore HR context fields
-  if (state.hrContext)  $('hrContext').value  = state.hrContext;
+  // Restore vacation/notice fields
   if (state.vacA != null) $('vacA').value  = state.vacA;
   if (state.vacB != null) $('vacB').value  = state.vacB;
   if (state.noticeA != null) $('noticeA').value = state.noticeA;
@@ -847,7 +834,6 @@ function init() {
     if (note) note.textContent = nat === 'saudi' ? t('gosi_note_saudi') : t('gosi_note_non');
   });
 
-  $('hrContext').addEventListener('input', e => { state.hrContext = e.target.value; autosave(); });
   $('vacA').addEventListener('input', e => { state.vacA = +e.target.value || null; autosave(); updateVacDiff(); });
   $('vacB').addEventListener('input', e => { state.vacB = +e.target.value || null; autosave(); updateVacDiff(); });
   $('noticeA').addEventListener('input', e => { state.noticeA = +e.target.value || null; autosave(); });
@@ -1455,7 +1441,7 @@ ${rows}`;
 
   const prompt = `You are a sharp HR and compensation advisor specializing in the Saudi Arabian job market.
 
-A professional is comparing two job offers.${state.hrContext ? `\nContext: ${state.hrContext}` : ''}
+A professional is comparing two job offers.
 
 ${coA}:
 Gross SAR ${fmt(a.gross)}/mo | Net SAR ${fmt(a.net)}/mo | Annual total SAR ${fmt(a.yearBenefits)}${state.vacA ? ` | Vacation: ${state.vacA} days/yr` : ''}${state.noticeA ? ` | Notice: ${state.noticeA} month(s)` : ''}
@@ -1749,7 +1735,7 @@ function resetAll() {
   $('oMonthA').textContent = '—'; $('oMonthB').textContent = '—';
   $('oYearBadge').textContent = ''; $('oMonthBadge').textContent = '';
   // Clear HR context fields
-  $('hrContext').value = ''; $('vacA').value = ''; $('vacB').value = '';
+  $('vacA').value = ''; $('vacB').value = '';
   $('noticeA').value = ''; $('noticeB').value = '';
   updateVacDiff();
 }
