@@ -9,7 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Noto+Sans+Arabic:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--sans:'Syne',sans-serif;--arabic:'Noto Sans Arabic',sans-serif;--mono:'DM Mono',monospace}
+:root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--field-bg:#0d0d13;--sans:'Syne',sans-serif;--arabic:'Noto Sans Arabic',sans-serif;--mono:'DM Mono',monospace}
+:root[data-theme="light"]{--bg:#f7f8fc;--surface:#ffffff;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b;--field-bg:#ffffff}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}html[lang="ar"] body{font-family:var(--arabic)}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
 .wrap{max-width:920px;margin:0 auto;padding:0 20px 34px;position:relative;z-index:1}
@@ -19,7 +20,7 @@ header{padding:24px 0 28px;display:flex;align-items:center;justify-content:space
 .hero-tag{display:inline-block;font-family:var(--mono);font-size:.72rem;color:var(--green);border:1px solid rgba(0,200,150,.3);padding:4px 12px;border-radius:4px;margin-bottom:16px;letter-spacing:.08em}
 h1{font-size:clamp(1.7rem,7vw,2.7rem);margin-bottom:10px;line-height:1.15}p.sub{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:18px}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;display:grid;grid-template-columns:1fr 320px;gap:16px}
-textarea{width:100%;min-height:140px;background:#0d0d13;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font:400 .9rem/1.6 var(--mono);resize:vertical}
+textarea{width:100%;min-height:140px;background:var(--field-bg);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font:400 .9rem/1.6 var(--mono);resize:vertical}
 .helper{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:8px}
 .qr-box{background:#fff;border-radius:14px;padding:12px;display:flex;align-items:center;justify-content:center;min-height:280px}
 canvas{max-width:100%;height:auto}
@@ -36,6 +37,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
     <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
     <div class="header-actions">
       <button class="lang-btn" id="langBtn" type="button">EN</button>
+      <button class="lang-btn" id="themeBtn" type="button">☀️</button>
       <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
     </div>
   </header>
@@ -63,13 +65,14 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'QR Generator — tools.oalfawzan.sa',meta:'مولد QR سريع مع خيار تنزيل الصورة.',tag:'// أداة',heading:'QR Code Generator',desc:'اكتب نصًا أو رابطًا، ثم أنشئ رمز QR قابلًا للتنزيل.',placeholder:'https://tools.oalfawzan.sa',helper:'يدعم الروابط والنصوص العادية.',generate:'إنشاء QR',download:'تنزيل PNG',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',empty:'يرجى إدخال نص أو رابط أولًا.',ok:'تم إنشاء الرمز بنجاح.'},
-  en:{lang:'en',dir:'ltr',title:'QR Generator — tools.oalfawzan.sa',meta:'Fast QR generator with downloadable image.',tag:'// TOOL',heading:'QR Code Generator',desc:'Enter text or URL, generate a QR code, then download it.',placeholder:'https://tools.oalfawzan.sa',helper:'Supports both plain text and URLs.',generate:'Generate QR',download:'Download PNG',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',empty:'Please enter text or URL first.',ok:'QR code generated successfully.'}
+  ar:{lang:'ar',dir:'rtl',title:'QR Generator — tools.oalfawzan.sa',meta:'مولد QR سريع مع خيار تنزيل الصورة.',tag:'// أداة',heading:'QR Code Generator',desc:'اكتب نصًا أو رابطًا، ثم أنشئ رمز QR قابلًا للتنزيل.',placeholder:'https://tools.oalfawzan.sa',helper:'يدعم الروابط والنصوص العادية.',generate:'إنشاء QR',download:'تنزيل PNG',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',empty:'يرجى إدخال نص أو رابط أولًا.',ok:'تم إنشاء الرمز بنجاح.'},
+  en:{lang:'en',dir:'ltr',title:'QR Generator — tools.oalfawzan.sa',meta:'Fast QR generator with downloadable image.',tag:'// TOOL',heading:'QR Code Generator',desc:'Enter text or URL, generate a QR code, then download it.',placeholder:'https://tools.oalfawzan.sa',helper:'Supports both plain text and URLs.',generate:'Generate QR',download:'Download PNG',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',empty:'Please enter text or URL first.',ok:'QR code generated successfully.'}
 };
 const qrText=document.getElementById('qrText');
 const statusEl=document.getElementById('status');
 const qr=new QRious({element:document.getElementById('qrCanvas'),size:260,value:'https://tools.oalfawzan.sa',background:'white',foreground:'black'});
 let currentLang=localStorage.getItem('tools_lang')||'ar';
+let currentTheme=localStorage.getItem('tools_theme')||'dark';
 function generate(){
   const value=qrText.value.trim();
   if(!value){statusEl.textContent=STRINGS[currentLang].empty;return}
@@ -88,11 +91,15 @@ function applyLang(lang){
   document.getElementById('helper').textContent=s.helper;document.getElementById('generateBtn').textContent=s.generate;
   document.getElementById('downloadBtn').textContent=s.download;document.getElementById('backLink').textContent=s.back;
   document.getElementById('builtBy').textContent=s.builtBy;document.getElementById('langBtn').textContent=s.langBtn;
+  document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
   statusEl.textContent='';localStorage.setItem('tools_lang',lang);
 }
 document.getElementById('generateBtn').addEventListener('click',generate);
 document.getElementById('downloadBtn').addEventListener('click',download);
 document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
+function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight)}
+document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
+applyTheme(currentTheme);
 applyLang(currentLang);
 </script>
 </body>
