@@ -24,11 +24,11 @@ header{padding:24px 0 28px;display:flex;align-items:center;justify-content:space
 h1{font-size:clamp(1.7rem,7vw,2.7rem);margin-bottom:10px;line-height:1.15}p.sub{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:18px}
 .grid{display:grid;grid-template-columns:340px 1fr;gap:16px}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
-textarea{width:100%;min-height:220px;background:#0d0d13;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font:400 .9rem/1.6 var(--mono);resize:vertical}
+textarea{width:100%;min-height:220px;background:var(--field-bg);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font:400 .9rem/1.6 var(--mono);resize:vertical}
 .result{margin-top:14px;font-size:1.05rem;font-weight:700;min-height:30px;color:var(--green)}
 .wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
 .pointer{width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:24px solid var(--accent);margin-bottom:-8px;z-index:2}
-canvas{width:min(100%,460px);height:auto;background:#0d0d13;border:1px solid var(--border);border-radius:50%}
+canvas{width:min(100%,460px);height:auto;background:var(--field-bg);border:1px solid var(--border);border-radius:50%}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
 footer{text-align:center;padding:26px 0 10px;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
 a,button{outline:none}a:focus-visible,button:focus-visible,textarea:focus-visible{box-shadow:0 0 0 3px rgba(0,122,255,.35);border-color:rgba(0,122,255,.8)}
@@ -85,7 +85,7 @@ const colors=['#007AFF','#00c896','#7f5af0','#ff8a00','#1f9d9d','#d95f5f','#5aa9
 function getNames(){return namesInput.value.split('\n').map(v=>v.trim()).filter(Boolean).slice(0,20)}
 function drawWheel(){
   const names=getNames();
-  const list=names.length?names:['?'];
+  const list=names.length?names:[''];
   const n=list.length; const cx=230, cy=230, r=210;
   ctx.clearRect(0,0,460,460);
   ctx.save();ctx.translate(cx,cy);ctx.rotate(rotation);
@@ -96,7 +96,7 @@ function drawWheel(){
     ctx.save();ctx.rotate((a1+a2)/2);ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='600 16px sans-serif';
     ctx.fillText(list[i],r-18,6,130);ctx.restore();
   }
-  ctx.beginPath();ctx.arc(0,0,40,0,Math.PI*2);ctx.fillStyle='#0d0d13';ctx.fill();
+  ctx.beginPath();ctx.arc(0,0,40,0,Math.PI*2);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--wheel-center').trim();ctx.fill();
   ctx.restore();
 }
 
@@ -121,7 +121,7 @@ function pickWinner(){
   requestAnimationFrame(animate);
 }
 
-function resetAll(){rotation=0;resultText.textContent='';drawWheel();}
+function resetAll(){rotation=0;namesInput.value='';resultText.textContent='';drawWheel();}
 function applyLang(lang){
   const s=STRINGS[lang]||STRINGS.ar; currentLang=lang;
   document.documentElement.lang=s.lang;document.documentElement.dir=s.dir;document.title=s.title;
