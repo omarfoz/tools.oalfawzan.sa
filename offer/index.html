@@ -34,7 +34,7 @@
   --space:clamp(10px,2vw,14px);
   --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
-  --mobile-cta-offset:132px;
+  --mobile-cta-offset:112px;
 }
 html{-webkit-text-size-adjust:100%;background:var(--bg);overflow-x:clip}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;min-height:100dvh;overflow-x:clip;-webkit-tap-highlight-color:transparent;font-size:15px;line-height:1.5}
@@ -329,6 +329,17 @@ footer a:hover{color:var(--text)}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid rgba(0,122,255,.65);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 @media(max-width:420px){header{gap:10px}.header-actions{width:100%;justify-content:space-between}.logo{overflow-wrap:anywhere}.inline-compare.action-row{flex-direction:column}.inline-compare .export-btn{width:100%}}
+
+/* Defensive text wrapping to avoid overflow in RTL and long-label cases. */
+.card-label,.cmp-lbl,.overall-label,.summary-label,.total-label,.factors-title,.nat-note,.hero p{overflow-wrap:anywhere}
+
+@media(max-width:420px){
+  .field-row{flex-wrap:wrap;align-items:flex-start}
+  .field-name{flex-basis:100%}
+  .field-amount{width:100%}
+  .card-top{gap:8px;align-items:flex-start}
+  .add-field-btn{white-space:normal;text-align:center;line-height:1.2;padding:6px 10px}
+}
 
 /* Defensive text wrapping to avoid overflow in RTL and long-label cases. */
 .card-label,.cmp-lbl,.overall-label,.summary-label,.total-label,.factors-title,.nat-note,.hero p{overflow-wrap:anywhere}
