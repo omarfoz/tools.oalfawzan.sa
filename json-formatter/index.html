@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON Formatter — tools.oalfawzan.sa</title>
+<meta name="description" content="منسق JSON سريع للنسخ والتحقق." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Noto+Sans+Arabic:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--danger:#ff5f6d;--sans:'Syne',sans-serif;--arabic:'Noto Sans Arabic',sans-serif;--mono:'DM Mono',monospace}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}html[lang="ar"] body{font-family:var(--arabic)}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
+.wrap{max-width:1020px;margin:0 auto;padding:0 20px 34px;position:relative;z-index:1}
+header{padding:24px 0 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.logo{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;letter-spacing:.05em}.logo span{color:var(--text)}
+.lang-btn,.btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:0 14px;min-height:44px;cursor:pointer;font-size:.82rem;font-weight:700}.btn.primary{background:rgba(0,122,255,.12);border-color:rgba(0,122,255,.4)}
+.hero-tag{display:inline-block;font-family:var(--mono);font-size:.72rem;color:var(--green);border:1px solid rgba(0,200,150,.3);padding:4px 12px;border-radius:4px;margin-bottom:16px;letter-spacing:.08em}
+h1{font-size:clamp(1.7rem,7vw,2.7rem);margin-bottom:10px;line-height:1.15}p.sub{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:18px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px}
+.editors{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+textarea{width:100%;min-height:280px;background:#0d0d13;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px;font:400 .88rem/1.65 var(--mono);resize:vertical}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 8px}
+.status{font-family:var(--mono);font-size:.76rem;min-height:20px;color:var(--green)}.status.error{color:var(--danger)}
+footer{text-align:center;padding:26px 0 10px;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+html[dir="rtl"] .header-actions{flex-direction:row-reverse}
+@media(max-width:860px){.editors{grid-template-columns:1fr}textarea{min-height:210px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
+  <div class="header-actions">
+    <button class="lang-btn" id="langBtn" type="button">EN</button>
+    <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
+  </div>
+</header>
+<div class="hero-tag" id="tag">// أداة</div>
+<h1 id="title">JSON Formatter</h1>
+<p class="sub" id="desc">ألصق JSON، ثم نسّقه أو صغّره وتحقق من صحته فورًا.</p>
+<section class="panel">
+  <div class="actions">
+    <button class="btn primary" id="formatBtn" type="button">تنسيق</button>
+    <button class="btn" id="minifyBtn" type="button">تصغير</button>
+    <button class="btn" id="copyBtn" type="button">نسخ الناتج</button>
+    <button class="btn" id="clearBtn" type="button">مسح</button>
+  </div>
+  <div class="status" id="status"></div>
+  <div class="editors">
+    <textarea id="inputJson" placeholder='{"project":"tools"}'></textarea>
+    <textarea id="outputJson" readonly></textarea>
+  </div>
+</section>
+<footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
+</div>
+<script>
+const STRINGS={
+  ar:{lang:'ar',dir:'rtl',title:'JSON Formatter — tools.oalfawzan.sa',meta:'منسق JSON سريع للنسخ والتحقق.',tag:'// أداة',heading:'JSON Formatter',desc:'ألصق JSON، ثم نسّقه أو صغّره وتحقق من صحته فورًا.',format:'تنسيق',minify:'تصغير',copy:'نسخ الناتج',clear:'مسح',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',placeholder:'{"project":"tools"}',ok:'JSON صالح.',copyOk:'تم النسخ.',empty:'لا يوجد JSON للإخراج.',invalid:'JSON غير صالح: '},
+  en:{lang:'en',dir:'ltr',title:'JSON Formatter — tools.oalfawzan.sa',meta:'Fast JSON formatter and validator.',tag:'// TOOL',heading:'JSON Formatter',desc:'Paste JSON, then format, minify, and validate instantly.',format:'Format',minify:'Minify',copy:'Copy Output',clear:'Clear',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',placeholder:'{"project":"tools"}',ok:'Valid JSON.',copyOk:'Copied.',empty:'No output to copy.',invalid:'Invalid JSON: '}
+};
+let currentLang=localStorage.getItem('tools_lang')||'ar';
+const input=document.getElementById('inputJson');const output=document.getElementById('outputJson');const status=document.getElementById('status');
+function parseJSON(){const raw=input.value.trim();if(!raw) throw new Error('empty');return JSON.parse(raw)}
+function setStatus(msg,isError=false){status.classList.toggle('error',isError);status.textContent=msg}
+function formatJSON(){try{output.value=JSON.stringify(parseJSON(),null,2);setStatus(STRINGS[currentLang].ok)}catch(e){setStatus(e.message==='empty'?'':STRINGS[currentLang].invalid+e.message,true)}}
+function minifyJSON(){try{output.value=JSON.stringify(parseJSON());setStatus(STRINGS[currentLang].ok)}catch(e){setStatus(e.message==='empty'?'':STRINGS[currentLang].invalid+e.message,true)}}
+async function copyOut(){if(!output.value.trim()){setStatus(STRINGS[currentLang].empty,true);return}await navigator.clipboard.writeText(output.value);setStatus(STRINGS[currentLang].copyOk)}
+function clearAll(){input.value='';output.value='';setStatus('')}
+function applyLang(lang){
+  const s=STRINGS[lang]||STRINGS.ar;currentLang=lang;
+  document.documentElement.lang=s.lang;document.documentElement.dir=s.dir;document.title=s.title;
+  document.querySelector('meta[name="description"]').setAttribute('content',s.meta);
+  document.getElementById('tag').textContent=s.tag;document.getElementById('title').textContent=s.heading;
+  document.getElementById('desc').textContent=s.desc;document.getElementById('formatBtn').textContent=s.format;
+  document.getElementById('minifyBtn').textContent=s.minify;document.getElementById('copyBtn').textContent=s.copy;
+  document.getElementById('clearBtn').textContent=s.clear;document.getElementById('backLink').textContent=s.back;
+  document.getElementById('builtBy').textContent=s.builtBy;document.getElementById('langBtn').textContent=s.langBtn;
+  input.placeholder=s.placeholder;setStatus('');localStorage.setItem('tools_lang',lang);
+}
+document.getElementById('formatBtn').addEventListener('click',formatJSON);
+document.getElementById('minifyBtn').addEventListener('click',minifyJSON);
+document.getElementById('copyBtn').addEventListener('click',copyOut);
+document.getElementById('clearBtn').addEventListener('click',clearAll);
+document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
+applyLang(currentLang);
+</script>
+</body>
+</html>

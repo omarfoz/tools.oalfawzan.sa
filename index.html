@@ -64,21 +64,29 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
       <div class="tool-tag" id="liveTag">متاح الآن</div>
     </a>
 
-    <a href="/prompts/" class="tool-card t2 soon">
+    <a href="/wheel-of-names/" class="tool-card t2">
       <div class="tool-num">TOOL_02</div>
-      <div class="tool-icon">✦</div>
-      <div class="tool-name" id="promptName">مكتبة برومبتات الذكاء</div>
-      <div class="tool-desc" id="promptDesc">مكتبة منتقاة من البرومبتات للبرمجة والكتابة التقنية وتحليل المشكلات.</div>
-      <div class="tool-tag" id="comingTag1">قريبًا</div>
+      <div class="tool-icon">🎡</div>
+      <div class="tool-name" id="wheelName">عجلة الأسماء</div>
+      <div class="tool-desc" id="wheelDesc">أدخل مجموعة أسماء ولف العجلة لاختيار اسم عشوائي بسرعة.</div>
+      <div class="tool-tag" id="wheelTag">متاح الآن</div>
     </a>
 
-    <div class="tool-card soon">
+    <a href="/qr-generator/" class="tool-card t1">
       <div class="tool-num">TOOL_03</div>
-      <div class="tool-icon">◎</div>
-      <div class="tool-name" id="moreName">المزيد قادم</div>
-      <div class="tool-desc" id="moreDesc">نعمل على أدوات إضافية. اقتراحاتك مرحب بها.</div>
-      <div class="tool-tag" id="comingTag2">قريبًا</div>
-    </div>
+      <div class="tool-icon">🔳</div>
+      <div class="tool-name" id="qrName">مولد QR</div>
+      <div class="tool-desc" id="qrDesc">أنشئ رمز QR للنصوص والروابط مع خيار تنزيل الصورة.</div>
+      <div class="tool-tag" id="qrTag">متاح الآن</div>
+    </a>
+
+    <a href="/json-formatter/" class="tool-card t2">
+      <div class="tool-num">TOOL_04</div>
+      <div class="tool-icon">🧩</div>
+      <div class="tool-name" id="jsonName">منسق JSON</div>
+      <div class="tool-desc" id="jsonDesc">نسّق أو صغّر JSON بسرعة مع التحقق من الصحة ونسخ الناتج.</div>
+      <div class="tool-tag" id="jsonTag">متاح الآن</div>
+    </a>
   </section>
 
   <footer>
@@ -88,8 +96,8 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'الأدوات — tools.oalfawzan.sa',description:'مجموعة أدوات عملية من عمر الفوزان للمقارنة واتخاذ القرار بسرعة.',tag:'// الأدوات',heroTitle:'أدوات صغيرة.<br><em>قرارات أكبر.</em>',heroDesc:'مجموعة متنامية من الأدوات العملية للقرارات اليومية — مصممة لتكون بسيطة وسريعة ومفيدة فعلًا.',offerName:'مقارن عروض العمل',offerDesc:'قارن بين عرضين وظيفيين جنبًا إلى جنب: صافي الراتب، الإجمالي السنوي، المزايا، وتوصية ذكية.',liveTag:'متاح الآن',promptName:'مكتبة برومبتات الذكاء',promptDesc:'مكتبة منتقاة من البرومبتات للبرمجة والكتابة التقنية وتحليل المشكلات.',coming:'قريبًا',moreName:'المزيد قادم',moreDesc:'نعمل على أدوات إضافية. اقتراحاتك مرحب بها.',back:'← العودة للملف الشخصي',builtBy:'من تطوير',langBtn:'EN'},
-  en:{lang:'en',dir:'ltr',title:'Tools — tools.oalfawzan.sa',description:'Useful tools by Omar Alfawzan. Job offer comparator and more.',tag:'// TOOLS',heroTitle:'Small tools.<br><em>Big decisions.</em>',heroDesc:'A growing collection of practical tools for everyday decisions — built to be simple, fast, and actually useful.',offerName:'Job Offer Comparator',offerDesc:'Compare two job offers side by side: net salary, yearly total, benefits, and an AI recommendation.',liveTag:'LIVE',promptName:'AI Prompt Library',promptDesc:'A curated prompt library for coding, technical writing, and debugging workflows.',coming:'COMING SOON',moreName:'More coming',moreDesc:'More tools are in the works. Ideas are welcome.',back:'← Back to portfolio',builtBy:'Built by',langBtn:'عربي'}
+  ar:{lang:'ar',dir:'rtl',title:'الأدوات — tools.oalfawzan.sa',description:'مجموعة أدوات عملية من عمر الفوزان للمقارنة واتخاذ القرار بسرعة.',tag:'// الأدوات',heroTitle:'أدوات صغيرة.<br><em>قرارات أكبر.</em>',heroDesc:'مجموعة متنامية من الأدوات العملية للقرارات اليومية — مصممة لتكون بسيطة وسريعة ومفيدة فعلًا.',offerName:'مقارن عروض العمل',offerDesc:'قارن بين عرضين وظيفيين جنبًا إلى جنب: صافي الراتب، الإجمالي السنوي، المزايا، وتوصية ذكية.',liveTag:'متاح الآن',wheelName:'عجلة الأسماء',wheelDesc:'أدخل مجموعة أسماء ولف العجلة لاختيار اسم عشوائي بسرعة.',qrName:'مولد QR',qrDesc:'أنشئ رمز QR للنصوص والروابط مع خيار تنزيل الصورة.',jsonName:'منسق JSON',jsonDesc:'نسّق أو صغّر JSON بسرعة مع التحقق من الصحة ونسخ الناتج.',back:'← العودة للملف الشخصي',builtBy:'من تطوير',langBtn:'EN'},
+  en:{lang:'en',dir:'ltr',title:'Tools — tools.oalfawzan.sa',description:'Useful tools by Omar Alfawzan. Quick practical web tools.',tag:'// TOOLS',heroTitle:'Small tools.<br><em>Big decisions.</em>',heroDesc:'A growing collection of practical tools for everyday decisions — built to be simple, fast, and actually useful.',offerName:'Job Offer Comparator',offerDesc:'Compare two job offers side by side: net salary, yearly total, benefits, and an AI recommendation.',liveTag:'LIVE',wheelName:'Wheel of Names',wheelDesc:'Enter multiple names and spin the wheel to pick one at random.',qrName:'QR Generator',qrDesc:'Generate a QR code from text or URLs and download it as an image.',jsonName:'JSON Formatter',jsonDesc:'Format or minify JSON instantly with validation and copy output.',back:'← Back to portfolio',builtBy:'Built by',langBtn:'عربي'}
 };
 
 let currentLang=localStorage.getItem('tools_lang')||'ar';
@@ -106,12 +114,15 @@ function applyLang(lang){
   document.getElementById('offerName').textContent=s.offerName;
   document.getElementById('offerDesc').textContent=s.offerDesc;
   document.getElementById('liveTag').textContent=s.liveTag;
-  document.getElementById('promptName').textContent=s.promptName;
-  document.getElementById('promptDesc').textContent=s.promptDesc;
-  document.getElementById('comingTag1').textContent=s.coming;
-  document.getElementById('moreName').textContent=s.moreName;
-  document.getElementById('moreDesc').textContent=s.moreDesc;
-  document.getElementById('comingTag2').textContent=s.coming;
+  document.getElementById('wheelName').textContent=s.wheelName;
+  document.getElementById('wheelDesc').textContent=s.wheelDesc;
+  document.getElementById('wheelTag').textContent=s.liveTag;
+  document.getElementById('qrName').textContent=s.qrName;
+  document.getElementById('qrDesc').textContent=s.qrDesc;
+  document.getElementById('qrTag').textContent=s.liveTag;
+  document.getElementById('jsonName').textContent=s.jsonName;
+  document.getElementById('jsonDesc').textContent=s.jsonDesc;
+  document.getElementById('jsonTag').textContent=s.liveTag;
   document.getElementById('backLink').textContent=s.back;
   document.getElementById('builtBy').textContent=s.builtBy;
   document.getElementById('langBtn').textContent=s.langBtn;
