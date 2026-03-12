@@ -328,7 +328,18 @@ footer a:hover{color:var(--text)}
 
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid rgba(0,122,255,.65);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
-@media(max-width:420px){header{gap:10px}.header-actions{width:100%;justify-content:space-between}.logo{overflow-wrap:anywhere}.action-row{flex-direction:column}.export-btn{width:100%}}
+@media(max-width:420px){header{gap:10px}.header-actions{width:100%;justify-content:space-between}.logo{overflow-wrap:anywhere}.inline-compare.action-row{flex-direction:column}.inline-compare .export-btn{width:100%}}
+
+/* Defensive text wrapping to avoid overflow in RTL and long-label cases. */
+.card-label,.cmp-lbl,.overall-label,.summary-label,.total-label,.factors-title,.nat-note,.hero p{overflow-wrap:anywhere}
+
+@media(max-width:420px){
+  .field-row{flex-wrap:wrap;align-items:flex-start}
+  .field-name{flex-basis:100%}
+  .field-amount{width:100%}
+  .card-top{gap:8px;align-items:flex-start}
+  .add-field-btn{white-space:normal;text-align:center;line-height:1.2;padding:6px 10px}
+}
 
 /* Defensive text wrapping to avoid overflow in RTL and long-label cases. */
 .card-label,.cmp-lbl,.overall-label,.summary-label,.total-label,.factors-title,.nat-note,.hero p{overflow-wrap:anywhere}
@@ -436,7 +447,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
     </div>
   </div>
 
-  <div class="action-row">
+  <div class="action-row inline-compare">
     <button class="calc-btn" onclick="calculate()"><span data-i18n="compare_btn">Compare Offers</span></button>
     <button class="export-btn" onclick="exportExcel()" id="exportBtn"><span data-i18n="export_btn">⬇ Export Excel</span></button>
   </div>
@@ -631,11 +642,20 @@ const DEFAULTS = {
 let state = deepClone(DEFAULTS);
 let popupSide = null, popupEditId = null;
 
+function ensureSingleCompareRowOnMobile() {
+  // Guard against merge regressions where inline CTA misses `inline-compare` class.
+  const rows = document.querySelectorAll('.action-row');
+  if (rows.length >= 2 && !rows[0].classList.contains('inline-compare')) {
+    rows[0].classList.add('inline-compare');
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────
 function init() {
   // Always start in Arabic by default
   currentLang = 'ar';
   applyLang('ar');
+  ensureSingleCompareRowOnMobile();
 
   try {
     const saved = localStorage.getItem('offer_v31');
