@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Time Toolkit — tools.oalfawzan.sa</title>
+<title>عدة الوقت والتقويم — tools.oalfawzan.sa</title>
 <meta name="description" content="تحويل الوقت بين المناطق الزمنية، حساب فرق الأيام، وتحويل التاريخ الهجري والميلادي.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Noto+Sans+Arabic:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -11,29 +11,41 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--danger:#ff5f6d;--sans:'Syne',sans-serif;--arabic:'Noto Sans Arabic',sans-serif;--mono:'DM Mono',monospace}
 :root[data-theme="light"]{--bg:#f7f8fc;--surface:#ffffff;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b;--danger:#d92d20}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}html[lang="ar"] body{font-family:var(--arabic)}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+html[lang="ar"] body{font-family:var(--arabic)}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px 34px;position:relative;z-index:1}
-header{padding:24px 0 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+header{padding:24px 0 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .logo{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;letter-spacing:.05em}.logo span{color:var(--text)}
 .lang-btn,.btn,input,select{background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);min-height:44px;font-size:.84rem}
 .lang-btn,.btn{padding:0 14px;cursor:pointer;font-weight:700}
 .btn.primary{background:rgba(0,122,255,.12);border-color:rgba(0,122,255,.4)}
 .hero-tag{display:inline-block;font-family:var(--mono);font-size:.72rem;color:var(--green);border:1px solid rgba(0,200,150,.3);padding:4px 12px;border-radius:4px;margin-bottom:16px;letter-spacing:.08em}
 h1{font-size:clamp(1.8rem,7vw,2.8rem);margin-bottom:10px;line-height:1.15}
-p.sub{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:18px}
+p.sub{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.8;margin-bottom:20px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
 .panel h2{font-size:1.05rem;margin-bottom:12px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 label{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:.74rem;color:var(--muted)}
-input,select{padding:0 12px;font-family:var(--mono)}
+input,select{padding:0 12px;font-family:var(--mono);width:100%}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.result{margin-top:10px;padding:12px;border:1px dashed var(--border);border-radius:10px;font-family:var(--mono);font-size:.8rem;line-height:1.7;min-height:52px}
+.actions .btn{width:100%}
+.result{margin-top:10px;padding:12px;border:1px dashed var(--border);border-radius:10px;font-family:var(--mono);font-size:.8rem;line-height:1.8;min-height:58px;word-break:break-word}
 .result.error{border-color:rgba(255,95,109,.55);color:var(--danger)}
 footer{text-align:center;padding:26px 0 10px;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
 html[dir="rtl"] .header-actions{flex-direction:row-reverse}
-@media(max-width:900px){.grid,.form-grid{grid-template-columns:1fr}}
+@media(max-width:980px){.grid,.form-grid{grid-template-columns:1fr}}
+@media(max-width:640px){
+  .wrap{padding:0 14px 26px}
+  header{padding:16px 0 20px}
+  .header-actions{width:100%;justify-content:space-between}
+  .lang-btn{min-width:64px}
+  .logo{font-size:.8rem;overflow-wrap:anywhere}
+  .panel{padding:14px;border-radius:14px}
+  h1{font-size:1.65rem}
+}
 </style>
 </head>
 <body>
@@ -47,7 +59,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
   </div>
 </header>
 <div class="hero-tag" id="tag">// أداة وقت</div>
-<h1 id="title">Time Toolkit</h1>
+<h1 id="title">عدة الوقت والتقويم</h1>
 <p class="sub" id="desc">حوّل الوقت بين المدن، احسب فرق الأيام، وحوّل بين الهجري والميلادي بسرعة.</p>
 <section class="grid">
   <article class="panel">
@@ -96,99 +108,102 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 </div>
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'Time Toolkit — tools.oalfawzan.sa',meta:'تحويل الوقت بين المناطق الزمنية، حساب فرق الأيام، وتحويل التاريخ الهجري والميلادي.',tag:'// أداة وقت',heading:'Time Toolkit',desc:'حوّل الوقت بين المدن، احسب فرق الأيام، وحوّل بين الهجري والميلادي بسرعة.',tzHeading:'تحويل الوقت بين المناطق',date:'التاريخ',time:'الوقت',from:'من منطقة',to:'إلى منطقة',convertTime:'تحويل الوقت',daysHeading:'حاسبة الأيام',start:'من تاريخ',end:'إلى تاريخ',calcDays:'احسب الفرق',h2gHeading:'تحويل هجري → ميلادي',hy:'سنة هجرية',hm:'شهر هجري',hd:'يوم هجري',h2g:'حوّل لميلادي',g2hHeading:'تحويل ميلادي → هجري',gDate:'التاريخ الميلادي',g2h:'حوّل لهجري',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',badInput:'تحقق من المدخلات أولًا.',daysResult:'الفرق: {days} يوم (حوالي {weeks} أسبوع و {rest} يوم).',tzResult:'{date} — الوقت في {to}: {time}',h2gResult:'التاريخ الميلادي: {date}',g2hResult:'التاريخ الهجري: {date}'},
+  ar:{lang:'ar',dir:'rtl',title:'عدة الوقت والتقويم — tools.oalfawzan.sa',meta:'تحويل الوقت بين المناطق الزمنية، حساب فرق الأيام، وتحويل التاريخ الهجري والميلادي.',tag:'// أداة وقت',heading:'عدة الوقت والتقويم',desc:'حوّل الوقت بين المدن، احسب فرق الأيام، وحوّل بين الهجري والميلادي بسرعة.',tzHeading:'تحويل الوقت بين المناطق',date:'التاريخ',time:'الوقت',from:'من منطقة',to:'إلى منطقة',convertTime:'تحويل الوقت',daysHeading:'حاسبة الأيام',start:'من تاريخ',end:'إلى تاريخ',calcDays:'احسب الفرق',h2gHeading:'تحويل هجري → ميلادي',hy:'سنة هجرية',hm:'شهر هجري',hd:'يوم هجري',h2g:'حوّل لميلادي',g2hHeading:'تحويل ميلادي → هجري',gDate:'التاريخ الميلادي',g2h:'حوّل لهجري',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',badInput:'تحقق من المدخلات أولًا.',daysResult:'الفرق: {days} يوم (حوالي {weeks} أسبوع و {rest} يوم).',tzResult:'{date} — الوقت في {to}: {time}',h2gResult:'التاريخ الميلادي: {date}',g2hResult:'التاريخ الهجري: {date}'},
   en:{lang:'en',dir:'ltr',title:'Time Toolkit — tools.oalfawzan.sa',meta:'Convert time zones, calculate day differences, and convert Hijri/Gregorian dates.',tag:'// TIME TOOL',heading:'Time Toolkit',desc:'Convert time between cities, calculate day differences, and switch between Hijri and Gregorian dates.',tzHeading:'Time Zone Converter',date:'Date',time:'Time',from:'From Zone',to:'To Zone',convertTime:'Convert Time',daysHeading:'Days Calculator',start:'Start Date',end:'End Date',calcDays:'Calculate',h2gHeading:'Hijri → Gregorian',hy:'Hijri Year',hm:'Hijri Month',hd:'Hijri Day',h2g:'Convert to Gregorian',g2hHeading:'Gregorian → Hijri',gDate:'Gregorian Date',g2h:'Convert to Hijri',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',badInput:'Please check your inputs first.',daysResult:'Difference: {days} days (about {weeks} weeks and {rest} days).',tzResult:'{date} — time in {to}: {time}',h2gResult:'Gregorian date: {date}',g2hResult:'Hijri date: {date}'}
 };
 
+const ZONES=[
+  {value:'Asia/Riyadh',ar:'الرياض',en:'Riyadh'},
+  {value:'Asia/Dubai',ar:'دبي',en:'Dubai'},
+  {value:'Asia/Qatar',ar:'الدوحة',en:'Doha'},
+  {value:'Asia/Kuwait',ar:'الكويت',en:'Kuwait'},
+  {value:'Asia/Bahrain',ar:'البحرين',en:'Bahrain'},
+  {value:'Africa/Cairo',ar:'القاهرة',en:'Cairo'},
+  {value:'Europe/London',ar:'لندن',en:'London'},
+  {value:'Europe/Paris',ar:'باريس',en:'Paris'},
+  {value:'America/New_York',ar:'نيويورك',en:'New York'},
+  {value:'America/Los_Angeles',ar:'لوس أنجلوس',en:'Los Angeles'},
+  {value:'Asia/Tokyo',ar:'طوكيو',en:'Tokyo'},
+  {value:'UTC',ar:'التوقيت العالمي UTC',en:'UTC'}
+];
+
 let currentLang=localStorage.getItem('tools_lang')||'ar';
 let currentTheme=localStorage.getItem('tools_theme')||'dark';
-const zones=['Asia/Riyadh','Asia/Dubai','Asia/Qatar','Asia/Kuwait','Asia/Bahrain','Africa/Cairo','Europe/London','Europe/Paris','America/New_York','America/Los_Angeles','Asia/Tokyo','UTC'];
 const tzDate=document.getElementById('tzDate');
 const tzTime=document.getElementById('tzTime');
 const fromZone=document.getElementById('fromZone');
 const toZone=document.getElementById('toZone');
 
 function populateZones(){
-  const opts=zones.map(z=>`<option value="${z}">${z}</option>`).join('');
+  const opts=ZONES.map(z=>`<option value="${z.value}">${currentLang==='ar'?z.ar:z.en} (${z.value})</option>`).join('');
+  const fromValue=fromZone.value||'Asia/Riyadh';
+  const toValue=toZone.value||'UTC';
   fromZone.innerHTML=opts;toZone.innerHTML=opts;
-  fromZone.value='Asia/Riyadh';toZone.value='UTC';
+  fromZone.value=fromValue;toZone.value=toValue;
 }
 
 function formatInZone(ms,tz,lang){
   return new Intl.DateTimeFormat(lang==='ar'?'ar-SA':'en-GB',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(ms));
 }
-
 function zoneOffsetMinutes(ms,tz){
   const p=new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}).formatToParts(new Date(ms));
   const g=t=>+p.find(x=>x.type===t).value;
   const asUTC=Date.UTC(g('year'),g('month')-1,g('day'),g('hour'),g('minute'),g('second'));
   return (asUTC-ms)/60000;
 }
-
 function zonedToUtcMs(dateStr,timeStr,tz){
-  const [y,m,d]=dateStr.split('-').map(Number);const [hh,mm]=timeStr.split(':').map(Number);
+  const [y,m,d]=dateStr.split('-').map(Number);
+  const [hh,mm]=timeStr.split(':').map(Number);
   let ms=Date.UTC(y,m-1,d,hh,mm,0);
-  for(let i=0;i<4;i++){ms=Date.UTC(y,m-1,d,hh,mm,0)-zoneOffsetMinutes(ms,tz)*60000;}
+  for(let i=0;i<4;i++){ms=Date.UTC(y,m-1,d,hh,mm,0)-zoneOffsetMinutes(ms,tz)*60000}
   return ms;
 }
 
+function setResult(id,msg,isError=false){
+  const el=document.getElementById(id);
+  el.classList.toggle('error',isError);
+  el.textContent=msg;
+}
+
 function convertTime(){
-  const res=document.getElementById('tzResult');res.classList.remove('error');
-  if(!tzDate.value||!tzTime.value){res.textContent=STRINGS[currentLang].badInput;res.classList.add('error');return;}
+  if(!tzDate.value||!tzTime.value){setResult('tzResult',STRINGS[currentLang].badInput,true);return;}
   try{
     const utcMs=zonedToUtcMs(tzDate.value,tzTime.value,fromZone.value);
     const target=formatInZone(utcMs,toZone.value,currentLang);
-    res.textContent=STRINGS[currentLang].tzResult.replace('{date}',tzDate.value+' '+tzTime.value).replace('{to}',toZone.value).replace('{time}',target);
-  }catch(e){res.textContent=STRINGS[currentLang].badInput;res.classList.add('error');}
+    const zoneName=toZone.options[toZone.selectedIndex]?.textContent||toZone.value;
+    setResult('tzResult',STRINGS[currentLang].tzResult.replace('{date}',`${tzDate.value} ${tzTime.value}`).replace('{to}',zoneName).replace('{time}',target));
+  }catch(e){setResult('tzResult',STRINGS[currentLang].badInput,true)}
 }
 
 function calcDays(){
-  const res=document.getElementById('daysResult');res.classList.remove('error');
-  const a=document.getElementById('startDate').value;const b=document.getElementById('endDate').value;
-  if(!a||!b){res.textContent=STRINGS[currentLang].badInput;res.classList.add('error');return;}
-  const d1=new Date(a+'T00:00:00Z');const d2=new Date(b+'T00:00:00Z');
+  const a=document.getElementById('startDate').value;
+  const b=document.getElementById('endDate').value;
+  if(!a||!b){setResult('daysResult',STRINGS[currentLang].badInput,true);return;}
+  const d1=new Date(`${a}T00:00:00Z`);
+  const d2=new Date(`${b}T00:00:00Z`);
   const days=Math.abs(Math.round((d2-d1)/86400000));
-  const weeks=Math.floor(days/7);const rest=days%7;
-  res.textContent=STRINGS[currentLang].daysResult.replace('{days}',days).replace('{weeks}',weeks).replace('{rest}',rest);
+  const weeks=Math.floor(days/7);
+  setResult('daysResult',STRINGS[currentLang].daysResult.replace('{days}',days).replace('{weeks}',weeks).replace('{rest}',days%7));
 }
 
 function islamicToJD(y,m,d){return d+Math.ceil(29.5*(m-1))+(y-1)*354+Math.floor((3+11*y)/30)+1948439.5-1}
-function jdToGregorian(jd){
-  const z=Math.floor(jd+0.5);let a=z;
-  const alpha=Math.floor((a-1867216.25)/36524.25);a+=1+alpha-Math.floor(alpha/4);
-  const b=a+1524;const c=Math.floor((b-122.1)/365.25);const d=Math.floor(365.25*c);
-  const e=Math.floor((b-d)/30.6001);const day=b-d-Math.floor(30.6001*e);
-  const month=e<14?e-1:e-13;const year=month>2?c-4716:c-4715;
-  return {year,month,day};
-}
-function gregorianToJD(y,m,d){
-  const a=Math.floor((14-m)/12);const y2=y+4800-a;const m2=m+12*a-3;
-  return d+Math.floor((153*m2+2)/5)+365*y2+Math.floor(y2/4)-Math.floor(y2/100)+Math.floor(y2/400)-32045;
-}
-function jdToIslamic(jd){
-  jd=Math.floor(jd)+0.5;
-  const year=Math.floor((30*(jd-1948439.5)+10646)/10631);
-  const month=Math.min(12,Math.ceil((jd-(29+islamicToJD(year,1,1)))/29.5)+1);
-  const day=Math.floor(jd-islamicToJD(year,month,1)+1);
-  return {year,month,day};
-}
+function jdToGregorian(jd){const z=Math.floor(jd+0.5);let a=z;const alpha=Math.floor((a-1867216.25)/36524.25);a+=1+alpha-Math.floor(alpha/4);const b=a+1524;const c=Math.floor((b-122.1)/365.25);const d=Math.floor(365.25*c);const e=Math.floor((b-d)/30.6001);return {day:b-d-Math.floor(30.6001*e),month:e<14?e-1:e-13,year:(e<14?e-1:e-13)>2?c-4716:c-4715}}
+function gregorianToJD(y,m,d){const a=Math.floor((14-m)/12);const y2=y+4800-a;const m2=m+12*a-3;return d+Math.floor((153*m2+2)/5)+365*y2+Math.floor(y2/4)-Math.floor(y2/100)+Math.floor(y2/400)-32045}
+function jdToIslamic(jd){jd=Math.floor(jd)+0.5;const year=Math.floor((30*(jd-1948439.5)+10646)/10631);const month=Math.min(12,Math.ceil((jd-(29+islamicToJD(year,1,1)))/29.5)+1);return {year,month,day:Math.floor(jd-islamicToJD(year,month,1)+1)}}
 function pad(n){return String(n).padStart(2,'0')}
 
 function convertH2G(){
-  const res=document.getElementById('h2gResult');res.classList.remove('error');
   const y=+document.getElementById('hYear').value,m=+document.getElementById('hMonth').value,d=+document.getElementById('hDay').value;
-  if(!y||m<1||m>12||d<1||d>30){res.textContent=STRINGS[currentLang].badInput;res.classList.add('error');return;}
+  if(!y||m<1||m>12||d<1||d>30){setResult('h2gResult',STRINGS[currentLang].badInput,true);return;}
   const g=jdToGregorian(islamicToJD(y,m,d));
-  res.textContent=STRINGS[currentLang].h2gResult.replace('{date}',`${g.year}-${pad(g.month)}-${pad(g.day)}`);
+  setResult('h2gResult',STRINGS[currentLang].h2gResult.replace('{date}',`${g.year}-${pad(g.month)}-${pad(g.day)}`));
 }
-
 function convertG2H(){
-  const res=document.getElementById('g2hResult');res.classList.remove('error');
   const gd=document.getElementById('gDate').value;
-  if(!gd){res.textContent=STRINGS[currentLang].badInput;res.classList.add('error');return;}
+  if(!gd){setResult('g2hResult',STRINGS[currentLang].badInput,true);return;}
   const [y,m,d]=gd.split('-').map(Number);
   const h=jdToIslamic(gregorianToJD(y,m,d));
-  res.textContent=STRINGS[currentLang].g2hResult.replace('{date}',`${h.year}-${pad(h.month)}-${pad(h.day)}`);
+  setResult('g2hResult',STRINGS[currentLang].g2hResult.replace('{date}',`${h.year}-${pad(h.month)}-${pad(h.day)}`));
 }
 
 function applyLang(lang){
@@ -201,8 +216,9 @@ function applyLang(lang){
   document.getElementById('daysHeading').textContent=s.daysHeading;document.getElementById('startLabel').textContent=s.start;document.getElementById('endLabel').textContent=s.end;document.getElementById('calcDaysBtn').textContent=s.calcDays;
   document.getElementById('h2gHeading').textContent=s.h2gHeading;document.getElementById('hyLabel').textContent=s.hy;document.getElementById('hmLabel').textContent=s.hm;document.getElementById('hdLabel').textContent=s.hd;document.getElementById('h2gBtn').textContent=s.h2g;
   document.getElementById('g2hHeading').textContent=s.g2hHeading;document.getElementById('gDateLabel').textContent=s.gDate;document.getElementById('g2hBtn').textContent=s.g2h;
-  document.getElementById('backLink').textContent=s.back;document.getElementById('builtBy').textContent=s.builtBy;document.getElementById('langBtn').textContent=s.langBtn;
-  document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
+  document.getElementById('backLink').textContent=s.back;document.getElementById('builtBy').textContent=s.builtBy;
+  document.getElementById('langBtn').textContent=s.langBtn;document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
+  populateZones();
   localStorage.setItem('tools_lang',lang);
 }
 function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight)}
@@ -214,8 +230,8 @@ document.getElementById('g2hBtn').addEventListener('click',convertG2H);
 document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
 document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
 
-const today=new Date();tzDate.value=today.toISOString().slice(0,10);document.getElementById('gDate').value=tzDate.value;
-populateZones();
+const today=new Date().toISOString().slice(0,10);
+tzDate.value=today;document.getElementById('gDate').value=today;
 applyTheme(currentTheme);
 applyLang(currentLang);
 </script>
