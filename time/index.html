@@ -24,12 +24,15 @@ header{padding:24px 0 28px;display:flex;align-items:center;justify-content:space
 .hero-tag{display:inline-block;font-family:var(--mono);font-size:.72rem;color:var(--green);border:1px solid rgba(0,200,150,.3);padding:4px 12px;border-radius:4px;margin-bottom:16px;letter-spacing:.08em}
 h1{font-size:clamp(1.8rem,7vw,2.8rem);margin-bottom:10px;line-height:1.15}
 p.sub{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.8;margin-bottom:20px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px}
 .panel h2{font-size:1.05rem;margin-bottom:12px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-label{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:.74rem;color:var(--muted)}
-input,select{padding:0 12px;font-family:var(--mono);width:100%}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+label{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:.74rem;color:var(--muted);min-width:0}
+input,select{padding:0 12px;font-family:var(--mono);width:100%;max-width:100%}
+
+.form-grid>*{min-width:0}
+select{text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .actions .btn{width:100%}
 .result{margin-top:10px;padding:12px;border:1px dashed var(--border);border-radius:10px;font-family:var(--mono);font-size:.8rem;line-height:1.8;min-height:58px;word-break:break-word}
@@ -44,6 +47,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
   .lang-btn{min-width:64px}
   .logo{font-size:.8rem;overflow-wrap:anywhere}
   .panel{padding:14px;border-radius:14px}
+  input,select{font-size:.8rem}
   h1{font-size:1.65rem}
 }
 </style>
