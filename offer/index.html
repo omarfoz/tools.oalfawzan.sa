@@ -9,7 +9,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>مقارن عروض العمل — tools.oalfawzan.sa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Noto+Sans+Arabic:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -25,9 +25,9 @@
   --new:#007AFF;
   --danger:#ff6b6b;
   --warn:#f3b14b;
-  --sans:'Syne',sans-serif;
-  --arabic:'Noto Sans Arabic',sans-serif;
-  --mono:'DM Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --arabic:'IBM Plex Sans Arabic',sans-serif;
+  --mono:'IBM Plex Sans',sans-serif;
   --r:12px;
   --tap:44px;
   --shadow:none;
@@ -730,7 +730,7 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
     </div>
     <div class="popup-row">
       <input type="checkbox" class="popup-check" id="pIsAnnual">
-      <label class="popup-check-label" for="pIsAnnual"><span data-i18n="annual_amt">Annual amount (÷ 12 for monthly view)</span></label>
+      <label class="popup-check-label" for="pIsAnnual"><span data-i18n="annual_amt">Annual amount (enter full yearly value)</span></label>
     </div>
     <div class="popup-row" id="pIsMonthsRow" style="display:none">
       <input type="checkbox" class="popup-check" id="pIsMonths" onchange="toggleMonthsMode()">
@@ -991,7 +991,7 @@ function makeSection(label, key) {
 
 function makeRow(f, side) {
   const val = resolveValue(f, state[side]);
-  const display = f.isAnnual ? val / 12 : val;
+  const display = val;
   const isReadonly = f.isPct;
   const toggleClass = f.enabled ? (side === 'A' ? 'on' : 'on-new') : '';
   const row = document.createElement('div');
@@ -1006,7 +1006,7 @@ function makeRow(f, side) {
         ${!f.enabled ? 'disabled' : ''}>
     </div>
     ${f.isPct ? `<span class="pct-badge">${f.isMonths ? (f.pct/100).toFixed(2).replace(/\.?0+$/,'')+'×' : f.pct+'%'} ${f.pctRef2 ? '(+2 fields)' : ''}</span>` : ''}
-    ${f.isAnnual ? `<span class="pct-badge">÷12</span>` : ''}
+    ${f.isAnnual ? `<span class="pct-badge">${t('yearly_input_badge')}</span>` : ''}
     <div class="field-amount">
       ${f.isMonths
         ? `<div style="display:flex;align-items:center;gap:4px">
@@ -1419,6 +1419,7 @@ function calculate() {
     { l: br.year_bonus,a: a.yearBonus,     b: b.yearBonus    },
     { l: br.overall_sal,a: a.overallSal,   b: b.overallSal   },
     { l: br.annual_ben, a: a.annualBenefits,b:b.annualBenefits},
+    { l: br.annual_ben_month, a: a.annualBenefits / 12, b: b.annualBenefits / 12 },
     { l: br.year_ben,  a: a.yearBenefits,  b: b.yearBenefits },
     { l: br.month_ben, a: a.overallBen,    b: b.overallBen   },
   ];
@@ -1595,7 +1596,8 @@ const STRINGS = {
     add_field_title:'Add Field', field_name_lbl:'FIELD NAME',
     amount_lbl:'AMOUNT (SAR/MONTH)', pct_lbl:'% OF FIELD',
     calc_pct:'Calculate as % of another field',
-    annual_amt:'Annual amount (÷ 12 for monthly view)',
+    annual_amt:'Annual amount (enter full yearly value)',
+    yearly_input_badge:'yearly',
     add_field_btn:'Add Field', cancel_btn:'Cancel', edit_field_title:'Edit Field', deduction_lbl:'Deduction (subtracted from total)',
     ref2_hint:'Add a second field (e.g. GOSI = Basic + Housing)',
     monthly_section:'Monthly', annual_section:'Annual Benefits',
@@ -1603,7 +1605,7 @@ const STRINGS = {
     net_monthly_salary:'NET MONTHLY SALARY', qualitative_score:'QUALITATIVE SCORE',
     reset_btn:'↺ Reset', save_btn:'Save', portfolio_btn:'← Portfolio',
     reset_confirm:'Reset everything to defaults?', saved_txt:'✓ Saved',
-    gosi_note_saudi:'GOSI (employee share): 9.75% of (Basic + Housing), capped SAR 45,000',
+    gosi_note_saudi:'',
     gosi_note_non:'Non-Saudi: no GOSI deduction from employee salary',
     deduction_toggle:'Deduction — click to toggle', addition_toggle:'Addition — click to mark as deduction',
     weight_lbl:'WEIGHT %', remove_factor:'✕ Remove',
@@ -1611,7 +1613,7 @@ const STRINGS = {
     breakdown_rows: {
       gross:'GROSS MONTHLY SALARY', gosi:'GOSI / DEDUCTIONS', net:'NET MONTHLY SALARY',
       year1:'1 YEAR (NET × 12)', year_bonus:'1 YEAR + BONUSES', overall_sal:'OVERALL SALARY (÷12)',
-      annual_ben:'OTHER ANNUAL BENEFITS', year_ben:'OVERALL SALARY WITH BENEFITS/YEAR',
+      annual_ben:'OTHER ANNUAL BENEFITS', annual_ben_month:'OTHER ANNUAL BENEFITS (÷12)', year_ben:'OVERALL SALARY WITH BENEFITS/YEAR',
       month_ben:'OVERALL SALARY WITH BENEFITS/MONTH'
     },
     ai_prompt_suffix:'Use overall annual package as the main decision factor, net monthly as the second factor, and qualitative factors mainly when the offers are close. Give a direct recommendation with exact numbers. No bullet points.',
@@ -1671,7 +1673,8 @@ const STRINGS = {
     add_field_title:'إضافة حقل', field_name_lbl:'اسم الحقل',
     amount_lbl:'المبلغ (ريال/شهر)', pct_lbl:'% من حقل',
     calc_pct:'احسب كنسبة مئوية من حقل آخر',
-    annual_amt:'مبلغ سنوي (÷ 12 للعرض الشهري)',
+    annual_amt:'مبلغ سنوي (أدخل القيمة السنوية كاملة)',
+    yearly_input_badge:'سنوي',
     add_field_btn:'إضافة', cancel_btn:'إلغاء',
     monthly_section:'الراتب الشهري', annual_section:'المزايا السنوية',
     deductions_section:'الاستقطاعات', gross_monthly:'إجمالي الراتب الشهري',
@@ -1686,7 +1689,7 @@ const STRINGS = {
     breakdown_rows: {
       gross:'إجمالي الراتب الشهري', gosi:'التأمينات / الاستقطاعات', net:'صافي الراتب الشهري',
       year1:'سنة كاملة (صافي × 12)', year_bonus:'سنة + المكافآت', overall_sal:'الراتب الإجمالي (÷12)',
-      annual_ben:'مزايا سنوية أخرى', year_ben:'إجمالي الراتب مع المزايا/سنة',
+      annual_ben:'مزايا سنوية أخرى', annual_ben_month:'مزايا سنوية أخرى (÷12)', year_ben:'إجمالي الراتب مع المزايا/سنة',
       month_ben:'إجمالي الراتب مع المزايا/شهر'
     },
     edit_field_title:'تعديل الحقل', deduction_lbl:'خصم (يُطرح من الإجمالي)',
