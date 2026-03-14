@@ -383,7 +383,12 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
 .winner-name{font-size:clamp(1.3rem,5vw,2rem);font-weight:800;margin-bottom:4px}
 .winner-name.wc-a{color:var(--current)}
 .winner-name.wc-b{color:var(--new)}
-.winner-uplift{font-size:.82rem;color:var(--muted2);margin-bottom:14px}
+.winner-uplift{font-size:.82rem;color:var(--muted2);margin-bottom:8px}
+.winner-reason{font-size:.78rem;color:var(--muted2);max-width:680px;margin:0 auto 14px;line-height:1.7}
+.helper-note{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);font-size:.75rem;color:var(--muted2);line-height:1.7}
+.audit-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:10px;box-shadow:var(--shadow)}
+.audit-title{font-size:.7rem;font-weight:700;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.audit-text{font-size:.82rem;line-height:1.8;color:var(--muted2)}
 .simple-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
 .sm-cell{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
 .sm-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
@@ -556,6 +561,7 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
       <div class="winner-label" id="winnerLabel">WINNER</div>
       <div class="winner-name" id="winnerName">—</div>
       <div class="winner-uplift" id="winnerUplift"></div>
+      <div class="winner-reason" id="winnerReason">—</div>
       <div class="simple-metrics">
         <div class="sm-cell">
           <div class="sm-label" data-i18n="net_monthly">NET MONTHLY</div>
@@ -653,10 +659,15 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
           <span id="oMonthBadge" class="total-badge"></span>
         </div>
       </div>
+      <div class="helper-note" id="packageHelper"><span data-i18n="package_helper">Total annual package includes enabled annual bonus and annual benefits. Effective monthly value = total annual package ÷ 12.</span></div>
     </div>
   </div>
 
   <div id="resultsWrap" style="display:none">
+    <div class="audit-card">
+      <div class="audit-title"><span data-i18n="decision_summary">// Decision Summary</span></div>
+      <div class="audit-text" id="decisionSummaryText">—</div>
+    </div>
     <div class="breakdown-card">
       <div class="breakdown-title"><span data-i18n="full_breakdown">// Full Breakdown</span></div>
       <div id="breakdownRows"></div>
@@ -720,6 +731,10 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
       <input type="checkbox" class="popup-check" id="pIsAnnual">
       <label class="popup-check-label" for="pIsAnnual"><span data-i18n="annual_amt">Annual amount (÷ 12 for monthly view)</span></label>
     </div>
+    <div class="popup-row" id="pIsMonthsRow" style="display:none">
+      <input type="checkbox" class="popup-check" id="pIsMonths" onchange="toggleMonthsMode()">
+      <label class="popup-check-label" for="pIsMonths"><span data-i18n="multiplier_unit">× basic salaries of</span></label>
+    </div>
     <div class="popup-actions">
       <button class="popup-btn cancel" onclick="closePopup()"><span data-i18n="cancel_btn">Cancel</span></button>
       <button class="popup-btn confirm" id="popupConfirmBtn" onclick="confirmField()"><span data-i18n="add_field_btn">Add Field</span></button>
@@ -740,8 +755,8 @@ const FIELD_NAMES = {
   b5:'field_mobile', b6:'field_gosi', b7:'field_perf_bonus', b8:'field_education',
   b9:'field_phone_bill', b10:'field_medical_ins', b11:'field_flight_ticket',
   f1:'factor_health', f2:'factor_remote', f3:'factor_career_growth',
-  f4:'factor_management', f5:'factor_commute', f6:'factor_wlb',
-  f7:'factor_job_security', f8:'factor_brand',
+  f4:'factor_management', f5:'factor_role_scope', f6:'factor_commute',
+  f7:'factor_wlb', f8:'factor_job_security', f9:'factor_brand',
 };
 function tFieldName(f) {
   const key = FIELD_NAMES[f.id];
@@ -795,16 +810,21 @@ function ensureSingleCompareRowOnMobile() {
 
 // ── Init ──────────────────────────────────────────────────────────
 function init() {
-  // Always start in Arabic by default
-  currentLang = 'ar';
+  const savedLang = localStorage.getItem('offer_lang') || 'ar';
   applyTheme(currentTheme);
-  applyLang('ar');
   ensureSingleCompareRowOnMobile();
 
   try {
     const saved = localStorage.getItem('offer_v31');
     if (saved) state = JSON.parse(saved);
   } catch {}
+
+  if (state.nationality && typeof state.nationality === 'object') {
+    nationality.A = state.nationality.A || nationality.A;
+    nationality.B = state.nationality.B || nationality.B;
+  }
+
+  applyLang(savedLang);
   $('coNameA').value = state.coA;
   $('coNameB').value = state.coB;
   $('coNameA').addEventListener('input', e => { state.coA = e.target.value; updateLabels(); updateTabLabels(); autosave(); liveUpdate(); });
@@ -820,13 +840,15 @@ function init() {
   if (state.noticeB != null) $('noticeB').value = state.noticeB;
   updateVacDiff();
 
-  // Restore nationality buttons to match saved GOSI state
+  // Restore nationality buttons from saved state, falling back to GOSI state
   ['A','B'].forEach(side => {
     const gosiId = side === 'A' ? 'a6' : 'b6';
     const gosi = state[side] && state[side].find(x => x.id === gosiId);
-    const isSaudi = !gosi || gosi.enabled !== false;
-    const nat = isSaudi ? 'saudi' : 'nonsaudi';
+    const inferredNat = (!gosi || gosi.enabled !== false) ? 'saudi' : 'nonsaudi';
+    const nat = (state.nationality && state.nationality[side]) || nationality[side] || inferredNat;
     nationality[side] = nat;
+    state.nationality = state.nationality || {};
+    state.nationality[side] = nat;
     const sa = $('nat' + side + '_saudi'), ns = $('nat' + side + '_nonsaudi');
     if (sa) sa.classList.toggle('active', nat === 'saudi');
     if (ns) ns.classList.toggle('active', nat === 'nonsaudi');
@@ -1167,6 +1189,7 @@ function confirmField() {
   const isDeduction = $('pIsDeduction').checked;
   const isAnnual    = $('pIsAnnual').checked;
   if (!name) { $('pName').focus(); return; }
+  if (isPct && !pctRef) { $('pPctRef').focus(); return; }
 
   if (popupEditId) {
     const f = state[popupSide].find(x => x.id === popupEditId);
@@ -1239,6 +1262,32 @@ function computeSide(side) {
     yearBenefits, overallBen,
     yearly: yearBenefits   // used for % comparison
   };
+
+}
+
+function buildWinnerReason(a, b, py, pn) {
+  const coA = state.coA || t('current');
+  const coB = state.coB || t('new_offer');
+  const reasons = [];
+  if (Math.abs(py) > 0.005) reasons.push(t('reason_package_lead').replace('{leader}', py > 0 ? coB : coA));
+  if (Math.abs(pn) > 0.005) reasons.push(t('reason_net_lead').replace('{leader}', pn > 0 ? coB : coA));
+  const vacDiff = (state.vacB || 0) - (state.vacA || 0);
+  if (Math.abs(py) <= 0.03 && vacDiff !== 0) reasons.push(t('reason_vacation_lead').replace('{leader}', vacDiff > 0 ? coB : coA));
+  return reasons.length ? reasons.join(' · ') : t('summary_close');
+}
+
+function updateDecisionSummary(a, b, py, pn) {
+  const coA = state.coA || t('current');
+  const coB = state.coB || t('new_offer');
+  const parts = [];
+  if (Math.abs(py) <= 0.03) parts.push(t('summary_close'));
+  else parts.push(t('summary_financial_lead').replace('{leader}', py > 0 ? coB : coA));
+  if (Math.abs(pn) > 0.005) parts.push(t('summary_net_lead').replace('{leader}', pn > 0 ? coB : coA));
+  const factors = state.factors || [];
+  const hasCustomScores = factors.some(f => f.scoreA !== 5 || f.scoreB !== 5);
+  parts.push(hasCustomScores ? t('summary_qual_used') : t('summary_qual_unused'));
+  parts.push(t('summary_assumption'));
+  if ($('decisionSummaryText')) $('decisionSummaryText').textContent = parts.join(' ');
 }
 
 function calculate() {
@@ -1269,12 +1318,14 @@ function calculate() {
       $('winnerName').textContent  = coB;
       $('winnerName').className    = 'winner-name wc-b';
       $('winnerUplift').textContent = '+' + (py*100).toFixed(1) + '% ' + t('winner_higher');
+      $('winnerReason').textContent = t('winner_reason').replace('{reason}', buildWinnerReason(a, b, py, pn));
     } else if (py < -0.005) {
       card.classList.add('winner-a');
       $('winnerLabel').textContent = t('winner_label');
       $('winnerName').textContent  = coA;
       $('winnerName').className    = 'winner-name wc-a';
       $('winnerUplift').textContent = Math.abs(py*100).toFixed(1) + '% ' + t('winner_higher');
+      $('winnerReason').textContent = t('winner_reason').replace('{reason}', buildWinnerReason(a, b, py, pn));
     } else {
       card.classList.add('winner-tie');
       $('winnerLabel').textContent = t('winner_tied_label');
@@ -1282,6 +1333,7 @@ function calculate() {
       $('winnerName').className    = 'winner-name';
       $('winnerName').style.color  = 'var(--muted2)';
       $('winnerUplift').textContent = t('winner_tied_sub');
+      $('winnerReason').textContent = t('winner_reason').replace('{reason}', buildWinnerReason(a, b, py, pn));
     }
     $('smNetA').textContent  = fmtK(a.net);
     $('smNetB').textContent  = fmtK(b.net);
@@ -1312,6 +1364,7 @@ function calculate() {
     $('simpleResult').style.display = 'block';
     $('simpleResult').classList.add('fadein');
     $('simpleResult').scrollIntoView({ behavior:'smooth', block:'start' });
+    updateDecisionSummary(a, b, py, pn);
     getAI(a, b, pg, pn, py);
     $('resultsWrap').style.display = 'block';
     $('resultsWrap').classList.add('fadein');
@@ -1392,6 +1445,7 @@ function calculate() {
   $('resultsWrap').classList.add('fadein');
   $('resultsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+  updateDecisionSummary(a, b, py, pn);
   getAI(a, b, pg, pn, py);
 }
 
@@ -1439,23 +1493,55 @@ ${rows}`;
 
   }
 
-  const prompt = `You are a sharp HR and compensation advisor specializing in the Saudi Arabian job market.
+  const annualGap = b.yearBenefits - a.yearBenefits;
+  const netGap = b.net - a.net;
+  const effGap = b.overallBen - a.overallBen;
+  const financialLeader = py > 0.03 ? coB : py < -0.03 ? coA : 'close';
+  const netLeader = pn > 0.03 ? coB : pn < -0.03 ? coA : 'close';
 
-A professional is comparing two job offers.
+  const prompt = `You are a senior HR, compensation, and career decision advisor specializing in the Saudi Arabian job market.
 
-${coA}:
-Gross SAR ${fmt(a.gross)}/mo | Net SAR ${fmt(a.net)}/mo | Annual total SAR ${fmt(a.yearBenefits)}${state.vacA ? ` | Vacation: ${state.vacA} days/yr` : ''}${state.noticeA ? ` | Notice: ${state.noticeA} month(s)` : ''}
+Your task is to compare two job offers and give a practical recommendation for a professional deciding whether to stay or move.
 
-${coB}:
-Gross SAR ${fmt(b.gross)}/mo | Net SAR ${fmt(b.net)}/mo | Annual total SAR ${fmt(b.yearBenefits)}${state.vacB ? ` | Vacation: ${state.vacB} days/yr` : ''}${state.noticeB ? ` | Notice: ${state.noticeB} month(s)` : ''}
+Decision rules:
+1. Prioritize the total annual package.
+2. Use net monthly salary as the second most important factor.
+3. Use effective monthly value only to make the package easier to understand.
+4. Use qualitative factors, vacation days, and notice period as modifiers, not as replacements for a material financial gap.
+5. If the annual package difference is about 3% or less, say the offers are financially close and explain which qualitative factors should decide.
+6. Be direct, specific, and practical.
+7. End with a clear recommendation: choose ${coA}, choose ${coB}, or either is reasonable depending on priorities.
 
-Financial change: Gross ${(pg*100).toFixed(1)}% | Net ${(pn*100).toFixed(1)}% | Total package ${(py*100).toFixed(1)}%
+Offer 1 — ${coA}
+- Gross monthly salary: SAR ${fmt(a.gross)}
+- Net monthly salary: SAR ${fmt(a.net)}
+- Total annual package: SAR ${fmt(a.yearBenefits)}
+- Effective monthly value: SAR ${fmt(a.overallBen)}${state.vacA ? `
+- Vacation days per year: ${state.vacA}` : ''}${state.noticeA ? `
+- Notice period: ${state.noticeA} month(s)` : ''}
+
+Offer 2 — ${coB}
+- Gross monthly salary: SAR ${fmt(b.gross)}
+- Net monthly salary: SAR ${fmt(b.net)}
+- Total annual package: SAR ${fmt(b.yearBenefits)}
+- Effective monthly value: SAR ${fmt(b.overallBen)}${state.vacB ? `
+- Vacation days per year: ${state.vacB}` : ''}${state.noticeB ? `
+- Notice period: ${state.noticeB} month(s)` : ''}
+
+Financial comparison:
+- Gross monthly change: ${(pg*100).toFixed(1)}%
+- Net monthly change: ${(pn*100).toFixed(1)}%
+- Total annual package change: ${(py*100).toFixed(1)}%
+- Annual package gap: SAR ${fmt(Math.abs(annualGap))}
+- Net monthly gap: SAR ${fmt(Math.abs(netGap))}
+- Effective monthly gap: SAR ${fmt(Math.abs(effGap))}
+- Preliminary calculator signal: financial lead = ${financialLeader}, net monthly lead = ${netLeader}
 ${qualSection}
 
 ${t('ai_lang_instruction')}
 ${t('ai_prompt_suffix')}
 
-Give a concise recommendation (3–5 sentences).`;
+Write 4–6 sentences in a confident advisory tone. No bullet points.`;
 
   try {
 
@@ -1499,11 +1585,11 @@ const STRINGS = {
     current:'Current', new_offer:'New Offer',
     add_field:'+ Add Field', add_deduction:'+ Add Deduction',
     qualitative_factors:'// Qualitative Factors',
-    factors_hint:'Rate each factor 1–10 · set weight % · affects final score',
+    factors_hint:'Rate each factor 1–10 · weight what matters most · used mainly when offers are close',
     add_factor:'+ Add Factor', compare_btn:'Compare Offers',
-    net_monthly:'NET MONTHLY', yearly_total:'YEARLY TOTAL', eff_monthly:'EFF. MONTHLY',
-    overall_year:'OVERALL SALARY WITH BENEFITS / YEAR',
-    overall_month:'OVERALL SALARY WITH BENEFITS / MONTH',
+    net_monthly:'NET MONTHLY', yearly_total:'YEARLY TOTAL', eff_monthly:'EFFECTIVE MONTHLY VALUE',
+    overall_year:'TOTAL ANNUAL PACKAGE',
+    overall_month:'EFFECTIVE MONTHLY VALUE',
     full_breakdown:'// Full Breakdown', ai_title:'AI Recommendation',
     add_field_title:'Add Field', field_name_lbl:'FIELD NAME',
     amount_lbl:'AMOUNT (SAR/MONTH)', pct_lbl:'% OF FIELD',
@@ -1527,7 +1613,7 @@ const STRINGS = {
       annual_ben:'OTHER ANNUAL BENEFITS', year_ben:'OVERALL SALARY WITH BENEFITS/YEAR',
       month_ben:'OVERALL SALARY WITH BENEFITS/MONTH'
     },
-    ai_prompt_suffix:'Give a direct, honest recommendation in 3–4 sentences. Be specific with the numbers. Mention what to weigh beyond salary. No bullet points. Confident advisory tone.',
+    ai_prompt_suffix:'Use overall annual package as the main decision factor, net monthly as the second factor, and qualitative factors mainly when the offers are close. Give a direct recommendation with exact numbers. No bullet points.',
     ai_lang_instruction:'Respond in English.',
     new_factor:'New Factor',
     export_btn:'⬇ Export Excel',
@@ -1537,7 +1623,7 @@ const STRINGS = {
     built_by:'Built by', figures_note:'Figures are estimates',
     mode_simple_label:'Quick Compare', mode_simple_sub:'Job Seeker · Fast answer',
     mode_detailed_label:'Full Analysis', mode_detailed_sub:'HR / Finance · Every detail',
-    winner_label:'WINNER', winner_higher:'higher total package',
+    winner_label:'WINNER', winner_higher:'higher total package', winner_reason:'Why: {reason}',
     winner_tied_label:'RESULT', winner_tied:'Roughly Equal', winner_tied_sub:'Both offers are very close financially',
     field_basic:'Basic Salary', field_housing:'Housing Allowance',
     field_transport:'Transport Allowance', field_special:'Special Allowance',
@@ -1546,15 +1632,26 @@ const STRINGS = {
     field_mobile:'Mobile Allowance', field_perf_bonus:'Performance Bonus',
     field_phone_bill:'Phone Bill',
     field_medical_ins:'Medical Insurance', field_flight_ticket:'Annual Flight Ticket',
-    factor_health:'Health Insurance Quality', factor_remote:'Remote Work / Flexibility',
+    factor_health:'Benefits Quality', factor_remote:'Remote Work / Flexibility',
     factor_career_growth:'Career Growth & Learning', factor_management:'Management Quality',
     factor_commute:'Commute & Location', factor_wlb:'Work-Life Balance',
-    factor_job_security:'Job Security & Stability', factor_brand:'Company Brand & Reputation',
+    factor_job_security:'Job Security & Stability', factor_brand:'Company Brand & Reputation', factor_role_scope:'Role Scope & Seniority',
     hr_context_label:'Role & Context (optional)',
     hr_context_placeholder:'e.g. Senior Engineer, 8 yrs exp, Riyadh',
     vacation_lbl:'Vacation Days / Year', notice_lbl:'Notice Period (months)',
     hr_context_hint:'Helps the AI give a more tailored recommendation',
-    vac_diff_lbl:'VACATION DIFF'
+    vac_diff_lbl:'VACATION DIFF',
+    package_helper:'Total annual package includes enabled annual bonus and annual benefits. Effective monthly value = total annual package ÷ 12.',
+    decision_summary:'// Decision Summary',
+    summary_close:'The offers are financially close, so qualitative factors should decide.',
+    summary_financial_lead:'Financially, {leader} leads on total annual package.',
+    summary_net_lead:'Take-home cash: {leader} leads on net monthly salary.',
+    summary_qual_used:'Qualitative scoring is active and is being used as a tie-breaker, not a replacement for a material financial gap.',
+    summary_qual_unused:'No meaningful qualitative scoring was applied yet.',
+    summary_assumption:'Enabled annual bonus and annual benefit fields are treated as included in the package calculation.',
+    reason_package_lead:'{leader} leads on total annual package',
+    reason_net_lead:'{leader} leads on net monthly pay',
+    reason_vacation_lead:'{leader} offers more vacation'
   },
   ar: {
     tool_tag:'// الأداة_01', hero_h1_line1:'مقارنة', hero_h1_line2:'العروض الوظيفية',
@@ -1564,11 +1661,11 @@ const STRINGS = {
     current:'الحالي', new_offer:'العرض الجديد',
     add_field:'+ إضافة حقل', add_deduction:'+ إضافة خصم',
     qualitative_factors:'// العوامل النوعية',
-    factors_hint:'قيّم كل عامل من 1–10 · حدد الوزن % · يؤثر على النتيجة النهائية',
+    factors_hint:'قيّم كل عامل من 1–10 · أعطِ وزناً لما يهمك أكثر · ويُستخدم غالباً عند تقارب العروض',
     add_factor:'+ إضافة عامل', compare_btn:'قارن العروض',
-    net_monthly:'صافي الشهري', yearly_total:'الإجمالي السنوي', eff_monthly:'المتوسط الشهري',
-    overall_year:'إجمالي الراتب مع المزايا / سنة',
-    overall_month:'إجمالي الراتب مع المزايا / شهر',
+    net_monthly:'صافي الشهري', yearly_total:'الإجمالي السنوي', eff_monthly:'القيمة الشهرية الفعلية',
+    overall_year:'إجمالي الحزمة السنوية',
+    overall_month:'القيمة الشهرية الفعلية',
     full_breakdown:'// التفاصيل الكاملة', ai_title:'توصية الذكاء الاصطناعي',
     add_field_title:'إضافة حقل', field_name_lbl:'اسم الحقل',
     amount_lbl:'المبلغ (ريال/شهر)', pct_lbl:'% من حقل',
@@ -1593,7 +1690,7 @@ const STRINGS = {
     },
     edit_field_title:'تعديل الحقل', deduction_lbl:'خصم (يُطرح من الإجمالي)',
     ref2_hint:'أضف حقلاً ثانياً (مثلاً: التأمينات = الأساسي + السكن)',
-    ai_prompt_suffix:'أعطِ توصية مباشرة وصريحة في 3–4 جمل. كن دقيقاً مع الأرقام. اذكر ما يجب الموازنة بين الراتب وغيره. بدون نقاط. بأسلوب استشاري واثق.',
+    ai_prompt_suffix:'اجعل إجمالي الحزمة السنوية هو العامل الرئيسي، ثم صافي الراتب الشهري، واستخدم العوامل النوعية غالباً عند تقارب العروض. قدّم توصية مباشرة مع أرقام واضحة. بدون نقاط.',
     ai_lang_instruction:'أجب باللغة العربية.',
     new_factor:'عامل جديد',
     export_btn:'⬇ تصدير Excel',
@@ -1603,7 +1700,7 @@ const STRINGS = {
     built_by:'من تطوير', figures_note:'الأرقام تقديرية',
     mode_simple_label:'مقارنة سريعة', mode_simple_sub:'الباحث عن عمل · جواب فوري',
     mode_detailed_label:'تحليل شامل', mode_detailed_sub:'HR / المالية · كل التفاصيل',
-    winner_label:'الفائز', winner_higher:'أعلى في الحزمة الإجمالية',
+    winner_label:'الفائز', winner_higher:'أعلى في الحزمة الإجمالية', winner_reason:'السبب: {reason}',
     winner_tied_label:'النتيجة', winner_tied:'متقاربان', winner_tied_sub:'كلا العرضين متقاربان مالياً',
     field_basic:'الراتب الأساسي', field_housing:'بدل السكن',
     field_transport:'بدل المواصلات', field_special:'البدل الخاص',
@@ -1612,15 +1709,26 @@ const STRINGS = {
     field_mobile:'بدل الاتصالات', field_perf_bonus:'مكافأة الأداء',
     field_phone_bill:'فاتورة الهاتف',
     field_medical_ins:'التأمين الطبي', field_flight_ticket:'تذكرة السفر السنوية',
-    factor_health:'جودة التأمين الصحي', factor_remote:'العمل عن بُعد / المرونة',
+    factor_health:'جودة المزايا', factor_remote:'العمل عن بُعد / المرونة',
     factor_career_growth:'النمو الوظيفي والتعلم', factor_management:'جودة الإدارة',
     factor_commute:'التنقل والموقع', factor_wlb:'التوازن بين العمل والحياة',
-    factor_job_security:'الاستقرار الوظيفي', factor_brand:'سمعة الشركة وعلامتها',
+    factor_job_security:'الاستقرار الوظيفي', factor_brand:'سمعة الشركة وعلامتها', factor_role_scope:'نطاق الدور والمرتبة',
     hr_context_label:'المسمى الوظيفي والسياق (اختياري)',
     hr_context_placeholder:'مثال: مهندس أول، 8 سنوات خبرة، الرياض',
     vacation_lbl:'أيام الإجازة / سنة', notice_lbl:'فترة الإشعار (أشهر)',
     hr_context_hint:'يساعد الذكاء الاصطناعي على تقديم توصية أكثر دقة',
-    vac_diff_lbl:'فرق الإجازة'
+    vac_diff_lbl:'فرق الإجازة',
+    package_helper:'إجمالي الحزمة السنوية يشمل المكافآت السنوية والمزايا السنوية المفعّلة. والقيمة الشهرية الفعلية = إجمالي الحزمة السنوية ÷ 12.',
+    decision_summary:'// ملخص القرار',
+    summary_close:'العرضان متقاربان مالياً، لذا يفترض أن تحسم العوامل النوعية القرار.',
+    summary_financial_lead:'مالياً، يتفوق {leader} في إجمالي الحزمة السنوية.',
+    summary_net_lead:'من ناحية صافي الاستلام الشهري، يتفوق {leader}.',
+    summary_qual_used:'تم تفعيل التقييم النوعي ويُستخدم كعامل ترجيح عند التقارب، وليس بديلاً عن فارق مالي جوهري.',
+    summary_qual_unused:'لم يتم تطبيق تقييم نوعي مؤثر حتى الآن.',
+    summary_assumption:'يتم احتساب أي مكافأة سنوية أو مزايا سنوية مفعّلة ضمن إجمالي الحزمة.',
+    reason_package_lead:'{leader} يتفوق في إجمالي الحزمة السنوية',
+    reason_net_lead:'{leader} يتفوق في صافي الراتب الشهري',
+    reason_vacation_lead:'{leader} يمنح إجازة أكثر'
   }
 };
 
@@ -1721,23 +1829,32 @@ function resetAll() {
   if (!confirm(t('reset_confirm'))) return;
   localStorage.removeItem('offer_v31');
   state = deepClone(DEFAULTS);
+  state.factors = deepClone(DEFAULT_FACTORS);
+  state.nationality = { A: 'saudi', B: 'saudi' };
+  nationality.A = 'saudi';
+  nationality.B = 'saudi';
   $('coNameA').value = state.coA;
   $('coNameB').value = state.coB;
+  // Clear HR context fields in both state and UI
+  state.vacA = null; state.vacB = null;
+  state.noticeA = null; state.noticeB = null;
+  $('vacA').value = ''; $('vacB').value = '';
+  $('noticeA').value = ''; $('noticeB').value = '';
   updateLabels();
+  setNationality('A', 'saudi');
+  setNationality('B', 'saudi');
   renderFields('A');
   renderFields('B');
+  renderFactors();
   $('resultsWrap').style.display = 'none';
   $('simpleResult').style.display = 'none';
-  state.factors = deepClone(DEFAULT_FACTORS);
-  renderFactors();
   $('totalsBar').style.display = 'none';
   $('oYearA').textContent = '—'; $('oYearB').textContent = '—';
   $('oMonthA').textContent = '—'; $('oMonthB').textContent = '—';
   $('oYearBadge').textContent = ''; $('oMonthBadge').textContent = '';
-  // Clear HR context fields
-  $('vacA').value = ''; $('vacB').value = '';
-  $('noticeA').value = ''; $('noticeB').value = '';
   updateVacDiff();
+  closePopup();
+  autosave();
 }
 
 // ── Nationality ───────────────────────────────────────────────────
@@ -1765,14 +1882,15 @@ function setNationality(side, nat) {
 
 // ── Qualitative Factors ──────────────────────────────────────────
 const DEFAULT_FACTORS = [
-  { id:'f1', name:'Health Insurance Quality',    scoreA:5, scoreB:5, weight:15 },
-  { id:'f2', name:'Remote Work / Flexibility',   scoreA:5, scoreB:5, weight:15 },
-  { id:'f3', name:'Career Growth & Learning',    scoreA:5, scoreB:5, weight:20 },
-  { id:'f4', name:'Management Quality',          scoreA:5, scoreB:5, weight:15 },
-  { id:'f5', name:'Commute & Location',          scoreA:5, scoreB:5, weight:10 },
-  { id:'f6', name:'Work-Life Balance',           scoreA:5, scoreB:5, weight:10 },
-  { id:'f7', name:'Job Security & Stability',    scoreA:5, scoreB:5, weight:10 },
-  { id:'f8', name:'Company Brand & Reputation',  scoreA:5, scoreB:5, weight:5  },
+  { id:'f1', name:'Benefits Quality',            scoreA:5, scoreB:5, weight:15 },
+  { id:'f2', name:'Remote Work / Flexibility',   scoreA:5, scoreB:5, weight:10 },
+  { id:'f3', name:'Career Growth & Learning',    scoreA:5, scoreB:5, weight:15 },
+  { id:'f4', name:'Management Quality',          scoreA:5, scoreB:5, weight:12 },
+  { id:'f5', name:'Role Scope & Seniority',      scoreA:5, scoreB:5, weight:12 },
+  { id:'f6', name:'Commute & Location',          scoreA:5, scoreB:5, weight:8  },
+  { id:'f7', name:'Work-Life Balance',           scoreA:5, scoreB:5, weight:10 },
+  { id:'f8', name:'Job Security & Stability',    scoreA:5, scoreB:5, weight:10 },
+  { id:'f9', name:'Company Brand & Reputation',  scoreA:5, scoreB:5, weight:8  },
 ];
 
 
