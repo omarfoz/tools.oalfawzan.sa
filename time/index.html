@@ -202,7 +202,7 @@ function convertG2H(){
   const gd=document.getElementById('gDate').value;
   if(!gd){setResult('g2hResult',STRINGS[currentLang].badInput,true);return;}
   const [y,m,d]=gd.split('-').map(Number);
-  const h=jdToIslamic(gregorianToJD(y,m,d));
+  const h=jdToIslamic(gregorianToJD(y,m,d)-0.5);
   setResult('g2hResult',STRINGS[currentLang].g2hResult.replace('{date}',`${h.year}-${pad(h.month)}-${pad(h.day)}`));
 }
 
