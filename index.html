@@ -98,6 +98,14 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
       <div class="tool-desc" id="timeDesc">حوّل الوقت بين المناطق، احسب فرق الأيام، وحوّل بين التاريخ الهجري والميلادي.</div>
       <div class="tool-tag" id="timeTag">متاح الآن</div>
     </a>
+
+    <a href="/stock-analysis-dashboard/" class="tool-card t2">
+      <div class="tool-num">TOOL_06</div>
+      <div class="tool-icon">📈</div>
+      <div class="tool-name" id="stockName">لوحة تحليل الأسهم السعودية</div>
+      <div class="tool-desc" id="stockDesc">حلّل أسهم تداول بمؤشرات RSI وMA50 وMA200 وحجم التداول مع توصية ذكية.</div>
+      <div class="tool-tag" id="stockTag">متاح الآن</div>
+    </a>
   </section>
 
   <footer>
@@ -107,8 +115,8 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'الأدوات — tools.oalfawzan.sa',description:'مجموعة أدوات عملية من عمر الفوزان للمقارنة واتخاذ القرار بسرعة.',tag:'// الأدوات',heroTitle:'أدوات صغيرة.<br><em>قرارات أكبر.</em>',heroDesc:'مجموعة متنامية من الأدوات العملية للقرارات اليومية — مصممة لتكون بسيطة وسريعة ومفيدة فعلًا.',offerName:'مقارن عروض العمل',offerDesc:'قارن بين عرضين وظيفيين جنبًا إلى جنب: صافي الراتب، الإجمالي السنوي، المزايا، وتوصية ذكية.',liveTag:'متاح الآن',wheelName:'عجلة الأسماء',wheelDesc:'أدخل مجموعة أسماء ولف العجلة لاختيار اسم عشوائي بسرعة.',qrName:'مولد QR',qrDesc:'أنشئ رمز QR للنصوص والروابط مع خيار تنزيل الصورة.',jsonName:'منسق JSON',jsonDesc:'نسّق أو صغّر JSON بسرعة مع التحقق من الصحة ونسخ الناتج.',timeName:'عدة الوقت والتقويم',timeDesc:'حوّل الوقت بين المناطق، احسب فرق الأيام، وحوّل بين التاريخ الهجري والميلادي.',back:'← العودة للملف الشخصي',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️'},
-  en:{lang:'en',dir:'ltr',title:'Tools — tools.oalfawzan.sa',description:'Useful tools by Omar Alfawzan. Quick practical web tools.',tag:'// TOOLS',heroTitle:'Small tools.<br><em>Big decisions.</em>',heroDesc:'A growing collection of practical tools for everyday decisions — built to be simple, fast, and actually useful.',offerName:'Job Offer Comparator',offerDesc:'Compare two job offers side by side: net salary, yearly total, benefits, and an AI recommendation.',liveTag:'LIVE',wheelName:'Wheel of Names',wheelDesc:'Enter multiple names and spin the wheel to pick one at random.',qrName:'QR Generator',qrDesc:'Generate a QR code from text or URLs and download it as an image.',jsonName:'JSON Formatter',jsonDesc:'Format or minify JSON instantly with validation and copy output.',timeName:'Time Toolkit',timeDesc:'Convert time zones, calculate day differences, and convert Hijri/Gregorian dates quickly.',back:'← Back to portfolio',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️'}
+  ar:{lang:'ar',dir:'rtl',title:'الأدوات — tools.oalfawzan.sa',description:'مجموعة أدوات عملية من عمر الفوزان للمقارنة واتخاذ القرار بسرعة.',tag:'// الأدوات',heroTitle:'أدوات صغيرة.<br><em>قرارات أكبر.</em>',heroDesc:'مجموعة متنامية من الأدوات العملية للقرارات اليومية — مصممة لتكون بسيطة وسريعة ومفيدة فعلًا.',offerName:'مقارن عروض العمل',offerDesc:'قارن بين عرضين وظيفيين جنبًا إلى جنب: صافي الراتب، الإجمالي السنوي، المزايا، وتوصية ذكية.',liveTag:'متاح الآن',wheelName:'عجلة الأسماء',wheelDesc:'أدخل مجموعة أسماء ولف العجلة لاختيار اسم عشوائي بسرعة.',qrName:'مولد QR',qrDesc:'أنشئ رمز QR للنصوص والروابط مع خيار تنزيل الصورة.',jsonName:'منسق JSON',jsonDesc:'نسّق أو صغّر JSON بسرعة مع التحقق من الصحة ونسخ الناتج.',timeName:'عدة الوقت والتقويم',timeDesc:'حوّل الوقت بين المناطق، احسب فرق الأيام، وحوّل بين التاريخ الهجري والميلادي.',stockName:'لوحة تحليل الأسهم السعودية',stockDesc:'حلّل أسهم تداول بمؤشرات RSI وMA50 وMA200 وحجم التداول مع توصية ذكية.',back:'← العودة للملف الشخصي',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️'},
+  en:{lang:'en',dir:'ltr',title:'Tools — tools.oalfawzan.sa',description:'Useful tools by Omar Alfawzan. Quick practical web tools.',tag:'// TOOLS',heroTitle:'Small tools.<br><em>Big decisions.</em>',heroDesc:'A growing collection of practical tools for everyday decisions — built to be simple, fast, and actually useful.',offerName:'Job Offer Comparator',offerDesc:'Compare two job offers side by side: net salary, yearly total, benefits, and an AI recommendation.',liveTag:'LIVE',wheelName:'Wheel of Names',wheelDesc:'Enter multiple names and spin the wheel to pick one at random.',qrName:'QR Generator',qrDesc:'Generate a QR code from text or URLs and download it as an image.',jsonName:'JSON Formatter',jsonDesc:'Format or minify JSON instantly with validation and copy output.',timeName:'Time Toolkit',timeDesc:'Convert time zones, calculate day differences, and convert Hijri/Gregorian dates quickly.',stockName:'Saudi Stock Analysis Dashboard',stockDesc:'Analyze Tadawul stocks with RSI, MA50, MA200, volume trend, and an AI recommendation.',back:'← Back to portfolio',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️'}
 };
 
 let currentLang=localStorage.getItem('tools_lang')||'ar';
@@ -144,6 +152,9 @@ function applyLang(lang){
   document.getElementById('timeName').textContent=s.timeName;
   document.getElementById('timeDesc').textContent=s.timeDesc;
   document.getElementById('timeTag').textContent=s.liveTag;
+  document.getElementById('stockName').textContent=s.stockName;
+  document.getElementById('stockDesc').textContent=s.stockDesc;
+  document.getElementById('stockTag').textContent=s.liveTag;
   document.getElementById('backLink').textContent=s.back;
   document.getElementById('builtBy').textContent=s.builtBy;
   document.getElementById('langBtn').textContent=s.langBtn;

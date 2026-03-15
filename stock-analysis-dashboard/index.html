@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Stock Analysis Dashboard (Tadawul) — tools.oalfawzan.sa</title>
+  <meta name="description" content="Saudi stock market dashboard with RSI, MA50, MA200, volume trend, favorites, and AI recommendation.">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:#0a0a0f;color:#f0f0f5}
+    .wrap{max-width:1100px;margin:0 auto;padding:20px}
+    .top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+    .logo{color:#a3a3bd;text-decoration:none;font-size:.9rem}
+    .logo span{color:#fff}
+    .card{background:#111118;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;margin-bottom:14px}
+    h1{margin:6px 0 10px;font-size:1.6rem}
+    .muted{color:#a3a3bd;font-size:.92rem;line-height:1.6}
+    .search{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:14px}
+    input,button{height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#151520;color:#f0f0f5;padding:0 12px;font-size:.95rem}
+    button{cursor:pointer;background:#007AFF;border-color:#007AFF;font-weight:600}
+    button.ghost{background:#151520;border-color:rgba(255,255,255,.15)}
+    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .kpi{background:#151520;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px}
+    .kpi .l{font-size:.75rem;color:#a3a3bd;text-transform:uppercase;letter-spacing:.06em}
+    .kpi .v{font-size:1.1rem;font-weight:700;margin-top:4px}
+    .two-col{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+    .list{display:grid;gap:8px;max-height:420px;overflow:auto;padding-right:4px}
+    .stock-item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#151520;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px}
+    .stock-item button{height:32px;padding:0 8px;font-size:.8rem}
+    .ai-box{background:#151520;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;line-height:1.7;color:#d8d8e6;min-height:130px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.75rem;font-weight:700;background:rgba(0,122,255,.2);color:#8dbbff}
+    @media(max-width:900px){.two-col{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.search{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
+    <a href="/" class="logo">← Back to tools</a>
+  </div>
+
+  <div class="card">
+    <div class="pill">Tadawul Dashboard</div>
+    <h1>Stock Analysis Dashboard</h1>
+    <p class="muted">Search by ticker (example: <b>7202</b>). Data source: Yahoo Finance using <code>TICKER.SR</code>. Includes RSI, MA50, MA200, support/resistance, volume trend, favorites, trending Saudi stocks, and AI recommendation.</p>
+    <div class="search">
+      <input id="tickerInput" placeholder="Enter Tadawul ticker (e.g. 7202)">
+      <button id="analyzeBtn">Analyze</button>
+      <button id="saveFavBtn" class="ghost">Save Favorite</button>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <canvas id="priceChart" height="120"></canvas>
+      </div>
+      <div class="card grid">
+        <div class="kpi"><div class="l">Price</div><div id="kpiPrice" class="v">—</div></div>
+        <div class="kpi"><div class="l">RSI (14)</div><div id="kpiRsi" class="v">—</div></div>
+        <div class="kpi"><div class="l">MA50</div><div id="kpiMa50" class="v">—</div></div>
+        <div class="kpi"><div class="l">MA200</div><div id="kpiMa200" class="v">—</div></div>
+        <div class="kpi"><div class="l">Support</div><div id="kpiSupport" class="v">—</div></div>
+        <div class="kpi"><div class="l">Resistance</div><div id="kpiResistance" class="v">—</div></div>
+        <div class="kpi"><div class="l">Volume Trend</div><div id="kpiVolume" class="v">—</div></div>
+        <div class="kpi"><div class="l">Ticker</div><div id="kpiTicker" class="v">—</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">AI Recommendation</h3>
+        <div id="aiText" class="ai-box">Run analysis to generate recommendation.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3 style="margin-top:0">Favorite Stocks</h3>
+        <div id="favoritesList" class="list"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Trending 20 Saudi Stocks</h3>
+        <div id="trendingList" class="list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const AI_ENDPOINT = 'https://tools.niug502.workers.dev';
+const FAVORITES_KEY = 'tadawul_favorites_v1';
+const TRENDING_TICKERS = ['2222','2010','1120','7010','1211','7202','1180','2380','4210','2290','2082','4002','4260','8010','1050','8310','1150','4321','1214','8012'];
+let currentTicker = '';
+let lastMetrics = null;
+let chart;
+
+function fmt(v){ return (Number.isFinite(v) ? Number(v).toFixed(2) : '—'); }
+function getFavorites(){ try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); } catch { return []; } }
+function setFavorites(v){ localStorage.setItem(FAVORITES_KEY, JSON.stringify(v)); }
+
+function sma(values, period){
+  if(values.length < period) return null;
+  const slice = values.slice(-period);
+  return slice.reduce((a,b)=>a+b,0)/period;
+}
+
+function calcRSI(closes, period = 14){
+  if(closes.length <= period) return null;
+  let gains = 0, losses = 0;
+  for(let i = closes.length - period; i < closes.length; i++){
+    const d = closes[i] - closes[i-1];
+    if(d > 0) gains += d; else losses += Math.abs(d);
+  }
+  const avgGain = gains / period;
+  const avgLoss = losses / period;
+  if(avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - (100 / (1 + rs));
+}
+
+function volumeTrend(volumes){
+  if(volumes.length < 30) return 'Not enough data';
+  const recent = volumes.slice(-10).reduce((a,b)=>a+b,0)/10;
+  const base = volumes.slice(-30,-10).reduce((a,b)=>a+b,0)/20;
+  if(recent > base * 1.15) return 'Increasing';
+  if(recent < base * 0.85) return 'Decreasing';
+  return 'Stable';
+}
+
+function supportResistance(closes){
+  const recent = closes.slice(-60);
+  return {
+    support: Math.min(...recent),
+    resistance: Math.max(...recent)
+  };
+}
+
+async function fetchHistory(ticker){
+  const symbol = `${ticker}.SR`;
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1y&interval=1d`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Failed to fetch market data');
+  const data = await res.json();
+  const result = data?.chart?.result?.[0];
+  const closes = result?.indicators?.quote?.[0]?.close?.filter(v => Number.isFinite(v)) || [];
+  const volumesRaw = result?.indicators?.quote?.[0]?.volume || [];
+  const volumes = volumesRaw.filter(v => Number.isFinite(v));
+  const timestamps = result?.timestamp || [];
+  if(closes.length < 210) throw new Error('Insufficient data from Yahoo Finance');
+  const points = closes.map((price, i) => ({ x: timestamps[i] * 1000, y: price })).filter(p => Number.isFinite(p.y) && Number.isFinite(p.x));
+  return { closes, volumes, points };
+}
+
+function drawChart(points, ma50, ma200){
+  const labels = points.map(p => new Date(p.x).toLocaleDateString());
+  const closeSeries = points.map(p => p.y);
+  if(chart) chart.destroy();
+  chart = new Chart(document.getElementById('priceChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Close', data: closeSeries, borderColor: '#8dbbff', pointRadius: 0, tension: .2 },
+        { label: 'MA50', data: Array(closeSeries.length).fill(ma50), borderColor: '#00c896', pointRadius: 0, borderDash:[4,4] },
+        { label: 'MA200', data: Array(closeSeries.length).fill(ma200), borderColor: '#f3b14b', pointRadius: 0, borderDash:[6,4] }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#d8d8e6' } } },
+      scales: {
+        x: { ticks: { color:'#a3a3bd', maxTicksLimit: 6 }, grid: { color:'rgba(255,255,255,.06)' } },
+        y: { ticks: { color:'#a3a3bd' }, grid: { color:'rgba(255,255,255,.06)' } }
+      }
+    }
+  });
+}
+
+async function getAiRecommendation(metrics){
+  const prompt = `You are a practical stock advisor for Saudi retail investors. Keep language simple.
+Analyze this Tadawul stock and return:
+1) Trend
+2) Risk level
+3) Recommendation: BUY / HOLD / SELL
+4) Short explanation in simple language.
+
+Data:
+- price: ${metrics.price}
+- RSI: ${metrics.rsi}
+- MA50: ${metrics.ma50}
+- MA200: ${metrics.ma200}
+- support: ${metrics.support}
+- resistance: ${metrics.resistance}
+- volume trend: ${metrics.volumeTrend}`;
+
+  try {
+    const res = await fetch(AI_ENDPOINT, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ prompt }) });
+    const data = await res.json();
+    return data?.text || 'AI response unavailable.';
+  } catch {
+    return 'AI recommendation is unavailable right now. You can still use indicators above.';
+  }
+}
+
+function renderMetrics(ticker, metrics){
+  document.getElementById('kpiTicker').textContent = ticker + '.SR';
+  document.getElementById('kpiPrice').textContent = fmt(metrics.price);
+  document.getElementById('kpiRsi').textContent = fmt(metrics.rsi);
+  document.getElementById('kpiMa50').textContent = fmt(metrics.ma50);
+  document.getElementById('kpiMa200').textContent = fmt(metrics.ma200);
+  document.getElementById('kpiSupport').textContent = fmt(metrics.support);
+  document.getElementById('kpiResistance').textContent = fmt(metrics.resistance);
+  document.getElementById('kpiVolume').textContent = metrics.volumeTrend;
+}
+
+async function analyzeTicker(ticker){
+  const cleanTicker = String(ticker || '').trim();
+  if(!/^\d{4}$/.test(cleanTicker)) return alert('Please enter a 4-digit Tadawul ticker (e.g. 7202).');
+  document.getElementById('aiText').textContent = 'Analyzing...';
+  currentTicker = cleanTicker;
+  try {
+    const { closes, volumes, points } = await fetchHistory(cleanTicker);
+    const price = closes[closes.length - 1];
+    const ma50 = sma(closes, 50);
+    const ma200 = sma(closes, 200);
+    const rsi = calcRSI(closes, 14);
+    const sr = supportResistance(closes);
+    const vTrend = volumeTrend(volumes);
+
+    lastMetrics = { price, ma50, ma200, rsi, support: sr.support, resistance: sr.resistance, volumeTrend: vTrend };
+    renderMetrics(cleanTicker, lastMetrics);
+    drawChart(points, ma50, ma200);
+
+    const aiText = await getAiRecommendation(lastMetrics);
+    document.getElementById('aiText').textContent = aiText;
+  } catch (e) {
+    document.getElementById('aiText').textContent = 'Failed to analyze this ticker. Please try another one.';
+  }
+}
+
+function saveFavorite(){
+  if(!currentTicker) return alert('Analyze a ticker first.');
+  const favs = getFavorites();
+  if(!favs.includes(currentTicker)){ favs.unshift(currentTicker); }
+  setFavorites(favs.slice(0, 20));
+  renderFavorites();
+}
+
+function renderFavorites(){
+  const list = document.getElementById('favoritesList');
+  const favs = getFavorites();
+  list.innerHTML = '';
+  if(!favs.length){ list.innerHTML = '<div class="muted">No favorites yet.</div>'; return; }
+  favs.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'stock-item';
+    row.innerHTML = `<div><strong>${t}.SR</strong></div><div><button class="ghost" data-load="${t}">Load</button> <button class="ghost" data-del="${t}">Remove</button></div>`;
+    list.appendChild(row);
+  });
+}
+
+async function renderTrending(){
+  const list = document.getElementById('trendingList');
+  list.innerHTML = '<div class="muted">Loading trending stocks...</div>';
+  const symbols = TRENDING_TICKERS.map(t => `${t}.SR`).join(',');
+  try {
+    const res = await fetch(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}`);
+    const data = await res.json();
+    const items = (data?.quoteResponse?.result || []).slice(0,20)
+      .sort((a,b)=>(Math.abs(b.regularMarketChangePercent||0)-Math.abs(a.regularMarketChangePercent||0)));
+    list.innerHTML = '';
+    items.forEach(q => {
+      const row = document.createElement('div');
+      row.className = 'stock-item';
+      const change = Number(q.regularMarketChangePercent || 0);
+      row.innerHTML = `<div><strong>${q.symbol}</strong><div class="muted">${q.shortName || ''}</div></div><div style="text-align:right"><div>${fmt(q.regularMarketPrice)}</div><div style="color:${change>=0?'#00c896':'#ff7b7b'}">${change.toFixed(2)}%</div></div>`;
+      list.appendChild(row);
+    });
+  } catch {
+    list.innerHTML = '<div class="muted">Could not load trending list right now.</div>';
+  }
+}
+
+document.getElementById('analyzeBtn').addEventListener('click', () => analyzeTicker(document.getElementById('tickerInput').value));
+document.getElementById('saveFavBtn').addEventListener('click', saveFavorite);
+document.getElementById('favoritesList').addEventListener('click', (e) => {
+  const load = e.target.getAttribute('data-load');
+  const del = e.target.getAttribute('data-del');
+  if(load){ document.getElementById('tickerInput').value = load; analyzeTicker(load); }
+  if(del){ setFavorites(getFavorites().filter(v => v !== del)); renderFavorites(); }
+});
+
+document.getElementById('tickerInput').value = '7202';
+renderFavorites();
+renderTrending();
+analyzeTicker('7202');
+</script>
+</body>
+</html>
