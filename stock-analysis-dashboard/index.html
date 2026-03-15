@@ -1,37 +1,45 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>Stock Analysis Dashboard (Tadawul) — tools.oalfawzan.sa</title>
-  <meta name="description" content="Saudi stock market dashboard with RSI, MA50, MA200, volume trend, favorites, and AI recommendation.">
+  <title>لوحة تحليل الأسهم — tools.oalfawzan.sa</title>
+  <meta name="description" content="لوحة تحليل الأسهم السعودية مع RSI وMA50 وMA200 وحجم التداول والمفضلة وتوصية ذكية مبسطة.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    *,*::before,*::after{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:#0a0a0f;color:#f0f0f5}
-    .wrap{max-width:1100px;margin:0 auto;padding:20px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0f;--surface:#111118;--field:#151520;--border:rgba(255,255,255,.08);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--danger:#ff7b7b;--sans:'IBM Plex Sans',sans-serif;--arabic:'IBM Plex Sans Arabic',sans-serif}
+    :root[data-theme="light"]{--bg:#f7f8fc;--surface:#fff;--field:#f8fafe;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b;--danger:#d92d20}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+    html[lang="ar"] body{font-family:var(--arabic)}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
+    .wrap{max-width:1100px;margin:0 auto;padding:20px;position:relative;z-index:1}
     .top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
-    .top-actions{display:flex;gap:10px;align-items:center}
-    .logo{color:#a3a3bd;text-decoration:none;font-size:.9rem}
-    .logo span{color:#fff}
-    .card{background:#111118;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;margin-bottom:14px}
-    h1{margin:6px 0 10px;font-size:1.6rem}
-    .muted{color:#a3a3bd;font-size:.92rem;line-height:1.6}
+    .top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .logo{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;letter-spacing:.05em}
+    .logo span{color:var(--text)}
+    .control-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:0 14px;min-height:42px;cursor:pointer;font-size:.78rem;font-weight:700}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+    h1{margin:8px 0 10px;font-size:1.7rem}
+    .muted{color:var(--muted);font-size:.9rem;line-height:1.7}
     .search{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:14px}
-    input,button{height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:#151520;color:#f0f0f5;padding:0 12px;font-size:.95rem}
-    button{cursor:pointer;background:#007AFF;border-color:#007AFF;font-weight:600}
-    button.ghost{background:#151520;border-color:rgba(255,255,255,.15)}
+    input,button{height:42px;border-radius:10px;border:1px solid var(--border);background:var(--field);color:var(--text);padding:0 12px;font-size:.94rem}
+    button{cursor:pointer;background:var(--accent);border-color:var(--accent);font-weight:600}
+    button.ghost{background:var(--field);border-color:var(--border);color:var(--text)}
     .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-    .kpi{background:#151520;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px}
-    .kpi .l{font-size:.75rem;color:#a3a3bd;text-transform:uppercase;letter-spacing:.06em}
+    .kpi{background:var(--field);border:1px solid var(--border);border-radius:12px;padding:10px}
+    .kpi .l{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
     .kpi .v{font-size:1.1rem;font-weight:700;margin-top:4px}
     .two-col{display:grid;grid-template-columns:2fr 1fr;gap:14px}
     .list{display:grid;gap:8px;max-height:420px;overflow:auto;padding-right:4px}
-    .stock-item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#151520;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px}
+    .stock-item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--field);border:1px solid var(--border);border-radius:10px;padding:10px}
     .stock-item button{height:32px;padding:0 8px;font-size:.8rem}
-    .ai-box{background:#151520;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px;line-height:1.7;color:#d8d8e6;min-height:130px;white-space:pre-line}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.75rem;font-weight:700;background:rgba(0,122,255,.2);color:#8dbbff}
+    .ai-box{background:var(--field);border:1px solid var(--border);border-radius:12px;padding:12px;line-height:1.8;color:var(--text);min-height:130px;white-space:pre-line}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.75rem;font-weight:700;background:rgba(0,122,255,.15);color:var(--accent)}
+    html[dir="rtl"] .top-actions{flex-direction:row-reverse}
     @media(max-width:900px){.two-col{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.search{grid-template-columns:1fr 1fr}}
   </style>
 </head>
@@ -40,53 +48,49 @@
   <div class="top">
     <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
     <div class="top-actions">
-      <select id="langSelect" aria-label="Language selector">
-        <option value="en">English</option>
-        <option value="ar">العربية</option>
-      </select>
-      <a href="/" id="backLink" class="logo">← Back to tools</a>
+      <button class="control-btn" id="langBtn" type="button">EN</button>
+      <button class="control-btn" id="themeBtn" type="button">☀️</button>
+      <a href="/" id="backLink" class="logo">← الرجوع لكل الأدوات</a>
     </div>
   </div>
 
   <div class="card">
-    <div class="pill">Tadawul Dashboard</div>
-    <h1 id="pageTitle">Stock Analysis Dashboard</h1>
-    <p id="pageDesc" class="muted">Search by ticker (example: <b>7202</b>). Data source: Yahoo Finance using <code>TICKER.SR</code>. Includes RSI, MA50, MA200, support/resistance, volume trend, favorites, trending Saudi stocks, and AI recommendation.</p>
+    <div class="pill" id="badgeText">لوحة تداول</div>
+    <h1 id="pageTitle">لوحة تحليل الأسهم</h1>
+    <p id="pageDesc" class="muted">ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة وتوصية ذكاء اصطناعي مبسطة.</p>
     <div class="search">
-      <input id="tickerInput" placeholder="Enter Tadawul ticker (e.g. 7202)">
-      <button id="analyzeBtn">Analyze</button>
-      <button id="saveFavBtn" class="ghost">Save Favorite</button>
+      <input id="tickerInput" placeholder="أدخل رمز تداول (مثال: 7202)">
+      <button id="analyzeBtn">تحليل</button>
+      <button id="saveFavBtn" class="ghost">حفظ بالمفضلة</button>
     </div>
   </div>
 
   <div class="two-col">
     <div>
-      <div class="card">
-        <canvas id="priceChart" height="120"></canvas>
-      </div>
+      <div class="card"><canvas id="priceChart" height="120"></canvas></div>
       <div class="card grid">
-        <div class="kpi"><div class="l">Price</div><div id="kpiPrice" class="v">—</div></div>
+        <div class="kpi"><div class="l" id="kpiPriceLabel">السعر</div><div id="kpiPrice" class="v">—</div></div>
         <div class="kpi"><div class="l">RSI (14)</div><div id="kpiRsi" class="v">—</div></div>
         <div class="kpi"><div class="l">MA50</div><div id="kpiMa50" class="v">—</div></div>
         <div class="kpi"><div class="l">MA200</div><div id="kpiMa200" class="v">—</div></div>
-        <div class="kpi"><div class="l">Support</div><div id="kpiSupport" class="v">—</div></div>
-        <div class="kpi"><div class="l">Resistance</div><div id="kpiResistance" class="v">—</div></div>
-        <div class="kpi"><div class="l">Volume Trend</div><div id="kpiVolume" class="v">—</div></div>
-        <div class="kpi"><div class="l">Ticker</div><div id="kpiTicker" class="v">—</div></div>
+        <div class="kpi"><div class="l" id="kpiSupportLabel">الدعم</div><div id="kpiSupport" class="v">—</div></div>
+        <div class="kpi"><div class="l" id="kpiResistanceLabel">المقاومة</div><div id="kpiResistance" class="v">—</div></div>
+        <div class="kpi"><div class="l" id="kpiVolumeLabel">اتجاه الحجم</div><div id="kpiVolume" class="v">—</div></div>
+        <div class="kpi"><div class="l" id="kpiTickerLabel">الرمز</div><div id="kpiTicker" class="v">—</div></div>
       </div>
       <div class="card">
-        <h3 id="aiTitle" style="margin-top:0">AI Recommendation</h3>
-        <div id="aiText" class="ai-box">Run analysis to generate recommendation.</div>
+        <h3 id="aiTitle" style="margin-top:0">توصية الذكاء الاصطناعي</h3>
+        <div id="aiText" class="ai-box">شغّل التحليل لإظهار التوصية.</div>
       </div>
     </div>
 
     <div>
       <div class="card">
-        <h3 id="favTitle" style="margin-top:0">Favorite Stocks</h3>
+        <h3 id="favTitle" style="margin-top:0">الأسهم المفضلة</h3>
         <div id="favoritesList" class="list"></div>
       </div>
       <div class="card">
-        <h3 id="trendingTitle" style="margin-top:0">Trending 20 Saudi Stocks</h3>
+        <h3 id="trendingTitle" style="margin-top:0">أكثر 20 سهماً سعودياً حركة</h3>
         <div id="trendingList" class="list"></div>
       </div>
     </div>
@@ -103,122 +107,91 @@ const YAHOO_PROXIES = [
   (url) => `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
   (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
 ];
-let currentTicker = '';
-let lastMetrics = null;
-let chart;
-let currentLang = (navigator.language || 'en').toLowerCase().startsWith('ar') ? 'ar' : 'en';
 
 const I18N = {
-  en: {
-    pageTitle: 'Stock Analysis Dashboard',
-    pageDesc: 'Search by ticker (example: <b>7202</b>). Data source: Yahoo Finance using <code>TICKER.SR</code>. Includes RSI, MA50, MA200, support/resistance, volume trend, favorites, trending Saudi stocks, and AI recommendation.',
-    back: '← Back to tools',
-    tickerPlaceholder: 'Enter Tadawul ticker (e.g. 7202)',
-    analyze: 'Analyze',
-    saveFavorite: 'Save Favorite',
-    aiTitle: 'AI Recommendation',
-    aiInitial: 'Run analysis to generate recommendation.',
-    favTitle: 'Favorite Stocks',
-    trendingTitle: 'Trending 20 Saudi Stocks',
-    invalidTicker: 'Please enter a 4-digit Tadawul ticker (e.g. 7202).',
-    analyzing: 'Analyzing...',
-    failed: 'Failed to analyze this ticker. Please try another one.',
-    favoriteFirst: 'Analyze a ticker first.',
-    noFavorites: 'No favorites yet.',
-    loadingTrending: 'Loading trending stocks...',
-    trendingFail: 'Could not load trending list right now.',
-    aiUnavailable: 'AI response unavailable.',
-    aiDown: 'AI recommendation is unavailable right now. You can still use indicators above.',
-    notEnough: 'Not enough data',
-    volumeIncreasing: 'Increasing',
-    volumeDecreasing: 'Decreasing',
-    volumeStable: 'Stable'
-  },
   ar: {
-    pageTitle: 'لوحة تحليل الأسهم',
-    pageDesc: 'ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة والأسهم السعودية الأكثر حركة وتوصية الذكاء الاصطناعي.',
-    back: 'العودة إلى الأدوات →',
-    tickerPlaceholder: 'أدخل رمز تداول (مثال: 7202)',
-    analyze: 'تحليل',
-    saveFavorite: 'حفظ بالمفضلة',
-    aiTitle: 'توصية الذكاء الاصطناعي',
-    aiInitial: 'شغّل التحليل لإظهار التوصية.',
-    favTitle: 'الأسهم المفضلة',
-    trendingTitle: 'أكثر 20 سهماً سعودياً حركة',
-    invalidTicker: 'من فضلك أدخل رمز تداول مكوّن من 4 أرقام (مثال: 7202).',
-    analyzing: 'جارٍ التحليل...',
-    failed: 'تعذر تحليل هذا السهم حالياً. حاول رمزاً آخر.',
-    favoriteFirst: 'حلّل سهماً أولاً.',
-    noFavorites: 'لا توجد أسهم مفضلة بعد.',
-    loadingTrending: 'جارٍ تحميل الأسهم الأكثر حركة...',
-    trendingFail: 'تعذر تحميل قائمة الأسهم الأكثر حركة حالياً.',
-    aiUnavailable: 'لا تتوفر استجابة الذكاء الاصطناعي حالياً.',
-    aiDown: 'خدمة التوصية غير متاحة الآن. يمكنك الاعتماد على المؤشرات أعلاه.',
-    notEnough: 'البيانات غير كافية',
-    volumeIncreasing: 'متزايد',
-    volumeDecreasing: 'متناقص',
-    volumeStable: 'مستقر'
+    lang: 'ar', dir: 'rtl', title: 'لوحة تحليل الأسهم — tools.oalfawzan.sa',
+    descMeta: 'لوحة تحليل الأسهم السعودية مع RSI وMA50 وMA200 وحجم التداول والمفضلة وتوصية ذكية مبسطة.',
+    badge: 'لوحة تداول', pageTitle: 'لوحة تحليل الأسهم',
+    pageDesc: 'ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة وتوصية ذكاء اصطناعي مبسطة.',
+    back: '← الرجوع لكل الأدوات', tickerPlaceholder: 'أدخل رمز تداول (مثال: 7202)', analyze: 'تحليل', saveFavorite: 'حفظ بالمفضلة',
+    aiTitle: 'توصية الذكاء الاصطناعي', aiInitial: 'شغّل التحليل لإظهار التوصية.', favTitle: 'الأسهم المفضلة', trendingTitle: 'أكثر 20 سهماً سعودياً حركة',
+    invalidTicker: 'من فضلك أدخل رمز تداول مكوّن من 4 أرقام (مثال: 7202).', analyzing: 'جارٍ التحليل...', failed: 'تعذر تحليل هذا السهم حالياً. حاول رمزاً آخر.', favoriteFirst: 'حلّل سهماً أولاً.',
+    noFavorites: 'لا توجد أسهم مفضلة بعد.', loadingTrending: 'جارٍ تحميل الأسهم الأكثر حركة...', trendingFail: 'تعذر تحميل قائمة الأسهم الأكثر حركة حالياً.',
+    aiUnavailable: 'لا تتوفر استجابة الذكاء الاصطناعي حالياً.', aiDown: 'خدمة التوصية غير متاحة الآن. يمكنك الاعتماد على المؤشرات أعلاه.',
+    notEnough: 'البيانات غير كافية', volumeIncreasing: 'متزايد', volumeDecreasing: 'متناقص', volumeStable: 'مستقر',
+    load: 'تحميل', remove: 'حذف', price: 'السعر', support: 'الدعم', resistance: 'المقاومة', volume: 'اتجاه الحجم', ticker: 'الرمز',
+    langBtn: 'EN', themeDark: '🌙', themeLight: '☀️', chartClose: 'الإغلاق',
+    aiPrompt: 'أنت مستشار أسهم بسيط للمستثمر الفردي السعودي. اكتب فقط بالعربية الفصحى البسيطة. ممنوع استخدام markdown أو رموز * أو - أو قوائم. اكتب بالضبط 4 أسطر فقط وبنفس العناوين التالية:\nالاتجاه: صاعد أو هابط أو جانبي + سبب قصير\nالمخاطرة: منخفضة أو متوسطة أو مرتفعة + سبب قصير\nالتوصية: شراء أو احتفاظ أو بيع\nالشرح المبسط: جملتان قصيرتان للمبتدئ.\nلا تضف أي سطر خامس ولا مقدمات.'
+  },
+  en: {
+    lang: 'en', dir: 'ltr', title: 'Stock Analysis Dashboard — tools.oalfawzan.sa',
+    descMeta: 'Saudi stock dashboard with RSI, MA50, MA200, volume trend, favorites, and a simple AI recommendation.',
+    badge: 'Tadawul Dashboard', pageTitle: 'Stock Analysis Dashboard',
+    pageDesc: 'Search by ticker (example: <b>7202</b>). Data source: Yahoo Finance using <code>TICKER.SR</code>. Includes RSI, MA50, MA200, support/resistance, volume trend, favorites, and a simplified AI recommendation.',
+    back: '← Back to all tools', tickerPlaceholder: 'Enter Tadawul ticker (e.g. 7202)', analyze: 'Analyze', saveFavorite: 'Save Favorite',
+    aiTitle: 'AI Recommendation', aiInitial: 'Run analysis to generate recommendation.', favTitle: 'Favorite Stocks', trendingTitle: 'Trending 20 Saudi Stocks',
+    invalidTicker: 'Please enter a 4-digit Tadawul ticker (example: 7202).', analyzing: 'Analyzing...', failed: 'Could not analyze this stock now. Try another ticker.', favoriteFirst: 'Analyze a stock first.',
+    noFavorites: 'No favorite stocks yet.', loadingTrending: 'Loading trending stocks...', trendingFail: 'Could not load trending list right now.',
+    aiUnavailable: 'AI response unavailable.', aiDown: 'AI recommendation is unavailable right now. You can still use indicators above.',
+    notEnough: 'Not enough data', volumeIncreasing: 'Increasing', volumeDecreasing: 'Decreasing', volumeStable: 'Stable',
+    load: 'Load', remove: 'Remove', price: 'Price', support: 'Support', resistance: 'Resistance', volume: 'Volume Trend', ticker: 'Ticker',
+    langBtn: 'عربي', themeDark: '🌙', themeLight: '☀️', chartClose: 'Close',
+    aiPrompt: 'You are a practical stock advisor for Saudi retail investors. Use plain beginner English only. No markdown, no asterisks, no bullet symbols. Return exactly 4 lines with these labels only:\nTrend: uptrend or downtrend or sideways + short reason\nRisk: Low or Medium or High + short reason\nRecommendation: BUY or HOLD or SELL\nSimple explanation: exactly 2 short beginner-friendly sentences.\nDo not add any extra lines or intro.'
   }
 };
 
+let currentLang = localStorage.getItem('tools_lang') || 'ar';
+let currentTheme = localStorage.getItem('tools_theme') || 'dark';
+let currentTicker = '';
+let chart;
+let lastMetrics = null;
+
 function t(key){ return I18N[currentLang][key] || I18N.en[key] || key; }
-
-function applyLanguage(){
-  document.documentElement.lang = currentLang;
-  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-  document.getElementById('langSelect').value = currentLang;
-  document.getElementById('pageTitle').textContent = t('pageTitle');
-  document.getElementById('pageDesc').innerHTML = t('pageDesc');
-  document.getElementById('backLink').textContent = t('back');
-  document.getElementById('tickerInput').placeholder = t('tickerPlaceholder');
-  document.getElementById('analyzeBtn').textContent = t('analyze');
-  document.getElementById('saveFavBtn').textContent = t('saveFavorite');
-  document.getElementById('aiTitle').textContent = t('aiTitle');
-  document.getElementById('favTitle').textContent = t('favTitle');
-  document.getElementById('trendingTitle').textContent = t('trendingTitle');
-  if(!lastMetrics){ document.getElementById('aiText').textContent = t('aiInitial'); }
-}
-
-function fmt(v){ return (Number.isFinite(v) ? Number(v).toFixed(2) : '—'); }
+function fmt(v){ return Number.isFinite(v) ? Number(v).toFixed(2) : '—'; }
 function getFavorites(){ try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); } catch { return []; } }
 function setFavorites(v){ localStorage.setItem(FAVORITES_KEY, JSON.stringify(v)); }
 
-function sma(values, period){
-  if(values.length < period) return null;
-  const slice = values.slice(-period);
-  return slice.reduce((a,b)=>a+b,0)/period;
+function applyTheme(theme){
+  currentTheme = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('tools_theme', currentTheme);
+  document.getElementById('themeBtn').textContent = currentTheme === 'light' ? t('themeDark') : t('themeLight');
+  if(lastMetrics && chart){ drawChart(chart.__points || [], lastMetrics.ma50, lastMetrics.ma200); }
 }
 
-function calcRSI(closes, period = 14){
-  if(closes.length <= period) return null;
-  let gains = 0, losses = 0;
-  for(let i = closes.length - period; i < closes.length; i++){
-    const d = closes[i] - closes[i-1];
-    if(d > 0) gains += d; else losses += Math.abs(d);
-  }
-  const avgGain = gains / period;
-  const avgLoss = losses / period;
-  if(avgLoss === 0) return 100;
-  const rs = avgGain / avgLoss;
-  return 100 - (100 / (1 + rs));
+function applyLanguage(lang){
+  currentLang = lang === 'en' ? 'en' : 'ar';
+  const s = I18N[currentLang];
+  document.documentElement.lang = s.lang;
+  document.documentElement.dir = s.dir;
+  document.title = s.title;
+  document.querySelector('meta[name="description"]').setAttribute('content', s.descMeta);
+  document.getElementById('badgeText').textContent = s.badge;
+  document.getElementById('pageTitle').textContent = s.pageTitle;
+  document.getElementById('pageDesc').innerHTML = s.pageDesc;
+  document.getElementById('backLink').textContent = s.back;
+  document.getElementById('tickerInput').placeholder = s.tickerPlaceholder;
+  document.getElementById('analyzeBtn').textContent = s.analyze;
+  document.getElementById('saveFavBtn').textContent = s.saveFavorite;
+  document.getElementById('aiTitle').textContent = s.aiTitle;
+  document.getElementById('favTitle').textContent = s.favTitle;
+  document.getElementById('trendingTitle').textContent = s.trendingTitle;
+  document.getElementById('kpiPriceLabel').textContent = s.price;
+  document.getElementById('kpiSupportLabel').textContent = s.support;
+  document.getElementById('kpiResistanceLabel').textContent = s.resistance;
+  document.getElementById('kpiVolumeLabel').textContent = s.volume;
+  document.getElementById('kpiTickerLabel').textContent = s.ticker;
+  document.getElementById('langBtn').textContent = s.langBtn;
+  document.getElementById('themeBtn').textContent = currentTheme === 'light' ? s.themeDark : s.themeLight;
+  if(!lastMetrics) document.getElementById('aiText').textContent = s.aiInitial;
+  localStorage.setItem('tools_lang', currentLang);
 }
 
-function volumeTrend(volumes){
-  if(volumes.length < 30) return t('notEnough');
-  const recent = volumes.slice(-10).reduce((a,b)=>a+b,0)/10;
-  const base = volumes.slice(-30,-10).reduce((a,b)=>a+b,0)/20;
-  if(recent > base * 1.15) return t('volumeIncreasing');
-  if(recent < base * 0.85) return t('volumeDecreasing');
-  return t('volumeStable');
-}
-
-function supportResistance(closes){
-  const recent = closes.slice(-60);
-  return {
-    support: Math.min(...recent),
-    resistance: Math.max(...recent)
-  };
-}
+function sma(values, period){ if(values.length < period) return null; return values.slice(-period).reduce((a,b)=>a+b,0)/period; }
+function calcRSI(closes, period=14){ if(closes.length <= period) return null; let gains=0,losses=0; for(let i=closes.length-period;i<closes.length;i++){const d=closes[i]-closes[i-1]; if(d>0) gains+=d; else losses+=Math.abs(d);} if(losses===0) return 100; const rs=(gains/period)/(losses/period); return 100-(100/(1+rs)); }
+function volumeTrend(volumes){ if(volumes.length<30) return t('notEnough'); const recent=volumes.slice(-10).reduce((a,b)=>a+b,0)/10; const base=volumes.slice(-30,-10).reduce((a,b)=>a+b,0)/20; if(recent>base*1.15) return t('volumeIncreasing'); if(recent<base*.85) return t('volumeDecreasing'); return t('volumeStable'); }
+function supportResistance(closes){ const recent = closes.slice(-60); return { support: Math.min(...recent), resistance: Math.max(...recent) }; }
 
 function extractJson(text){
   try { return JSON.parse(text); } catch {}
@@ -232,14 +205,8 @@ async function fetchJsonWithFallback(path){
   let lastErr;
   for(const buildUrl of YAHOO_PROXIES){
     const url = buildUrl(`${YAHOO_BASE}${path}`);
-    try {
-      const res = await fetch(url, { headers: { 'Accept': 'application/json,text/plain,*/*' } });
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const raw = await res.text();
-      return extractJson(raw);
-    } catch (e) {
-      lastErr = e;
-    }
+    try { const res = await fetch(url,{ headers:{ 'Accept':'application/json,text/plain,*/*' } }); if(!res.ok) throw new Error(`HTTP ${res.status}`); return extractJson(await res.text()); }
+    catch(e){ lastErr = e; }
   }
   throw lastErr || new Error('Unable to load market data');
 }
@@ -249,71 +216,64 @@ async function fetchHistory(ticker){
   const data = await fetchJsonWithFallback(`/v8/finance/chart/${symbol}?range=1y&interval=1d`);
   const result = data?.chart?.result?.[0];
   const closes = result?.indicators?.quote?.[0]?.close?.filter(v => Number.isFinite(v)) || [];
-  const volumesRaw = result?.indicators?.quote?.[0]?.volume || [];
-  const volumes = volumesRaw.filter(v => Number.isFinite(v));
+  const volumes = (result?.indicators?.quote?.[0]?.volume || []).filter(v => Number.isFinite(v));
   const timestamps = result?.timestamp || [];
   if(closes.length < 210) throw new Error('Insufficient data from Yahoo Finance');
-  const points = closes.map((price, i) => ({ x: timestamps[i] * 1000, y: price })).filter(p => Number.isFinite(p.y) && Number.isFinite(p.x));
+  const points = closes.map((price,i)=>({x:timestamps[i]*1000,y:price})).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y));
   return { closes, volumes, points };
 }
 
 function drawChart(points, ma50, ma200){
-  const labels = points.map(p => new Date(p.x).toLocaleDateString());
+  if(!points.length) return;
+  const labels = points.map(p => new Date(p.x).toLocaleDateString(currentLang));
   const closeSeries = points.map(p => p.y);
   if(chart) chart.destroy();
+  const styles = getComputedStyle(document.documentElement);
+  const text = styles.getPropertyValue('--text').trim();
+  const muted = styles.getPropertyValue('--muted').trim();
+  const border = styles.getPropertyValue('--border').trim();
+  const accent = styles.getPropertyValue('--accent').trim();
+  const green = styles.getPropertyValue('--green').trim();
   chart = new Chart(document.getElementById('priceChart').getContext('2d'), {
     type: 'line',
     data: {
       labels,
       datasets: [
-        { label: 'Close', data: closeSeries, borderColor: '#8dbbff', pointRadius: 0, tension: .2 },
-        { label: 'MA50', data: Array(closeSeries.length).fill(ma50), borderColor: '#00c896', pointRadius: 0, borderDash:[4,4] },
+        { label: t('chartClose'), data: closeSeries, borderColor: accent, pointRadius: 0, tension: .2 },
+        { label: 'MA50', data: Array(closeSeries.length).fill(ma50), borderColor: green, pointRadius: 0, borderDash:[4,4] },
         { label: 'MA200', data: Array(closeSeries.length).fill(ma200), borderColor: '#f3b14b', pointRadius: 0, borderDash:[6,4] }
       ]
     },
     options: {
       responsive: true,
-      plugins: { legend: { labels: { color: '#d8d8e6' } } },
+      plugins: { legend: { labels: { color: text } } },
       scales: {
-        x: { ticks: { color:'#a3a3bd', maxTicksLimit: 6 }, grid: { color:'rgba(255,255,255,.06)' } },
-        y: { ticks: { color:'#a3a3bd' }, grid: { color:'rgba(255,255,255,.06)' } }
+        x: { ticks: { color: muted, maxTicksLimit: 6 }, grid: { color: border } },
+        y: { ticks: { color: muted }, grid: { color: border } }
       }
     }
   });
+  chart.__points = points;
+}
+
+function sanitizeAiResponse(text){
+  const clean = String(text || '').replace(/\*+/g,'').replace(/•/g,'').replace(/\r/g,'').trim();
+  const lines = clean.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(lines.length >= 4) return lines.slice(0,4).join('\n');
+  return clean;
 }
 
 async function getAiRecommendation(metrics){
-  const responseLanguage = currentLang === 'ar' ? 'Arabic' : 'English';
-  const prompt = `You are a practical stock advisor for Saudi retail investors.
-Respond in ${responseLanguage}.
-Use very simple words.
-Do not use markdown, asterisks, or bullet symbols.
-Use this exact output format on separate lines:
-Trend: <uptrend/downtrend/sideways + short reason>
-Risk: <Low/Medium/High + short reason>
-Recommendation: <BUY/HOLD/SELL>
-Simple explanation: <2-3 short sentences for beginners>
-
-Data:
-- price: ${metrics.price}
-- RSI: ${metrics.rsi}
-- MA50: ${metrics.ma50}
-- MA200: ${metrics.ma200}
-- support: ${metrics.support}
-- resistance: ${metrics.resistance}
-- volume trend: ${metrics.volumeTrend}`;
-
+  const prompt = `${t('aiPrompt')}\n\nData:\nprice: ${metrics.price}\nRSI: ${metrics.rsi}\nMA50: ${metrics.ma50}\nMA200: ${metrics.ma200}\nsupport: ${metrics.support}\nresistance: ${metrics.resistance}\nvolume trend: ${metrics.volumeTrend}`;
   try {
     const res = await fetch(AI_ENDPOINT, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ prompt }) });
     const data = await res.json();
-    return (data?.text || t('aiUnavailable')).replace(/\*\*/g, '').replace(/\s{2,}/g, ' ').replace(/\s(Trend:|Risk:|Recommendation:|Simple explanation:)/g, '\n$1').trim();
-  } catch {
-    return t('aiDown');
-  }
+    return sanitizeAiResponse(data?.text || t('aiUnavailable'));
+  } catch { return t('aiDown'); }
 }
 
 function renderMetrics(ticker, metrics){
-  document.getElementById('kpiTicker').textContent = ticker + '.SR';
+  document.getElementById('kpiTicker').textContent = `${ticker}.SR`;
   document.getElementById('kpiPrice').textContent = fmt(metrics.price);
   document.getElementById('kpiRsi').textContent = fmt(metrics.rsi);
   document.getElementById('kpiMa50').textContent = fmt(metrics.ma50);
@@ -330,20 +290,19 @@ async function analyzeTicker(ticker){
   currentTicker = cleanTicker;
   try {
     const { closes, volumes, points } = await fetchHistory(cleanTicker);
-    const price = closes[closes.length - 1];
-    const ma50 = sma(closes, 50);
-    const ma200 = sma(closes, 200);
-    const rsi = calcRSI(closes, 14);
-    const sr = supportResistance(closes);
-    const vTrend = volumeTrend(volumes);
-
-    lastMetrics = { price, ma50, ma200, rsi, support: sr.support, resistance: sr.resistance, volumeTrend: vTrend };
-    renderMetrics(cleanTicker, lastMetrics);
-    drawChart(points, ma50, ma200);
-
-    const aiText = await getAiRecommendation(lastMetrics);
-    document.getElementById('aiText').textContent = aiText;
-  } catch (e) {
+    const metrics = {
+      price: closes[closes.length - 1],
+      ma50: sma(closes, 50),
+      ma200: sma(closes, 200),
+      rsi: calcRSI(closes, 14),
+      ...supportResistance(closes),
+      volumeTrend: volumeTrend(volumes)
+    };
+    lastMetrics = metrics;
+    renderMetrics(cleanTicker, metrics);
+    drawChart(points, metrics.ma50, metrics.ma200);
+    document.getElementById('aiText').textContent = await getAiRecommendation(metrics);
+  } catch {
     document.getElementById('aiText').textContent = t('failed');
   }
 }
@@ -351,8 +310,8 @@ async function analyzeTicker(ticker){
 function saveFavorite(){
   if(!currentTicker) return alert(t('favoriteFirst'));
   const favs = getFavorites();
-  if(!favs.includes(currentTicker)){ favs.unshift(currentTicker); }
-  setFavorites(favs.slice(0, 20));
+  if(!favs.includes(currentTicker)) favs.unshift(currentTicker);
+  setFavorites(favs.slice(0,20));
   renderFavorites();
 }
 
@@ -361,10 +320,10 @@ function renderFavorites(){
   const favs = getFavorites();
   list.innerHTML = '';
   if(!favs.length){ list.innerHTML = `<div class="muted">${t('noFavorites')}</div>`; return; }
-  favs.forEach(t => {
+  favs.forEach(symbol => {
     const row = document.createElement('div');
     row.className = 'stock-item';
-    row.innerHTML = `<div><strong>${t}.SR</strong></div><div><button class="ghost" data-load="${t}">Load</button> <button class="ghost" data-del="${t}">Remove</button></div>`;
+    row.innerHTML = `<div><strong>${symbol}.SR</strong></div><div><button class="ghost" data-load="${symbol}">${t('load')}</button> <button class="ghost" data-del="${symbol}">${t('remove')}</button></div>`;
     list.appendChild(row);
   });
 }
@@ -372,33 +331,30 @@ function renderFavorites(){
 async function renderTrending(){
   const list = document.getElementById('trendingList');
   list.innerHTML = `<div class="muted">${t('loadingTrending')}</div>`;
-  const symbols = TRENDING_TICKERS.map(t => `${t}.SR`).join(',');
+  const symbols = TRENDING_TICKERS.map(s => `${s}.SR`).join(',');
   try {
     const data = await fetchJsonWithFallback(`/v7/finance/quote?symbols=${encodeURIComponent(symbols)}`);
-    const items = (data?.quoteResponse?.result || []).slice(0,20)
-      .sort((a,b)=>(Math.abs(b.regularMarketChangePercent||0)-Math.abs(a.regularMarketChangePercent||0)));
+    const items = (data?.quoteResponse?.result || []).slice(0,20).sort((a,b)=>Math.abs(b.regularMarketChangePercent||0)-Math.abs(a.regularMarketChangePercent||0));
     list.innerHTML = '';
     items.forEach(q => {
       const row = document.createElement('div');
-      row.className = 'stock-item';
       const change = Number(q.regularMarketChangePercent || 0);
-      row.innerHTML = `<div><strong>${q.symbol}</strong><div class="muted">${q.shortName || ''}</div></div><div style="text-align:right"><div>${fmt(q.regularMarketPrice)}</div><div style="color:${change>=0?'#00c896':'#ff7b7b'}">${change.toFixed(2)}%</div></div>`;
+      row.className = 'stock-item';
+      row.innerHTML = `<div><strong>${q.symbol}</strong><div class="muted">${q.shortName || ''}</div></div><div style="text-align:right"><div>${fmt(q.regularMarketPrice)}</div><div style="color:${change>=0?'var(--green)':'var(--danger)'}">${change.toFixed(2)}%</div></div>`;
       list.appendChild(row);
     });
-  } catch {
-    list.innerHTML = `<div class="muted">${t('trendingFail')}</div>`;
-  }
+  } catch { list.innerHTML = `<div class="muted">${t('trendingFail')}</div>`; }
 }
 
 document.getElementById('analyzeBtn').addEventListener('click', () => analyzeTicker(document.getElementById('tickerInput').value));
 document.getElementById('saveFavBtn').addEventListener('click', saveFavorite);
-document.getElementById('langSelect').addEventListener('change', (e) => {
-  currentLang = e.target.value === 'ar' ? 'ar' : 'en';
-  applyLanguage();
+document.getElementById('langBtn').addEventListener('click', () => {
+  applyLanguage(currentLang === 'ar' ? 'en' : 'ar');
   renderFavorites();
   renderTrending();
-  if(lastMetrics){ analyzeTicker(currentTicker || document.getElementById('tickerInput').value); }
+  if(lastMetrics) analyzeTicker(currentTicker || document.getElementById('tickerInput').value);
 });
+document.getElementById('themeBtn').addEventListener('click', () => applyTheme(currentTheme === 'dark' ? 'light' : 'dark'));
 document.getElementById('favoritesList').addEventListener('click', (e) => {
   const load = e.target.getAttribute('data-load');
   const del = e.target.getAttribute('data-del');
@@ -407,7 +363,8 @@ document.getElementById('favoritesList').addEventListener('click', (e) => {
 });
 
 document.getElementById('tickerInput').value = '7202';
-applyLanguage();
+applyTheme(currentTheme);
+applyLanguage(currentLang);
 renderFavorites();
 renderTrending();
 analyzeTicker('7202');
