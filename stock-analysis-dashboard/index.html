@@ -36,6 +36,8 @@
     .two-col{display:grid;grid-template-columns:2fr 1fr;gap:14px}
     .list{display:grid;gap:8px;max-height:420px;overflow:auto;padding-right:4px}
     .stock-item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--field);border:1px solid var(--border);border-radius:10px;padding:10px}
+    .stock-item-main{display:flex;flex-direction:column;gap:2px}
+    .stock-item-side{display:flex;align-items:center;gap:8px}
     .stock-item button{height:32px;padding:0 8px;font-size:.8rem}
     .ai-box{background:var(--field);border:1px solid var(--border);border-radius:12px;padding:12px;line-height:1.8;color:var(--text);min-height:130px;white-space:pre-line}
     .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.75rem;font-weight:700;background:rgba(0,122,255,.15);color:var(--accent)}
@@ -385,7 +387,7 @@ async function renderTrending(){
       const row = document.createElement('div');
       const change = Number(q.changePercent || 0);
       row.className = 'stock-item';
-      row.innerHTML = `<div><strong>${q.symbol}</strong><div class="muted">${q.name || ''}</div></div><div style="text-align:right"><div>${fmt(q.price)}</div><div style="color:${change>=0?'var(--green)':'var(--danger)'}">${change.toFixed(2)}%</div></div>`;
+      row.innerHTML = `<div class="stock-item-main"><strong>${q.symbol}</strong><div class="muted">${q.name || ''}</div></div><div class="stock-item-side"><div style="text-align:right"><div>${fmt(q.price)}</div><div style="color:${change>=0?'var(--green)':'var(--danger)'}">${change.toFixed(2)}%</div></div><button class="ghost" data-load="${q.symbol.replace('.SR','')}">${t('analyze')}</button></div>`;
       list.appendChild(row);
     });
   } catch { list.innerHTML = `<div class="muted">${t('trendingFail')}</div>`; }
@@ -405,6 +407,12 @@ document.getElementById('favoritesList').addEventListener('click', (e) => {
   const del = e.target.getAttribute('data-del');
   if(load){ document.getElementById('tickerInput').value = load; analyzeTicker(load); }
   if(del){ setFavorites(getFavorites().filter(v => v !== del)); renderFavorites(); }
+});
+document.getElementById('trendingList').addEventListener('click', (e) => {
+  const load = e.target.getAttribute('data-load');
+  if(!load) return;
+  document.getElementById('tickerInput').value = load;
+  analyzeTicker(load);
 });
 
 document.getElementById('tickerInput').value = '7202';
