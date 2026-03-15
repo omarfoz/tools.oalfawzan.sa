@@ -117,7 +117,7 @@ const I18N = {
     back: '← الرجوع لكل الأدوات', tickerPlaceholder: 'أدخل رمز تداول (مثال: 7202)', analyze: 'تحليل', saveFavorite: 'حفظ بالمفضلة',
     aiTitle: 'توصية الذكاء الاصطناعي', aiInitial: 'شغّل التحليل لإظهار التوصية.', favTitle: 'الأسهم المفضلة', trendingTitle: 'أكثر 20 سهماً سعودياً حركة',
     invalidTicker: 'من فضلك أدخل رمز تداول مكوّن من 4 أرقام (مثال: 7202).', analyzing: 'جارٍ التحليل...', failed: 'تعذر تحليل هذا السهم حالياً. حاول رمزاً آخر.', favoriteFirst: 'حلّل سهماً أولاً.',
-    noFavorites: 'لا توجد أسهم مفضلة بعد.', loadingTrending: 'جارٍ تحميل الأسهم الأكثر حركة...', trendingFail: 'تعذر تحميل قائمة الأسهم الأكثر حركة حالياً.',
+    noFavorites: 'لا توجد أسهم مفضلة بعد.', loadingTrending: 'جارٍ تحميل الأسهم الأكثر حركة...', trendingFail: 'تعذر تحميل قائمة الأسهم الأكثر حركة حالياً.', trendingEmpty: 'لا توجد بيانات متاحة لقائمة الأسهم الأكثر حركة حالياً.',
     aiUnavailable: 'لا تتوفر استجابة الذكاء الاصطناعي حالياً.', aiDown: 'خدمة التوصية غير متاحة الآن. يمكنك الاعتماد على المؤشرات أعلاه.',
     notEnough: 'البيانات غير كافية', volumeIncreasing: 'متزايد', volumeDecreasing: 'متناقص', volumeStable: 'مستقر',
     load: 'تحميل', remove: 'حذف', price: 'السعر', support: 'الدعم', resistance: 'المقاومة', volume: 'اتجاه الحجم', ticker: 'الرمز',
@@ -132,7 +132,7 @@ const I18N = {
     back: '← Back to all tools', tickerPlaceholder: 'Enter Tadawul ticker (e.g. 7202)', analyze: 'Analyze', saveFavorite: 'Save Favorite',
     aiTitle: 'AI Recommendation', aiInitial: 'Run analysis to generate recommendation.', favTitle: 'Favorite Stocks', trendingTitle: 'Trending 20 Saudi Stocks',
     invalidTicker: 'Please enter a 4-digit Tadawul ticker (example: 7202).', analyzing: 'Analyzing...', failed: 'Could not analyze this stock now. Try another ticker.', favoriteFirst: 'Analyze a stock first.',
-    noFavorites: 'No favorite stocks yet.', loadingTrending: 'Loading trending stocks...', trendingFail: 'Could not load trending list right now.',
+    noFavorites: 'No favorite stocks yet.', loadingTrending: 'Loading trending stocks...', trendingFail: 'Could not load trending list right now.', trendingEmpty: 'No data is currently available for the trending list.',
     aiUnavailable: 'AI response unavailable.', aiDown: 'AI recommendation is unavailable right now. You can still use indicators above.',
     notEnough: 'Not enough data', volumeIncreasing: 'Increasing', volumeDecreasing: 'Decreasing', volumeStable: 'Stable',
     load: 'Load', remove: 'Remove', price: 'Price', support: 'Support', resistance: 'Resistance', volume: 'Volume Trend', ticker: 'Ticker',
@@ -205,8 +205,17 @@ async function fetchJsonWithFallback(path){
   let lastErr;
   for(const buildUrl of YAHOO_PROXIES){
     const url = buildUrl(`${YAHOO_BASE}${path}`);
-    try { const res = await fetch(url,{ headers:{ 'Accept':'application/json,text/plain,*/*' } }); if(!res.ok) throw new Error(`HTTP ${res.status}`); return extractJson(await res.text()); }
-    catch(e){ lastErr = e; }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const res = await fetch(url,{ headers:{ 'Accept':'application/json,text/plain,*/*' }, signal: controller.signal });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return extractJson(await res.text());
+    } catch(e){
+      lastErr = e;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
   throw lastErr || new Error('Unable to load market data');
 }
@@ -331,16 +340,52 @@ function renderFavorites(){
 async function renderTrending(){
   const list = document.getElementById('trendingList');
   list.innerHTML = `<div class="muted">${t('loadingTrending')}</div>`;
-  const symbols = TRENDING_TICKERS.map(s => `${s}.SR`).join(',');
   try {
-    const data = await fetchJsonWithFallback(`/v7/finance/quote?symbols=${encodeURIComponent(symbols)}`);
-    const items = (data?.quoteResponse?.result || []).slice(0,20).sort((a,b)=>Math.abs(b.regularMarketChangePercent||0)-Math.abs(a.regularMarketChangePercent||0));
+    const symbols = TRENDING_TICKERS.map(s => `${s}.SR`).join(',');
+    const data = await fetchJsonWithFallback(`/v7/finance/quote?symbols=${symbols}`);
+    let items = (data?.quoteResponse?.result || []).map(q => ({
+      symbol: q.symbol,
+      name: q.shortName || '',
+      price: Number(q.regularMarketPrice || 0),
+      changePercent: Number(q.regularMarketChangePercent || 0)
+    })).filter(i => i.symbol);
+
+    if(!items.length){
+      const fallback = await Promise.allSettled(TRENDING_TICKERS.map(async ticker => {
+        const history = await fetchJsonWithFallback(`/v8/finance/chart/${ticker}.SR?range=1mo&interval=1d`);
+        const result = history?.chart?.result?.[0];
+        const closes = (result?.indicators?.quote?.[0]?.close || []).filter(v => Number.isFinite(v));
+        if(closes.length < 2) return null;
+        const prev = closes[closes.length - 2];
+        const last = closes[closes.length - 1];
+        if(!Number.isFinite(prev) || prev === 0 || !Number.isFinite(last)) return null;
+        return {
+          symbol: `${ticker}.SR`,
+          name: result?.meta?.shortName || '',
+          price: last,
+          changePercent: ((last - prev) / prev) * 100
+        };
+      }));
+      items = fallback
+        .filter(row => row.status === 'fulfilled' && row.value)
+        .map(row => row.value);
+    }
+
+    items = items
+      .sort((a,b)=>Math.abs(b.changePercent||0)-Math.abs(a.changePercent||0))
+      .slice(0,20);
+
     list.innerHTML = '';
+    if(!items.length){
+      list.innerHTML = `<div class="muted">${t('trendingEmpty')}</div>`;
+      return;
+    }
+
     items.forEach(q => {
       const row = document.createElement('div');
-      const change = Number(q.regularMarketChangePercent || 0);
+      const change = Number(q.changePercent || 0);
       row.className = 'stock-item';
-      row.innerHTML = `<div><strong>${q.symbol}</strong><div class="muted">${q.shortName || ''}</div></div><div style="text-align:right"><div>${fmt(q.regularMarketPrice)}</div><div style="color:${change>=0?'var(--green)':'var(--danger)'}">${change.toFixed(2)}%</div></div>`;
+      row.innerHTML = `<div><strong>${q.symbol}</strong><div class="muted">${q.name || ''}</div></div><div style="text-align:right"><div>${fmt(q.price)}</div><div style="color:${change>=0?'var(--green)':'var(--danger)'}">${change.toFixed(2)}%</div></div>`;
       list.appendChild(row);
     });
   } catch { list.innerHTML = `<div class="muted">${t('trendingFail')}</div>`; }
