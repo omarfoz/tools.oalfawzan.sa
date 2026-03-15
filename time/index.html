@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>عدة الوقت والتقويم — tools.oalfawzan.sa</title>
-<meta name="description" content="تحويل الوقت بين المناطق الزمنية، حساب فرق الأيام، وتحويل التاريخ الهجري والميلادي.">
+<meta name="description" content="تحويل الوقت بين المناطق الزمنية، حساب الفترات بين الأوقات، وجمع الساعات بسرعة.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -91,6 +91,36 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
   </article>
 
   <article class="panel">
+    <h2 id="durationHeading">المدة بين وقتين</h2>
+    <div class="form-grid">
+      <label><span id="durationStartLabel">من وقت</span><input type="time" id="durationStart" value="05:00"></label>
+      <label><span id="durationEndLabel">إلى وقت</span><input type="time" id="durationEnd" value="12:00"></label>
+    </div>
+    <div class="actions"><button class="btn primary" id="durationBtn" type="button">احسب المدة</button></div>
+    <div class="result" id="durationResult"></div>
+  </article>
+
+  <article class="panel">
+    <h2 id="addHoursHeading">إضافة ساعات إلى وقت</h2>
+    <div class="form-grid">
+      <label><span id="baseTimeLabel">الوقت الحالي</span><input type="time" id="baseTime" value="04:00"></label>
+      <label><span id="hoursToAddLabel">عدد الساعات</span>
+        <select id="hoursToAdd">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="6">6</option>
+          <option value="8">8</option>
+          <option value="12">12</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions"><button class="btn primary" id="addHoursBtn" type="button">احسب الوقت الجديد</button></div>
+    <div class="result" id="addHoursResult"></div>
+  </article>
+
+  <article class="panel">
     <h2 id="h2gHeading">تحويل هجري → ميلادي</h2>
     <div class="form-grid">
       <label><span id="hyLabel">سنة هجرية</span><input type="number" id="hYear" min="1" value="1446"></label>
@@ -114,8 +144,8 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 </div>
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'عدة الوقت والتقويم — tools.oalfawzan.sa',meta:'تحويل الوقت بين المناطق الزمنية، حساب فرق الأيام، وتحويل التاريخ الهجري والميلادي.',tag:'// أداة وقت',heading:'عدة الوقت والتقويم',desc:'حوّل الوقت بين المدن، احسب فرق الأيام، وحوّل بين الهجري والميلادي بسرعة.',tzHeading:'تحويل الوقت بين المناطق',date:'التاريخ',time:'الوقت',from:'من منطقة',to:'إلى منطقة',convertTime:'تحويل الوقت',daysHeading:'حاسبة الأيام',start:'من تاريخ',end:'إلى تاريخ',calcDays:'احسب الفرق',h2gHeading:'تحويل هجري → ميلادي',hy:'سنة هجرية',hm:'شهر هجري',hd:'يوم هجري',h2g:'حوّل لميلادي',g2hHeading:'تحويل ميلادي → هجري',gDate:'التاريخ الميلادي',g2h:'حوّل لهجري',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',badInput:'تحقق من المدخلات أولًا.',daysResult:'الفرق: {days} يوم (حوالي {weeks} أسبوع و {rest} يوم).',tzResult:'{date} — الوقت في {to}: {time}',h2gResult:'التاريخ الميلادي: {date}',g2hResult:'التاريخ الهجري: {date}'},
-  en:{lang:'en',dir:'ltr',title:'Time Toolkit — tools.oalfawzan.sa',meta:'Convert time zones, calculate day differences, and convert Hijri/Gregorian dates.',tag:'// TIME TOOL',heading:'Time Toolkit',desc:'Convert time between cities, calculate day differences, and switch between Hijri and Gregorian dates.',tzHeading:'Time Zone Converter',date:'Date',time:'Time',from:'From Zone',to:'To Zone',convertTime:'Convert Time',daysHeading:'Days Calculator',start:'Start Date',end:'End Date',calcDays:'Calculate',h2gHeading:'Hijri → Gregorian',hy:'Hijri Year',hm:'Hijri Month',hd:'Hijri Day',h2g:'Convert to Gregorian',g2hHeading:'Gregorian → Hijri',gDate:'Gregorian Date',g2h:'Convert to Hijri',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',badInput:'Please check your inputs first.',daysResult:'Difference: {days} days (about {weeks} weeks and {rest} days).',tzResult:'{date} — time in {to}: {time}',h2gResult:'Gregorian date: {date}',g2hResult:'Hijri date: {date}'}
+  ar:{lang:'ar',dir:'rtl',title:'عدة الوقت والتقويم — tools.oalfawzan.sa',meta:'تحويل الوقت بين المناطق الزمنية، حساب الفترات بين الأوقات، وجمع الساعات بسرعة.',tag:'// أداة وقت',heading:'عدة الوقت والتقويم',desc:'حوّل الوقت بين المدن، احسب فرق الوقت بين ساعتين، وأضف ساعات إلى أي وقت بسرعة.',tzHeading:'تحويل الوقت بين المناطق',date:'التاريخ',time:'الوقت',from:'من منطقة',to:'إلى منطقة',convertTime:'تحويل الوقت',daysHeading:'حاسبة الأيام',start:'من تاريخ',end:'إلى تاريخ',calcDays:'احسب الفرق',durationHeading:'المدة بين وقتين',durationStart:'من وقت',durationEnd:'إلى وقت',calcDuration:'احسب المدة',addHoursHeading:'إضافة ساعات إلى وقت',baseTime:'الوقت الحالي',hoursToAdd:'عدد الساعات',calcAddHours:'احسب الوقت الجديد',h2gHeading:'تحويل هجري → ميلادي',hy:'سنة هجرية',hm:'شهر هجري',hd:'يوم هجري',h2g:'حوّل لميلادي',g2hHeading:'تحويل ميلادي → هجري',gDate:'التاريخ الميلادي',g2h:'حوّل لهجري',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',badInput:'تحقق من المدخلات أولًا.',daysResult:'الفرق: {days} يوم (حوالي {weeks} أسبوع و {rest} يوم).',durationResult:'الفرق بين {start} و {end}: {hours} ساعة و {minutes} دقيقة.',addHoursResult:'بعد {hours} ساعة من {start} سيكون الوقت: {time}.',tzResult:'{date} — الوقت في {to}: {time}',h2gResult:'التاريخ الميلادي: {date}',g2hResult:'التاريخ الهجري: {date}'},
+  en:{lang:'en',dir:'ltr',title:'Time Toolkit — tools.oalfawzan.sa',meta:'Convert time zones, calculate time durations, and quickly add hours to any time.',tag:'// TIME TOOL',heading:'Time Toolkit',desc:'Convert time between cities, calculate durations between times, and add hours instantly.',tzHeading:'Time Zone Converter',date:'Date',time:'Time',from:'From Zone',to:'To Zone',convertTime:'Convert Time',daysHeading:'Days Calculator',start:'Start Date',end:'End Date',calcDays:'Calculate',durationHeading:'Duration Between Two Times',durationStart:'Start Time',durationEnd:'End Time',calcDuration:'Calculate Duration',addHoursHeading:'Add Hours to Time',baseTime:'Current Time',hoursToAdd:'Hours to Add',calcAddHours:'Calculate New Time',h2gHeading:'Hijri → Gregorian',hy:'Hijri Year',hm:'Hijri Month',hd:'Hijri Day',h2g:'Convert to Gregorian',g2hHeading:'Gregorian → Hijri',gDate:'Gregorian Date',g2h:'Convert to Hijri',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',badInput:'Please check your inputs first.',daysResult:'Difference: {days} days (about {weeks} weeks and {rest} days).',durationResult:'Difference between {start} and {end}: {hours}h {minutes}m.',addHoursResult:'After {hours} hour(s) from {start}, the time will be: {time}.',tzResult:'{date} — time in {to}: {time}',h2gResult:'Gregorian date: {date}',g2hResult:'Hijri date: {date}'}
 };
 
 const ZONES=[
@@ -192,6 +222,37 @@ function calcDays(){
   setResult('daysResult',STRINGS[currentLang].daysResult.replace('{days}',days).replace('{weeks}',weeks).replace('{rest}',days%7));
 }
 
+function parseMinutes(timeValue){
+  const [hours,minutes]=timeValue.split(':').map(Number);
+  return hours*60+minutes;
+}
+
+function formatMinutes(totalMinutes){
+  const wrapped=((totalMinutes%1440)+1440)%1440;
+  const hours=Math.floor(wrapped/60);
+  const minutes=wrapped%60;
+  return `${pad(hours)}:${pad(minutes)}`;
+}
+
+function calcDuration(){
+  const start=document.getElementById('durationStart').value;
+  const end=document.getElementById('durationEnd').value;
+  if(!start||!end){setResult('durationResult',STRINGS[currentLang].badInput,true);return;}
+  let diff=parseMinutes(end)-parseMinutes(start);
+  if(diff<0){diff+=1440;}
+  const hours=Math.floor(diff/60);
+  const minutes=diff%60;
+  setResult('durationResult',STRINGS[currentLang].durationResult.replace('{start}',start).replace('{end}',end).replace('{hours}',hours).replace('{minutes}',minutes));
+}
+
+function calcAddedHours(){
+  const start=document.getElementById('baseTime').value;
+  const hoursToAdd=Number(document.getElementById('hoursToAdd').value);
+  if(!start||!Number.isFinite(hoursToAdd)){setResult('addHoursResult',STRINGS[currentLang].badInput,true);return;}
+  const resultTime=formatMinutes(parseMinutes(start)+hoursToAdd*60);
+  setResult('addHoursResult',STRINGS[currentLang].addHoursResult.replace('{hours}',hoursToAdd).replace('{start}',start).replace('{time}',resultTime));
+}
+
 function islamicToJD(y,m,d){return d+Math.ceil(29.5*(m-1))+(y-1)*354+Math.floor((3+11*y)/30)+1948439.5-1}
 function jdToGregorian(jd){const z=Math.floor(jd+0.5);let a=z;const alpha=Math.floor((a-1867216.25)/36524.25);a+=1+alpha-Math.floor(alpha/4);const b=a+1524;const c=Math.floor((b-122.1)/365.25);const d=Math.floor(365.25*c);const e=Math.floor((b-d)/30.6001);return {day:b-d-Math.floor(30.6001*e),month:e<14?e-1:e-13,year:(e<14?e-1:e-13)>2?c-4716:c-4715}}
 function gregorianToJD(y,m,d){const a=Math.floor((14-m)/12);const y2=y+4800-a;const m2=m+12*a-3;return d+Math.floor((153*m2+2)/5)+365*y2+Math.floor(y2/4)-Math.floor(y2/100)+Math.floor(y2/400)-32045}
@@ -219,7 +280,7 @@ function applyLang(lang){
   document.getElementById('tag').textContent=s.tag;document.getElementById('title').textContent=s.heading;document.getElementById('desc').textContent=s.desc;
   document.getElementById('tzHeading').textContent=s.tzHeading;document.getElementById('dateLabel').textContent=s.date;document.getElementById('timeLabel').textContent=s.time;
   document.getElementById('fromLabel').textContent=s.from;document.getElementById('toLabel').textContent=s.to;document.getElementById('convertTimeBtn').textContent=s.convertTime;
-  document.getElementById('daysHeading').textContent=s.daysHeading;document.getElementById('startLabel').textContent=s.start;document.getElementById('endLabel').textContent=s.end;document.getElementById('calcDaysBtn').textContent=s.calcDays;
+  document.getElementById('daysHeading').textContent=s.daysHeading;document.getElementById('startLabel').textContent=s.start;document.getElementById('endLabel').textContent=s.end;document.getElementById('calcDaysBtn').textContent=s.calcDays;document.getElementById('durationHeading').textContent=s.durationHeading;document.getElementById('durationStartLabel').textContent=s.durationStart;document.getElementById('durationEndLabel').textContent=s.durationEnd;document.getElementById('durationBtn').textContent=s.calcDuration;document.getElementById('addHoursHeading').textContent=s.addHoursHeading;document.getElementById('baseTimeLabel').textContent=s.baseTime;document.getElementById('hoursToAddLabel').textContent=s.hoursToAdd;document.getElementById('addHoursBtn').textContent=s.calcAddHours;
   document.getElementById('h2gHeading').textContent=s.h2gHeading;document.getElementById('hyLabel').textContent=s.hy;document.getElementById('hmLabel').textContent=s.hm;document.getElementById('hdLabel').textContent=s.hd;document.getElementById('h2gBtn').textContent=s.h2g;
   document.getElementById('g2hHeading').textContent=s.g2hHeading;document.getElementById('gDateLabel').textContent=s.gDate;document.getElementById('g2hBtn').textContent=s.g2h;
   document.getElementById('backLink').textContent=s.back;document.getElementById('builtBy').textContent=s.builtBy;
@@ -231,6 +292,8 @@ function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.
 
 document.getElementById('convertTimeBtn').addEventListener('click',convertTime);
 document.getElementById('calcDaysBtn').addEventListener('click',calcDays);
+document.getElementById('durationBtn').addEventListener('click',calcDuration);
+document.getElementById('addHoursBtn').addEventListener('click',calcAddedHours);
 document.getElementById('h2gBtn').addEventListener('click',convertH2G);
 document.getElementById('g2hBtn').addEventListener('click',convertG2H);
 document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
