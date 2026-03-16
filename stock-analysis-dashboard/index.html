@@ -58,9 +58,24 @@
     .ai-box{background:var(--field);border:1px solid var(--border);border-radius:12px;padding:12px;line-height:1.8;color:var(--text);min-height:130px;white-space:pre-line}
     .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.75rem;font-weight:700;background:rgba(0,122,255,.15);color:var(--accent)}
     .chart-wrap{position:relative;height:360px}
-    @media(max-width:700px){.chart-wrap{height:260px}}
+    @media(max-width:700px){.chart-wrap{height:240px}}
     html[dir="rtl"] .top-actions{flex-direction:row-reverse}
     @media(max-width:900px){.two-col{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.search{grid-template-columns:1fr 1fr}}
+    @media(max-width:600px){
+      .wrap{padding:12px}
+      .card{padding:12px}
+      h1{font-size:1.3rem;line-height:1.4}
+      .muted{font-size:.84rem;line-height:1.6}
+      .top{align-items:flex-start}
+      .top-actions{width:100%;justify-content:space-between}
+      .search{grid-template-columns:1fr}
+      input,button,.control-btn{width:100%}
+      .grid{grid-template-columns:1fr}
+      .kpi .v{font-size:1rem}
+      .list{max-height:300px}
+      .stock-item{align-items:flex-start;flex-direction:column}
+      .stock-item-side{width:100%;justify-content:space-between}
+    }
   </style>
 </head>
 <body>
@@ -445,10 +460,25 @@ document.getElementById('trendingList').addEventListener('click', (e) => {
   analyzeTicker(load);
 });
 
+let resizeTimer;
+let lastViewportWidth = window.innerWidth;
+let lastIsMobile = window.matchMedia('(max-width: 700px)').matches;
+
 window.addEventListener('resize', () => {
-  if(lastMetrics && chart && chart.__points){
-    drawChart(chart.__points, lastMetrics.ma50, lastMetrics.ma200);
-  }
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const nextWidth = window.innerWidth;
+    const widthDelta = Math.abs(nextWidth - lastViewportWidth);
+    const nextIsMobile = window.matchMedia('(max-width: 700px)').matches;
+    const shouldRedraw = nextIsMobile !== lastIsMobile || widthDelta > 120;
+
+    lastViewportWidth = nextWidth;
+    lastIsMobile = nextIsMobile;
+
+    if(shouldRedraw && lastMetrics && chart && chart.__points){
+      drawChart(chart.__points, lastMetrics.ma50, lastMetrics.ma200);
+    }
+  }, 220);
 });
 
 document.getElementById('tickerInput').value = '7202';
