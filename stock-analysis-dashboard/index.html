@@ -2,29 +2,13 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script>
-(() => {
-  let lastTouchEnd = 0;
-  document.addEventListener('touchstart', (event) => {
-    if (event.touches.length > 1) event.preventDefault();
-  }, { passive: false });
-  document.addEventListener('touchend', (event) => {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) event.preventDefault();
-    lastTouchEnd = now;
-  }, { passive: false });
-  document.addEventListener('gesturestart', (event) => event.preventDefault());
-  document.addEventListener('gesturechange', (event) => event.preventDefault());
-  document.addEventListener('gestureend', (event) => event.preventDefault());
-})();
-</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>لوحة تحليل الأسهم — tools.oalfawzan.sa</title>
   <meta name="description" content="لوحة تحليل الأسهم السعودية مع RSI وMA50 وMA200 وحجم التداول والمفضلة وتوصية ذكية مبسطة.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{--bg:#0a0a0f;--surface:#111118;--field:#151520;--border:rgba(255,255,255,.08);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--danger:#ff7b7b;--sans:'IBM Plex Sans',sans-serif;--arabic:'IBM Plex Sans Arabic',sans-serif}
@@ -57,8 +41,10 @@
     .stock-item button{height:32px;padding:0 8px;font-size:.8rem}
     .ai-box{background:var(--field);border:1px solid var(--border);border-radius:12px;padding:12px;line-height:1.8;color:var(--text);min-height:130px;white-space:pre-line}
     .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:.75rem;font-weight:700;background:rgba(0,122,255,.15);color:var(--accent)}
-    .chart-wrap{position:relative;height:360px}
-    @media(max-width:700px){.chart-wrap{height:240px}}
+    .chart-wrap{position:relative;height:460px;width:100%;background:#0b0f14;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px}
+    #priceChart{width:100%;height:100%;position:relative}
+    .chart-tooltip{position:absolute;top:12px;left:12px;background:rgba(11,15,20,.95);border:1px solid rgba(255,255,255,.1);color:#ddd;padding:8px 10px;border-radius:8px;font-size:.76rem;line-height:1.5;pointer-events:none;z-index:3;display:none;text-align:left;direction:ltr;min-width:180px}
+    @media(max-width:700px){.chart-wrap{height:420px;padding:8px}}
     html[dir="rtl"] .top-actions{flex-direction:row-reverse}
     @media(max-width:900px){.two-col{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.search{grid-template-columns:1fr 1fr}}
     @media(max-width:600px){
@@ -100,9 +86,15 @@
     </div>
   </div>
 
+  <div class="card">
+    <div class="chart-wrap" id="priceChartContainer">
+      <div id="priceChart"></div>
+      <div id="chartTooltip" class="chart-tooltip"></div>
+    </div>
+  </div>
+
   <div class="two-col">
     <div>
-      <div class="card"><div class="chart-wrap"><canvas id="priceChart"></canvas></div></div>
       <div class="card grid">
         <div class="kpi"><div class="l" id="kpiPriceLabel">السعر</div><div id="kpiPrice" class="v">—</div></div>
         <div class="kpi"><div class="l">RSI (14)</div><div id="kpiRsi" class="v">—</div></div>
@@ -179,20 +171,42 @@ const I18N = {
 let currentLang = localStorage.getItem('tools_lang') || 'ar';
 let currentTheme = localStorage.getItem('tools_theme') || 'dark';
 let currentTicker = '';
-let chart;
+let chartApi;
+let candleSeries;
+let volumeSeries;
+let sma10Series;
+let sma50Series;
+let sma200Series;
+let supportLine;
+let resistanceLine;
+let chartDataCache = null;
+let chartVisible = false;
+let chartObserver = null;
 let lastMetrics = null;
 
 function t(key){ return I18N[currentLang][key] || I18N.en[key] || key; }
 function fmt(v){ return Number.isFinite(v) ? Number(v).toFixed(2) : '—'; }
 function getFavorites(){ try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); } catch { return []; } }
 function setFavorites(v){ localStorage.setItem(FAVORITES_KEY, JSON.stringify(v)); }
+function toChartDate(ts){ return new Date(ts * 1000).toISOString().slice(0,10); }
+
+function buildSmaSeries(candles, period){
+  const out = [];
+  let sum = 0;
+  for(let i=0;i<candles.length;i++){
+    sum += candles[i].close;
+    if(i >= period) sum -= candles[i - period].close;
+    if(i >= period - 1) out.push({ time: candles[i].time, value: sum / period });
+  }
+  return out;
+}
 
 function applyTheme(theme){
   currentTheme = theme === 'light' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', currentTheme);
   localStorage.setItem('tools_theme', currentTheme);
   document.getElementById('themeBtn').textContent = currentTheme === 'light' ? t('themeDark') : t('themeLight');
-  if(lastMetrics && chart){ drawChart(chart.__points || [], lastMetrics.ma50, lastMetrics.ma200); }
+  if(chartDataCache) drawChart(chartDataCache);
 }
 
 function applyLanguage(lang){
@@ -259,57 +273,108 @@ async function fetchHistory(ticker){
   const symbol = `${ticker}.SR`;
   const data = await fetchJsonWithFallback(`/v8/finance/chart/${symbol}?range=1y&interval=1d`);
   const result = data?.chart?.result?.[0];
-  const closes = result?.indicators?.quote?.[0]?.close?.filter(v => Number.isFinite(v)) || [];
-  const volumes = (result?.indicators?.quote?.[0]?.volume || []).filter(v => Number.isFinite(v));
+  const quote = result?.indicators?.quote?.[0] || {};
   const timestamps = result?.timestamp || [];
-  if(closes.length < 210) throw new Error('Insufficient data from Yahoo Finance');
-  const points = closes.map((price,i)=>({x:timestamps[i]*1000,y:price})).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y));
-  return { closes, volumes, points };
+  const candles = [];
+  const volumes = [];
+
+  timestamps.forEach((ts, i) => {
+    const open = Number(quote.open?.[i]);
+    const high = Number(quote.high?.[i]);
+    const low = Number(quote.low?.[i]);
+    const close = Number(quote.close?.[i]);
+    const volume = Number(quote.volume?.[i]);
+    if(!Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) return;
+    candles.push({ time: toChartDate(ts), open, high, low, close });
+    volumes.push(Number.isFinite(volume) ? volume : 0);
+  });
+
+  if(candles.length < 210) throw new Error('Insufficient data from Yahoo Finance');
+  return { candles, volumes };
 }
 
-function drawChart(points, ma50, ma200){
-  if(!points.length) return;
-  const labels = points.map(p => new Date(p.x).toLocaleDateString(currentLang));
-  const closeSeries = points.map(p => p.y);
-  if(chart) chart.destroy();
-  const styles = getComputedStyle(document.documentElement);
-  const text = styles.getPropertyValue('--text').trim();
-  const muted = styles.getPropertyValue('--muted').trim();
-  const border = styles.getPropertyValue('--border').trim();
-  const accent = styles.getPropertyValue('--accent').trim();
-  const green = styles.getPropertyValue('--green').trim();
-  const isMobile = window.matchMedia('(max-width: 700px)').matches;
-  chart = new Chart(document.getElementById('priceChart').getContext('2d'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: t('chartClose'), data: closeSeries, borderColor: accent, pointRadius: 0, tension: .2, borderWidth: 2 },
-        { label: 'MA50', data: Array(closeSeries.length).fill(ma50), borderColor: green, pointRadius: 0, borderDash:[4,4], borderWidth: 1.8 },
-        { label: 'MA200', data: Array(closeSeries.length).fill(ma200), borderColor: '#f3b14b', pointRadius: 0, borderDash:[6,4], borderWidth: 1.8 }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: {
-          position: 'top',
-          align: 'start',
-          labels: { color: text, usePointStyle: true, boxWidth: 8, boxHeight: 8, padding: isMobile ? 12 : 16 }
-        }
-      },
-      scales: {
-        x: {
-          ticks: { color: muted, maxTicksLimit: isMobile ? 4 : 7, autoSkip: true, maxRotation: 0 },
-          grid: { color: border }
-        },
-        y: { ticks: { color: muted, maxTicksLimit: 5 }, grid: { color: border } }
-      }
-    }
+function formatCrosshairDate(timeValue){
+  if(typeof timeValue === 'string') return new Date(`${timeValue}T00:00:00`).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+  if(typeof timeValue === 'number') return new Date(timeValue * 1000).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+  if(timeValue && typeof timeValue === 'object' && 'year' in timeValue){
+    return new Date(timeValue.year, timeValue.month - 1, timeValue.day).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+  }
+  return '—';
+}
+
+function addChartSeries(type, options){
+  if(typeof chartApi.addSeries === 'function') return chartApi.addSeries(type, options);
+  if(type === LightweightCharts.CandlestickSeries && typeof chartApi.addCandlestickSeries === 'function') return chartApi.addCandlestickSeries(options);
+  if(type === LightweightCharts.LineSeries && typeof chartApi.addLineSeries === 'function') return chartApi.addLineSeries(options);
+  if(type === LightweightCharts.HistogramSeries && typeof chartApi.addHistogramSeries === 'function') return chartApi.addHistogramSeries(options);
+  throw new Error('Unsupported lightweight-charts series API');
+}
+
+function initChart(){
+  const container = document.getElementById('priceChart');
+  if(!container || chartApi) return;
+
+  chartApi = LightweightCharts.createChart(container, {
+    width: container.clientWidth,
+    height: container.clientHeight,
+    layout: { background: { color: '#0b0f14' }, textColor: '#aaa' },
+    grid: { vertLines: { color: 'rgba(255,255,255,0.05)' }, horzLines: { color: 'rgba(255,255,255,0.05)' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: 'rgba(255,255,255,0.12)' },
+    timeScale: { borderColor: 'rgba(255,255,255,0.12)', rightOffset: 8, barSpacing: 8, fixLeftEdge: false },
+    localization: { locale: currentLang === 'ar' ? 'ar-SA' : 'en-US' },
+    handleScale: { axisPressedMouseMove: true, mouseWheel: true, pinch: true },
+    handleScroll: { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: true, kineticScroll: { touch: true, mouse: true } }
   });
-  chart.__points = points;
+
+  candleSeries = addChartSeries(LightweightCharts.CandlestickSeries, {
+    upColor: '#26a69a', downColor: '#ef5350', borderVisible: true,
+    borderUpColor: '#26a69a', borderDownColor: '#ef5350', wickUpColor: '#26a69a', wickDownColor: '#ef5350'
+  });
+  sma10Series = addChartSeries(LightweightCharts.LineSeries, { color: '#f2c94c', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+  sma50Series = addChartSeries(LightweightCharts.LineSeries, { color: '#4c9aff', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+  sma200Series = addChartSeries(LightweightCharts.LineSeries, { color: '#ff7ab6', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+  volumeSeries = addChartSeries(LightweightCharts.HistogramSeries, {
+    priceFormat: { type: 'volume' },
+    priceScaleId: '',
+    scaleMargins: { top: 0.8, bottom: 0 },
+    lastValueVisible: false,
+    priceLineVisible: false
+  });
+
+  const tooltip = document.getElementById('chartTooltip');
+  chartApi.subscribeCrosshairMove((param) => {
+    if(!param.point || !param.time || !param.seriesData.size){
+      tooltip.style.display = 'none';
+      return;
+    }
+    const candle = param.seriesData.get(candleSeries);
+    if(!candle) return;
+    const sma10 = param.seriesData.get(sma10Series)?.value;
+    const sma50 = param.seriesData.get(sma50Series)?.value;
+    const sma200 = param.seriesData.get(sma200Series)?.value;
+    const dateLabel = formatCrosshairDate(param.time);
+    tooltip.innerHTML = `Date: ${dateLabel}<br>O: ${fmt(candle.open)} H: ${fmt(candle.high)}<br>L: ${fmt(candle.low)} C: ${fmt(candle.close)}<br>SMA10: ${fmt(sma10)} | SMA50: ${fmt(sma50)}<br>SMA200: ${fmt(sma200)}`;
+    tooltip.style.display = 'block';
+  });
+}
+
+function drawChart(payload){
+  if(!payload?.candles?.length) return;
+  chartDataCache = payload;
+  if(!chartVisible) return;
+  initChart();
+
+  candleSeries.setData(payload.candles);
+  sma10Series.setData(payload.sma10);
+  sma50Series.setData(payload.sma50);
+  sma200Series.setData(payload.sma200);
+  volumeSeries.setData(payload.volume);
+  if(supportLine) candleSeries.removePriceLine(supportLine);
+  if(resistanceLine) candleSeries.removePriceLine(resistanceLine);
+  supportLine = candleSeries.createPriceLine({ price: 170.10, color: '#26a69a', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Support 170.10' });
+  resistanceLine = candleSeries.createPriceLine({ price: 340, color: '#ef5350', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Resistance 340' });
+  chartApi.timeScale().fitContent();
 }
 
 function sanitizeAiResponse(text){
@@ -345,7 +410,13 @@ async function analyzeTicker(ticker){
   document.getElementById('aiText').textContent = t('analyzing');
   currentTicker = cleanTicker;
   try {
-    const { closes, volumes, points } = await fetchHistory(cleanTicker);
+    const { candles, volumes } = await fetchHistory(cleanTicker);
+    const closes = candles.map(c => c.close);
+    const sma10 = buildSmaSeries(candles, 10);
+    const sma50 = buildSmaSeries(candles, 50);
+    const sma200 = buildSmaSeries(candles, 200);
+    const volumeData = candles.map((c, i) => ({ time: c.time, value: volumes[i] || 0, color: c.close >= c.open ? '#26a69a' : '#ef5350' }));
+
     const metrics = {
       price: closes[closes.length - 1],
       ma50: sma(closes, 50),
@@ -356,7 +427,7 @@ async function analyzeTicker(ticker){
     };
     lastMetrics = metrics;
     renderMetrics(cleanTicker, metrics);
-    drawChart(points, metrics.ma50, metrics.ma200);
+    drawChart({ candles, sma10, sma50, sma200, volume: volumeData });
     document.getElementById('aiText').textContent = await getAiRecommendation(metrics);
   } catch {
     document.getElementById('aiText').textContent = t('failed');
@@ -460,30 +531,33 @@ document.getElementById('trendingList').addEventListener('click', (e) => {
   analyzeTicker(load);
 });
 
-let resizeTimer;
-let lastViewportWidth = window.innerWidth;
-let lastIsMobile = window.matchMedia('(max-width: 700px)').matches;
+function setupChartVisibility(){
+  const container = document.getElementById('priceChartContainer');
+  if(!container) return;
+  chartObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      chartVisible = entry.isIntersecting;
+      if(chartVisible && chartDataCache) drawChart(chartDataCache);
+    });
+  }, { threshold: 0.15 });
+  chartObserver.observe(container);
+}
 
+let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    const nextWidth = window.innerWidth;
-    const widthDelta = Math.abs(nextWidth - lastViewportWidth);
-    const nextIsMobile = window.matchMedia('(max-width: 700px)').matches;
-    const shouldRedraw = nextIsMobile !== lastIsMobile || widthDelta > 120;
-
-    lastViewportWidth = nextWidth;
-    lastIsMobile = nextIsMobile;
-
-    if(shouldRedraw && lastMetrics && chart && chart.__points){
-      drawChart(chart.__points, lastMetrics.ma50, lastMetrics.ma200);
+    if(chartApi){
+      const target = document.getElementById('priceChart');
+      chartApi.applyOptions({ width: target.clientWidth, height: target.clientHeight });
     }
-  }, 220);
+  }, 150);
 });
 
 document.getElementById('tickerInput').value = '7202';
 applyTheme(currentTheme);
 applyLanguage(currentLang);
+setupChartVisibility();
 renderFavorites();
 renderTrending();
 analyzeTicker('7202');
