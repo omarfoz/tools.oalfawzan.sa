@@ -26,48 +26,55 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--danger:#ff5f6d;--sans:'IBM Plex Sans',sans-serif;--arabic:'IBM Plex Sans Arabic',sans-serif;--mono:'IBM Plex Sans',sans-serif}
-:root[data-theme="light"]{--bg:#f7f8fc;--surface:#ffffff;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b;--danger:#d92d20}
+:root{--bg:#0a0a0f;--surface:#111118;--surface-soft:#161621;--border:rgba(255,255,255,.1);--text:#f0f0f5;--muted:#8a8aa1;--accent:#007AFF;--green:#00c896;--danger:#ff5f6d;--sans:'IBM Plex Sans',sans-serif;--arabic:'IBM Plex Sans Arabic',sans-serif;--mono:'IBM Plex Sans',sans-serif}
+:root[data-theme="light"]{--bg:#f7f8fc;--surface:#ffffff;--surface-soft:#f8f9ff;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b;--danger:#d92d20}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
 html[lang="ar"] body{font-family:var(--arabic)}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
-.wrap{max-width:1080px;margin:0 auto;padding:0 20px 34px;position:relative;z-index:1}
-header{padding:24px 0 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 26px;position:relative;z-index:1}
+header{padding:16px 0 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.header-actions{display:flex;gap:8px;align-items:center}
 .logo{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;letter-spacing:.05em}.logo span{color:var(--text)}
-.lang-btn,.btn,input,select{background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);min-height:44px;font-size:.84rem}
-.lang-btn,.btn{padding:0 14px;cursor:pointer;font-weight:700}
-.btn.primary{background:rgba(0,122,255,.12);border-color:rgba(0,122,255,.4)}
-.hero-tag{display:inline-block;font-family:var(--mono);font-size:.72rem;color:var(--green);border:1px solid rgba(0,200,150,.3);padding:4px 12px;border-radius:4px;margin-bottom:16px;letter-spacing:.08em}
-h1{font-size:clamp(1.8rem,7vw,2.8rem);margin-bottom:10px;line-height:1.15}
-p.sub{font-family:var(--mono);font-size:.82rem;color:var(--muted);line-height:1.8;margin-bottom:20px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;overflow:hidden}
-.panel h2{font-size:1.05rem;margin-bottom:12px}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-label{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:.74rem;color:var(--muted);min-width:0}
-input,select{padding:0 12px;font-family:var(--mono);width:100%;max-width:100%;min-width:0;min-inline-size:0;display:block}
+.lang-btn,.btn,input,select{background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);min-height:42px;font-size:.86rem}
+.lang-btn,.btn{padding:0 14px;cursor:pointer;font-weight:700;transition:.2s ease}
+.lang-btn:hover,.btn:hover{border-color:rgba(0,122,255,.45)}
+.btn.primary{background:rgba(0,122,255,.14);border-color:rgba(0,122,255,.38);box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.hero{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));border:1px solid var(--border);border-radius:18px;padding:14px 16px 12px;margin-bottom:14px}
+.hero-tag{display:inline-block;font-family:var(--mono);font-size:.69rem;color:var(--green);border:1px solid rgba(0,200,150,.3);padding:3px 10px;border-radius:999px;margin-bottom:10px;letter-spacing:.08em}
+h1{font-size:clamp(1.75rem,6vw,2.55rem);margin-bottom:6px;line-height:1.12}
+p.sub{font-family:var(--mono);font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:0}
+.back-link{display:inline-flex;margin-bottom:12px;font-size:.78rem;padding:4px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.panel{background:linear-gradient(180deg,var(--surface),var(--surface-soft));border:1px solid var(--border);border-radius:14px;padding:13px;overflow:hidden}
+.panel h2{font-size:1rem;margin-bottom:10px;line-height:1.3}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+label{display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:.7rem;font-weight:600;color:var(--muted);letter-spacing:.02em;min-width:0}
+input,select{padding:0 10px;font-family:var(--mono);width:100%;max-width:100%;min-width:0;min-inline-size:0;display:block}
 input[type="date"],input[type="time"]{-webkit-min-logical-width:0;inline-size:100%;max-inline-size:100%;min-inline-size:0;width:100%!important;min-width:0!important}
 
 .form-grid>*{min-width:0}
 select{text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .actions .btn{width:100%}
-.result{margin-top:10px;padding:12px;border:1px dashed var(--border);border-radius:10px;font-family:var(--mono);font-size:.8rem;line-height:1.8;min-height:58px;word-break:break-word}
+.result{margin-top:9px;padding:10px 11px;border:1px solid var(--border);background:rgba(0,0,0,.1);border-radius:10px;font-family:var(--mono);font-size:.77rem;line-height:1.6;min-height:52px;word-break:break-word;display:flex;align-items:flex-start}
+.result[data-empty="true"]{color:var(--muted);border-style:dashed;background:transparent}
 .result.error{border-color:rgba(255,95,109,.55);color:var(--danger)}
-footer{text-align:center;padding:26px 0 10px;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+footer{text-align:center;padding:22px 0 8px;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
 html[dir="rtl"] .header-actions{flex-direction:row-reverse}
 @media(max-width:980px){.grid,.form-grid{grid-template-columns:1fr}}
 @media(max-width:640px){
-  .wrap{padding:0 14px 26px}
-  header{padding:16px 0 20px}
-  .header-actions{width:100%;justify-content:flex-start;gap:10px}
-  .lang-btn{min-width:64px}
-  #backLink{width:100%;display:block;text-align:start}
+  .wrap{padding:0 12px 22px}
+  header{padding:12px 0 10px}
+  .header-actions{gap:6px}
+  .lang-btn{min-width:56px;min-height:38px;font-size:.8rem;padding:0 11px}
   .logo{font-size:.8rem;overflow-wrap:anywhere}
-  .panel{padding:14px;border-radius:14px}
-  input,select{font-size:.8rem}
-  h1{font-size:1.65rem}
+  .hero{padding:12px 12px 11px;border-radius:15px;margin-bottom:10px}
+  .panel{padding:11px;border-radius:12px}
+  input,select{font-size:.8rem;min-height:40px}
+  .btn{min-height:40px;font-size:.82rem}
+  h1{font-size:1.56rem}
+  .grid{gap:9px}
+  .back-link{margin-bottom:8px}
 }
 </style>
 </head>
@@ -78,12 +85,14 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
   <div class="header-actions">
     <button class="lang-btn" id="langBtn" type="button">EN</button>
     <button class="lang-btn" id="themeBtn" type="button">☀️</button>
-    <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
   </div>
 </header>
-<div class="hero-tag" id="tag">// أداة وقت</div>
-<h1 id="title">عدة الوقت والتقويم</h1>
-<p class="sub" id="desc">حوّل الوقت بين المدن، احسب فرق الأيام، وحوّل بين الهجري والميلادي بسرعة.</p>
+<a href="/" class="logo back-link" id="backLink">← الرجوع لكل الأدوات</a>
+<section class="hero">
+  <div class="hero-tag" id="tag">// أداة وقت</div>
+  <h1 id="title">عدة الوقت والتقويم</h1>
+  <p class="sub" id="desc">حوّل الوقت بين المدن، احسب فرق الأيام، وحوّل بين الهجري والميلادي بسرعة.</p>
+</section>
 <section class="grid">
   <article class="panel">
     <h2 id="tzHeading">تحويل الوقت بين المناطق</h2>
@@ -94,7 +103,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
       <label><span id="toLabel">إلى منطقة</span><select id="toZone"></select></label>
     </div>
     <div class="actions"><button class="btn primary" id="convertTimeBtn" type="button">تحويل الوقت</button></div>
-    <div class="result" id="tzResult"></div>
+    <div class="result" id="tzResult" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -104,7 +113,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
       <label><span id="endLabel">إلى تاريخ</span><input type="date" id="endDate"></label>
     </div>
     <div class="actions"><button class="btn primary" id="calcDaysBtn" type="button">احسب الفرق</button></div>
-    <div class="result" id="daysResult"></div>
+    <div class="result" id="daysResult" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -114,7 +123,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
       <label><span id="durationEndLabel">إلى وقت</span><input type="time" id="durationEnd" value="12:00"></label>
     </div>
     <div class="actions"><button class="btn primary" id="durationBtn" type="button">احسب المدة</button></div>
-    <div class="result" id="durationResult"></div>
+    <div class="result" id="durationResult" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -134,7 +143,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
       </label>
     </div>
     <div class="actions"><button class="btn primary" id="addHoursBtn" type="button">احسب الوقت الجديد</button></div>
-    <div class="result" id="addHoursResult"></div>
+    <div class="result" id="addHoursResult" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -145,7 +154,7 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
       <label><span id="hdLabel">يوم هجري</span><input type="number" id="hDay" min="1" max="30" value="1"></label>
     </div>
     <div class="actions"><button class="btn primary" id="h2gBtn" type="button">حوّل لميلادي</button></div>
-    <div class="result" id="h2gResult"></div>
+    <div class="result" id="h2gResult" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -154,15 +163,15 @@ html[dir="rtl"] .header-actions{flex-direction:row-reverse}
       <label><span id="gDateLabel">التاريخ الميلادي</span><input type="date" id="gDate"></label>
     </div>
     <div class="actions"><button class="btn primary" id="g2hBtn" type="button">حوّل لهجري</button></div>
-    <div class="result" id="g2hResult"></div>
+    <div class="result" id="g2hResult" data-empty="true"></div>
   </article>
 </section>
 <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
 </div>
 <script>
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'عدة الوقت والتقويم — tools.oalfawzan.sa',meta:'تحويل الوقت بين المناطق الزمنية، حساب الفترات بين الأوقات، وجمع الساعات بسرعة.',tag:'// أداة وقت',heading:'عدة الوقت والتقويم',desc:'حوّل الوقت بين المدن، احسب فرق الوقت بين ساعتين، وأضف ساعات إلى أي وقت بسرعة.',tzHeading:'تحويل الوقت بين المناطق',date:'التاريخ',time:'الوقت',from:'من منطقة',to:'إلى منطقة',convertTime:'تحويل الوقت',daysHeading:'حاسبة الأيام',start:'من تاريخ',end:'إلى تاريخ',calcDays:'احسب الفرق',durationHeading:'المدة بين وقتين',durationStart:'من وقت',durationEnd:'إلى وقت',calcDuration:'احسب المدة',addHoursHeading:'إضافة ساعات إلى وقت',baseTime:'الوقت الحالي',hoursToAdd:'عدد الساعات',calcAddHours:'احسب الوقت الجديد',h2gHeading:'تحويل هجري → ميلادي',hy:'سنة هجرية',hm:'شهر هجري',hd:'يوم هجري',h2g:'حوّل لميلادي',g2hHeading:'تحويل ميلادي → هجري',gDate:'التاريخ الميلادي',g2h:'حوّل لهجري',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',badInput:'تحقق من المدخلات أولًا.',daysResult:'الفرق: {days} يوم (حوالي {weeks} أسبوع و {rest} يوم).',durationResult:'الفرق بين {start} و {end}: {hours} ساعة و {minutes} دقيقة.',addHoursResult:'بعد {hours} ساعة من {start} سيكون الوقت: {time}.',tzResult:'{date} — الوقت في {to}: {time}',h2gResult:'التاريخ الميلادي: {date}',g2hResult:'التاريخ الهجري: {date}'},
-  en:{lang:'en',dir:'ltr',title:'Time Toolkit — tools.oalfawzan.sa',meta:'Convert time zones, calculate time durations, and quickly add hours to any time.',tag:'// TIME TOOL',heading:'Time Toolkit',desc:'Convert time between cities, calculate durations between times, and add hours instantly.',tzHeading:'Time Zone Converter',date:'Date',time:'Time',from:'From Zone',to:'To Zone',convertTime:'Convert Time',daysHeading:'Days Calculator',start:'Start Date',end:'End Date',calcDays:'Calculate',durationHeading:'Duration Between Two Times',durationStart:'Start Time',durationEnd:'End Time',calcDuration:'Calculate Duration',addHoursHeading:'Add Hours to Time',baseTime:'Current Time',hoursToAdd:'Hours to Add',calcAddHours:'Calculate New Time',h2gHeading:'Hijri → Gregorian',hy:'Hijri Year',hm:'Hijri Month',hd:'Hijri Day',h2g:'Convert to Gregorian',g2hHeading:'Gregorian → Hijri',gDate:'Gregorian Date',g2h:'Convert to Hijri',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',badInput:'Please check your inputs first.',daysResult:'Difference: {days} days (about {weeks} weeks and {rest} days).',durationResult:'Difference between {start} and {end}: {hours}h {minutes}m.',addHoursResult:'After {hours} hour(s) from {start}, the time will be: {time}.',tzResult:'{date} — time in {to}: {time}',h2gResult:'Gregorian date: {date}',g2hResult:'Hijri date: {date}'}
+  ar:{lang:'ar',dir:'rtl',title:'عدة الوقت والتقويم — tools.oalfawzan.sa',meta:'تحويل الوقت بين المناطق الزمنية، حساب الفترات بين الأوقات، وجمع الساعات بسرعة.',tag:'// أداة وقت',heading:'عدة الوقت والتقويم',desc:'حوّل الوقت بين المدن، احسب فرق الوقت بين ساعتين، وأضف ساعات إلى أي وقت بسرعة.',tzHeading:'تحويل الوقت بين المناطق',date:'التاريخ',time:'الوقت',from:'من منطقة',to:'إلى منطقة',convertTime:'تحويل الوقت',daysHeading:'حاسبة الأيام',start:'من تاريخ',end:'إلى تاريخ',calcDays:'احسب الفرق',durationHeading:'المدة بين وقتين',durationStart:'من وقت',durationEnd:'إلى وقت',calcDuration:'احسب المدة',addHoursHeading:'إضافة ساعات إلى وقت',baseTime:'الوقت الحالي',hoursToAdd:'عدد الساعات',calcAddHours:'احسب الوقت الجديد',h2gHeading:'تحويل هجري → ميلادي',hy:'سنة هجرية',hm:'شهر هجري',hd:'يوم هجري',h2g:'حوّل لميلادي',g2hHeading:'تحويل ميلادي → هجري',gDate:'التاريخ الميلادي',g2h:'حوّل لهجري',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',badInput:'تحقق من المدخلات أولًا.',emptyResult:'ستظهر النتيجة هنا بعد الحساب.',daysResult:'الفرق: {days} يوم (حوالي {weeks} أسبوع و {rest} يوم).',durationResult:'الفرق بين {start} و {end}: {hours} ساعة و {minutes} دقيقة.',addHoursResult:'بعد {hours} ساعة من {start} سيكون الوقت: {time}.',tzResult:'{date} — الوقت في {to}: {time}',h2gResult:'التاريخ الميلادي: {date}',g2hResult:'التاريخ الهجري: {date}'},
+  en:{lang:'en',dir:'ltr',title:'Time Toolkit — tools.oalfawzan.sa',meta:'Convert time zones, calculate time durations, and quickly add hours to any time.',tag:'// TIME TOOL',heading:'Time Toolkit',desc:'Convert time between cities, calculate durations between times, and add hours instantly.',tzHeading:'Time Zone Converter',date:'Date',time:'Time',from:'From Zone',to:'To Zone',convertTime:'Convert Time',daysHeading:'Days Calculator',start:'Start Date',end:'End Date',calcDays:'Calculate',durationHeading:'Duration Between Two Times',durationStart:'Start Time',durationEnd:'End Time',calcDuration:'Calculate Duration',addHoursHeading:'Add Hours to Time',baseTime:'Current Time',hoursToAdd:'Hours to Add',calcAddHours:'Calculate New Time',h2gHeading:'Hijri → Gregorian',hy:'Hijri Year',hm:'Hijri Month',hd:'Hijri Day',h2g:'Convert to Gregorian',g2hHeading:'Gregorian → Hijri',gDate:'Gregorian Date',g2h:'Convert to Hijri',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',badInput:'Please check your inputs first.',emptyResult:'Your result will appear here after calculation.',daysResult:'Difference: {days} days (about {weeks} weeks and {rest} days).',durationResult:'Difference between {start} and {end}: {hours}h {minutes}m.',addHoursResult:'After {hours} hour(s) from {start}, the time will be: {time}.',tzResult:'{date} — time in {to}: {time}',h2gResult:'Gregorian date: {date}',g2hResult:'Hijri date: {date}'}
 };
 
 const ZONES=[
@@ -215,6 +224,7 @@ function zonedToUtcMs(dateStr,timeStr,tz){
 function setResult(id,msg,isError=false){
   const el=document.getElementById(id);
   el.classList.toggle('error',isError);
+  el.dataset.empty=msg? 'false':'true';
   el.textContent=msg;
 }
 
@@ -303,9 +313,21 @@ function applyLang(lang){
   document.getElementById('backLink').textContent=s.back;document.getElementById('builtBy').textContent=s.builtBy;
   document.getElementById('langBtn').textContent=s.langBtn;document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
   populateZones();
+  initResultPlaceholders();
   localStorage.setItem('tools_lang',lang);
 }
 function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight)}
+
+
+function initResultPlaceholders(){
+  const placeholder=STRINGS[currentLang].emptyResult;
+  document.querySelectorAll('.result').forEach((el)=>{
+    if(!el.textContent.trim()){
+      el.textContent=placeholder;
+      el.dataset.empty='true';
+    }
+  });
+}
 
 document.getElementById('convertTimeBtn').addEventListener('click',convertTime);
 document.getElementById('calcDaysBtn').addEventListener('click',calcDays);
