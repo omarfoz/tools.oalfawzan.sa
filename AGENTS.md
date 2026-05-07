@@ -243,3 +243,37 @@ gh api repos/:owner/:repo/pages | jq '.status'
 **Last Updated:** 2025  
 **Version:** 1.0.0  
 **Status:** Production (GitHub Pages)
+
+## Tool 7: Loan Calculator (`/loan-calculator/`)
+
+**Purpose:** Saudi housing loan comparator with regulatory compliance checking
+
+**Key Features:**
+- Standard amortization formula (accurate bank calculations)
+- 10% down payment requirement (Saudi regulation)
+- Personal loan for down payment option
+- 65% debt-to-income regulatory limit (SAMA compliance)
+- Multi-loan comparison (up to 4 loans)
+- Amortization schedule generation
+- Risk assessment with regulatory compliance badge
+- Export to CSV functionality
+- RTL Arabic support
+
+**Regulatory Compliance:**
+- Enforces Saudi Central Bank (SAMA) 65% DTI limit
+- Validates down payment requirements
+- Checks combined loan compliance
+- Provides regulatory rejection notices
+
+**Formulas Used:**
+- Standard amortization: MRC = P×[r(1+r)^n]/[(1+r)^n-1]
+- Debt-to-income: DTI = Monthly Payment ÷ Salary
+- Down payment: 10% of property value + 10,000 SAR fee
+
+**Implementation:**
+- Location: `/loan-calculator/index.html`
+- Languages: Arabic (primary), English fallback
+- No external dependencies
+- Pure client-side calculations
+- Privacy-first (no data collection)
+

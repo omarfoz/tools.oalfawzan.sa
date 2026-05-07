@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مقارن القروض - Loan Comparator</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface-light: #1a1a24;
+            --primary: #00d4aa;
+            --accent: #0099ff;
+            --text: #e6e6ff;
+            --text-muted: #a0a0c0;
+            --border: #2a2a35;
+            --success: #00d4aa;
+            --warning: #ffaa00;
+            --error: #ff5566;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .panel h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+
+        button {
+            background: var(--primary);
+            color: var(--bg);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #00b894;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: var(--surface-light);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        button.secondary:hover {
+            background: var(--border);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .results-section {
+            margin-top: 40px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .comparison-table th {
+            background: var(--surface-light);
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .risk-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .risk-low {
+            background: rgba(0, 212, 170, 0.2);
+            color: var(--success);
+        }
+
+        .risk-medium {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .risk-high {
+            background: rgba(255, 85, 100, 0.2);
+            color: var(--error);
+        }
+
+        .risk-reject {
+            background: rgba(139, 0, 0, 0.3);
+            color: #ff8a8a;
+        }
+
+        .compliance-badge {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .compliant {
+            background: rgba(0, 212, 170, 0.2);
+            color: var(--success);
+        }
+
+        .non-compliant {
+            background: rgba(255, 85, 100, 0.2);
+            color: var(--error);
+        }
+
+        .amortization-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .amortization-table th {
+            background: var(--surface-light);
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            position: sticky;
+            top: 0;
+        }
+
+        .amortization-table td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .amortization-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .risk-assessment {
+            background: var(--surface-light);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .risk-assessment h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .recommendation {
+            background: rgba(0, 212, 170, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: var(--surface-light);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .summary-card .label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>مقارن القروض</h1>
+            <p class="subtitle">حاسبة القروض مع تقييم المخاطر والامتثال للوائح المصرفية السعودية</p>
+        </header>
+
+        <div class="main-layout">
+            <!-- Input Panel -->
+            <div class="panel">
+                <h2>بيانات القرض</h2>
+                
+                <div class="form-group">
+                    <label for="propertyPrice">سعر العقار (ريال سعودي)</label>
+                    <input type="number" id="propertyPrice" placeholder="1000000" value="1000000">
+                </div>
+
+                <div class="form-group">
+                    <label>طريقة دفع الدفعة الأولى (10%)</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="cashDown" name="downPaymentType" value="cash" checked>
+                            <label for="cashDown">نقداً</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="loanDown" name="downPaymentType" value="loan">
+                            <label for="loanDown">قرض شخصي</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="interestRate">معدل الفائدة السنوي (%)</label>
+                    <input type="number" id="interestRate" placeholder="6.0" step="0.1" value="6.0">
+                </div>
+
+                <div class="form-group">
+                    <label for="loanTerm">مدة القرض (سنوات)</label>
+                    <input type="number" id="loanTerm" placeholder="20" value="20">
+                </div>
+
+                <div class="form-group">
+                    <label for="salary">الراتب الشهري (ريال سعودي)</label>
+                    <input type="number" id="salary" placeholder="10000" value="10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalFees">رسوم إضافية (ريال سعودي)</label>
+                    <input type="number" id="additionalFees" placeholder="8000" value="8000">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="calculateLoan()">حساب القرض</button>
+                    <button class="secondary" onclick="clearForm()">مسح</button>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="panel">
+                <h2>النتائج</h2>
+                
+                <div id="results" class="hidden">
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="value" id="monthlyPayment">-</div>
+                            <div class="label">القسط الشهري (MRC)</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="value" id="totalInterest">-</div>
+                            <div class="label">إجمالي الفوائد</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="value" id="totalAmount">-</div>
+                            <div class="label">إجمالي المبلغ المدفوع</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="value" id="debtRatio">-</div>
+                            <div class="label">نسبة الدين إلى الدخل</div>
+                        </div>
+                    </div>
+
+                    <div id="riskAssessment" class="risk-assessment hidden">
+                        <h3>تقييم المخاطر والامتثال التنظيمي</h3>
+                        <div id="complianceStatus"></div>
+                        <div id="riskLevel"></div>
+                        <div id="recommendations"></div>
+                    </div>
+                </div>
+
+                <div id="noResults" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    أدخل بيانات القرض لعرض النتائج
+                </div>
+            </div>
+        </div>
+
+        <!-- Amortization Schedule -->
+        <div class="panel results-section hidden" id="amortizationSection">
+            <h2>جدول السداد</h2>
+            <div class="amortization-container">
+                <table class="amortization-table" id="amortizationTable">
+                    <thead>
+                        <tr>
+                            <th>الشهر</th>
+                            <th>القسط الشهري</th>
+                            <th>أصل القرض</th>
+                            <th>الفوائد</th>
+                            <th>رصيد القرض</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortizationBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="button-group">
+                <button class="secondary" onclick="exportToCSV()">تصدير كـ CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Localization strings
+        const STRINGS = {
+            ar: {
+                monthlyPayment: 'القسط الشهري (MRC)',
+                totalInterest: 'إجمالي الفوائد',
+                totalAmount: 'إجمالي المبلغ المدفوع',
+                debtRatio: 'نسبة الدين إلى الدخل',
+                month: 'الشهر',
+                principal: 'أصل القرض',
+                interest: 'الفوائد',
+                balance: 'رصيد القرض',
+                compliant: '✅ متوافق مع اللوائح (≤ 65%)',
+                nonCompliant: '❌ يخالف اللوائح (> 65%)',
+                riskLow: 'مخاطر منخفضة',
+                riskMedium: 'مخاطر متوسطة',
+                riskHigh: 'مخاطر عالية',
+                riskReject: 'مرفوض - يخالف اللوائح'
+            }
+        };
+
+        let currentLang = 'ar';
+        let currentLoan = null;
+        let amortizationData = [];
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('ar-SA').format(Math.round(amount)) + ' ر.س';
+        }
+
+        function formatPercent(value) {
+            return (value * 100).toFixed(2) + '%';
+        }
+
+        // Standard amortization formula: MRC = P × [r(1+r)^n] ÷ [(1+r)^n-1]
+        function calculateMRC(principal, annualRate, years) {
+            const monthlyRate = annualRate / 12;
+            const numPayments = years * 12;
+            
+            if (monthlyRate === 0) {
+                return principal / numPayments;
+            }
+            
+            const numerator = principal * monthlyRate * Math.pow(1 + monthlyRate, numPayments);
+            const denominator = Math.pow(1 + monthlyRate, numPayments) - 1;
+            
+            return numerator / denominator;
+        }
+
+        function generateAmortizationTable(principal, annualRate, years, monthlyPayment) {
+            const monthlyRate = annualRate / 12;
+            const numPayments = years * 12;
+            const table = [];
+            
+            let balance = principal;
+            
+            for (let month = 1; month <= numPayments; month++) {
+                const interestPayment = balance * monthlyRate;
+                const principalPayment = monthlyPayment - interestPayment;
+                balance -= principalPayment;
+                
+                table.push({
+                    month,
+                    payment: monthlyPayment,
+                    principal: principalPayment,
+                    interest: interestPayment,
+                    balance: Math.max(0, balance)
+                });
+            }
+            
+            return table;
+        }
+
+        function assessRisk(debtRatio) {
+            if (debtRatio > 0.65) {
+                return { level: 'reject', text: STRINGS[currentLang].riskReject };
+            } else if (debtRatio > 0.50) {
+                return { level: 'high', text: STRINGS[currentLang].riskHigh };
+            } else if (debtRatio > 0.35) {
+                return { level: 'medium', text: STRINGS[currentLang].riskMedium };
+            } else {
+                return { level: 'low', text: STRINGS[currentLang].riskLow };
+            }
+        }
+
+        function calculateLoan() {
+            const propertyPrice = parseFloat(document.getElementById('propertyPrice').value) || 0;
+            const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
+            const loanTerm = parseInt(document.getElementById('loanTerm').value) || 0;
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const additionalFees = parseFloat(document.getElementById('additionalFees').value) || 0;
+            const downPaymentType = document.querySelector('input[name="downPaymentType"]:checked').value;
+
+            if (!propertyPrice || !interestRate || !loanTerm || !salary) {
+                alert('الرجاء إدخال جميع الحقول المطلوبة');
+                return;
+            }
+
+            // Calculate 10% down payment
+            const downPaymentRate = 0.10;
+            const downPayment = propertyPrice * downPaymentRate + 10000; // 10% + 10,000 SAR fee
+            const loanAmount = propertyPrice - downPayment;
+
+            // Calculate MRC using standard amortization formula
+            const monthlyPayment = calculateMRC(loanAmount, interestRate / 100, loanTerm);
+            const totalPayments = monthlyPayment * loanTerm * 12;
+            const totalInterest = totalPayments - loanAmount;
+
+            // Debt-to-income ratio
+            const debtRatio = monthlyPayment / salary;
+
+            // Generate amortization table
+            amortizationData = generateAmortizationTable(loanAmount, interestRate / 100, loanTerm, monthlyPayment);
+
+            // Store current loan data
+            currentLoan = {
+                propertyPrice,
+                downPayment,
+                loanAmount,
+                interestRate,
+                loanTerm,
+                salary,
+                monthlyPayment,
+                totalInterest,
+                totalAmount: totalPayments,
+                debtRatio,
+                additionalFees
+            };
+
+            // Update display
+            displayResults();
+            
+            // Show sections
+            document.getElementById('noResults').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            document.getElementById('amortizationSection').classList.remove('hidden');
+        }
+
+        function displayResults() {
+            if (!currentLoan) return;
+
+            // Update summary cards
+            document.getElementById('monthlyPayment').textContent = formatCurrency(currentLoan.monthlyPayment);
+            document.getElementById('totalInterest').textContent = formatCurrency(currentLoan.totalInterest);
+            document.getElementById('totalAmount').textContent = formatCurrency(currentLoan.totalAmount);
+            document.getElementById('debtRatio').textContent = formatPercent(currentLoan.debtRatio);
+
+            // Risk assessment
+            const risk = assessRisk(currentLoan.debtRatio);
+            const complianceStatus = currentLoan.debtRatio <= 0.65;
+            
+            document.getElementById('complianceStatus').innerHTML = `
+                <div class="compliance-badge ${complianceStatus ? 'compliant' : 'non-compliant'}">
+                    ${complianceStatus ? STRINGS[currentLang].compliant : STRINGS[currentLang].nonCompliant}
+                </div>
+            `;
+            
+            document.getElementById('riskLevel').innerHTML = `
+                <p><strong>مستوى المخاطر:</strong> <span class="risk-indicator risk-${risk.level}">${risk.text}</span></p>
+                <p><strong>الدخل المتبقي:</strong> ${formatCurrency(currentLoan.salary - currentLoan.monthlyPayment)}</p>
+            `;
+
+            // Recommendations
+            let recommendations = '<h4>توصيات:</h4><ul>';
+            
+            if (currentLoan.debtRatio > 0.65) {
+                recommendations += '<li>❌ القرض يخالف لوائح ساما (نسبة الدين > 65%)</li>';
+                recommendations += `<li>💡 يجب زيادة الراتب إلى ${formatCurrency(currentLoan.monthlyPayment / 0.65)} على الأقل</li>`;
+            } else if (currentLoan.debtRatio > 0.50) {
+                recommendations += '<li>⚠️ نسبة دين عالية - سيكون هناك ضغط مالي</li>';
+                recommendations += '<li>💡 حاول زيادة الدفعة الأولى لتقليل القرض</li>';
+            } else if (currentLoan.debtRatio > 0.35) {
+                recommendations += '<li>✅ القرض مقبول لكن تأكد من وجود واديء طوارئ</li>';
+            } else {
+                recommendations += '<li>✅ وضع مالي ممتاز - القرض مناسب جداً</li>';
+            }
+            
+            recommendations += '</ul>';
+            document.getElementById('recommendations').innerHTML = recommendations;
+
+            // Show risk assessment
+            document.getElementById('riskAssessment').classList.remove('hidden');
+
+            // Update amortization table
+            displayAmortizationTable();
+        }
+
+        function displayAmortizationTable() {
+            const tbody = document.getElementById('amortizationBody');
+            tbody.innerHTML = '';
+
+            // Show first 60 months only (to avoid performance issues)
+            const displayMonths = Math.min(60, amortizationData.length);
+            
+            for (let i = 0; i < displayMonths; i++) {
+                const row = amortizationData[i];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.month}</td>
+                    <td>${formatCurrency(row.payment)}</td>
+                    <td>${formatCurrency(row.principal)}</td>
+                    <td>${formatCurrency(row.interest)}</td>
+                    <td>${formatCurrency(row.balance)}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+
+            // Add note if table is truncated
+            if (amortizationData.length > 60) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">
+                        عرض ${displayMonths} من ${amortizationData.length} أشهر
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('propertyPrice').value = '1000000';
+            document.getElementById('interestRate').value = '6.0';
+            document.getElementById('loanTerm').value = '20';
+            document.getElementById('salary').value = '10000';
+            document.getElementById('additionalFees').value = '8000';
+            document.getElementById('cashDown').checked = true;
+            
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('riskAssessment').classList.add('hidden');
+            document.getElementById('amortizationSection').classList.add('hidden');
+            document.getElementById('noResults').classList.remove('hidden');
+            
+            currentLoan = null;
+            amortizationData = [];
+        }
+
+        function exportToCSV() {
+            if (!currentLoan || amortizationData.length === 0) {
+                alert('الرجاء حساب القرض أولاً');
+                return;
+            }
+
+            let csv = 'شهر,القسط الشهري,أصل القرض,الفوائد,الرصيد\n';
+            
+            amortizationData.forEach(row => {
+                csv += `${row.month},${row.payment},${row.principal},${row.interest},${row.balance}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `amortization-schedule-${Date.now()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial values
+            document.getElementById('propertyPrice').value = '1000000';
+            document.getElementById('interestRate').value = '6.0';
+            document.getElementById('loanTerm').value = '20';
+            document.getElementById('salary').value = '10000';
+            document.getElementById('additionalFees').value = '8000';
+        });
+    </script>
+</body>
+</html>
