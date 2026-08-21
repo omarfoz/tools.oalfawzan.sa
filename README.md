@@ -1,139 +1,43 @@
-# Tools.oalfawzan.sa
+# tools.oalfawzan.sa
 
-A collection of client-side web tools deployed on GitHub Pages. All tools work entirely in your browser with no server-side processing or data collection.
+A focused collection of browser-first utilities deployed as a static GitHub Pages site. The primary interface is Arabic (RTL) with English support where available.
 
-**Live Site:** https://tools.oalfawzan.sa
+**Live site:** https://tools.oalfawzan.sa
 
-**Language:** العربية (Arabic - RTL)
+## Tools
 
-## 🛠️ Available Tools
+1. **Job Offer Comparator** (`/offer/`) — compare compensation, benefits, annual value, and offer trade-offs.
+2. **Loan Comparator** (`/loan-calculator/`) — compare housing-finance scenarios, DTI, cost, and amortization.
+3. **Time Toolkit** (`/time/`) — time-zone, date-duration, and Hijri/Gregorian utilities.
+4. **Wheel of Names** (`/wheel-of-names/`) — random selection from a list of names.
+5. **JSON Formatter** (`/json-formatter/`) — validate, format, minify, and copy JSON.
+6. **QR Generator** (`/qr-generator/`) — create downloadable QR codes from text or URLs.
+7. **Saudi Stock Analysis** (`/stock-analysis-dashboard/`) — technical indicators, favorites, market data, and a simplified analysis summary.
 
-### 1. [مقارن عروض العمل](https://tools.oalfawzan.sa/offer/) - Job Offer Comparator
-Compare job offers side-by-side with financial scoring and custom benefits calculation.
+## Architecture
 
-**Features:**
-- Add unlimited job offers
-- Calculate comprehensive financial scores
-- Custom fields for benefits and perks
-- Export comparisons to Excel
-- RTL-optimized for Arabic
+- Static HTML/CSS/JavaScript; no application server is required for GitHub Pages.
+- Shared platform foundation lives under `assets/css` and `assets/js`.
+- Tool-specific CSS/JavaScript lives under `assets/*/pages` to keep individual pages maintainable.
+- User preferences may be stored in `localStorage`.
+- Most processing is local in the browser. Some tools intentionally request third-party data/services (for example stock-market data and optional analysis services), so those features depend on external availability and privacy policies.
 
-### 2. [أدوات الوقت](https://tools.oalfawzan.sa/time/) - Time Toolkit
-Comprehensive time zone conversion and calculation utilities.
+## Development and deployment
 
-**Features:**
-- Convert between time zones
-- Calculate time durations
-- Prayer times calculation
-- Hijri and Gregorian calendar support
-- RTL date/time inputs
+GitHub Pages serves the `main` branch from the repository root using the custom domain in `CNAME`. There is no build step. Changes should pass the Modernization Audit workflow before merging.
 
-### 3. [مولد QR](https://tools.oalfawzan.sa/qr-generator/) - QR Code Generator
-Generate QR codes instantly from any text or URL.
+## Quality goals
 
-**Features:**
-- Real-time QR code generation
-- Canvas-based rendering
-- Download generated codes
-- Light/dark theme toggle
-- No server-side processing
+- Responsive from small phones through desktop.
+- Keyboard-visible focus and browser zoom support.
+- Clear labels and status feedback for interactive controls.
+- No secrets or credentials in client-side code.
+- Third-party dependencies kept explicit and limited.
 
-### 4. [عجلة الأسماء](https://tools.oalfawzan.sa/wheel-of-names/) - Wheel of Names
-Visual random name picker with a spinning wheel animation.
+## Data files
 
-**Features:**
-- Canvas-based spinning wheel
-- Add up to 20 names
-- Smooth CSS animations
-- Visual winner highlighting
-- Reset functionality
+`loan/Loan.csv` and `loan/Loan.xlsx` are source/reference analysis files for the loan calculator. They are not runtime dependencies of the page.
 
-### 5. [منسق JSON](https://tools.oalfawzan.sa/json-formatter/) - JSON Formatter
-Format, validate, and pretty-print JSON data.
+## License
 
-**Features:**
-- Syntax highlighting
-- Error detection and reporting
-- Pretty-print and minify modes
-- Copy to clipboard
-- Client-side validation
-
-### 6. [لوحة تحليل الأسهم](https://tools.oalfawzan.sa/stock-analysis-dashboard/) - Stock Analysis Dashboard
-Saudi stock market analysis and visualization.
-
-**Features:**
-- Ticker symbol search
-- Historical data visualization
-- Financial metrics display
-- Interactive charts
-- Market data integration
-
-## 🚀 GitHub Pages Deployment
-
-This repository is configured for GitHub Pages deployment with the following settings:
-
-- **Source:** `main` branch, root folder
-- **Domain:** Custom domain `tools.oalfawzan.sa`
-- **HTTPS:** Enforced
-- **Build Process:** None (static files only)
-
-### Deployment Process
-
-1. Push changes to the `main` branch
-2. GitHub Pages automatically deploys within seconds
-3. Verify live at `https://tools.oalfawzan.sa/`
-
-## 💻 Technical Details
-
-### Architecture
-- **Type:** Pure static (client-side only)
-- **Framework:** Vanilla HTML/CSS/JavaScript (no frameworks)
-- **Styling:** Custom CSS with CSS variables
-- **Language Support:** Arabic (RTL) + English fallback
-- **Privacy:** No data collection, all processing in browser
-
-### Technologies Used
-- HTML5
-- CSS3 (with custom properties)
-- ES6+ JavaScript
-- Canvas API
-- LocalStorage (for preferences)
-- External: SheetJS (Excel export)
-
-### Browser Requirements
-- Modern browser with ES6+ support
-- Canvas API support
-- LocalStorage enabled
-- JavaScript enabled
-
-## 🔒 Privacy & Security
-
-- **No data collection** - All processing happens in your browser
-- **No external tracking** - No analytics or telemetry scripts
-- **No server-side** - Cannot access your data
-- **GDPR compliant** - By design
-
-## 🛡️ Security Features
-
-- Content Security Policy (CSP) ready
-- No external dependencies (except CDNs)
-- No user authentication required
-- No cookies or tracking
-
-## 🤝 Contributing
-
-This is a personal project. For issues or suggestions, please use GitHub Issues.
-
-## 📄 License
-
-This project is open source. See the repository for license details.
-
-## 🌐 Links
-
-- **Live Site:** https://tools.oalfawzan.sa
-- **Repository:** https://github.com/omarfoz/tools.oalfawzan.sa
-- **Issues:** https://github.com/omarfoz/tools.oalfawzan.sa/issues
-
----
-
-**Note:** This site uses a custom RTL layout optimized for Arabic language. The interface and all tools are primarily in Arabic, with English fallbacks where applicable.
+See repository licensing information before reuse or redistribution.
