@@ -1,0 +1,54 @@
+name: Modernization Audit
+
+on:
+  push:
+    branches:
+      - chore/enterprise-modernization
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run repository audit
+        run: python scripts/repo_audit.py
+      - name: Syntax-check inline JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          failed=0
+          for f in audit-js/*.js; do
+            echo "Checking $f"
+            if ! node --check "$f"; then failed=1; fi
+          done
+          exit "$failed"
+      - name: Validate internal absolute tool links
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, sys
+          root=Path('.')
+          errors=[]
+          for page in root.rglob('*.html'):
+              if '.git' in page.parts: continue
+              text=page.read_text(encoding='utf-8', errors='replace')
+              for href in re.findall(r'href=["\'](/[^"\'#?]+)', text):
+                  target=root/href.lstrip('/')
+                  if href.endswith('/'):
+                      target=target/'index.html'
+                  if not target.exists(): errors.append((str(page),href))
+          for page,href in errors: print(f'Broken internal link: {page} -> {href}')
+          sys.exit(1 if errors else 0)
+          PY
