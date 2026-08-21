@@ -1,0 +1,74 @@
+name: Apply Modernization
+
+on:
+  push:
+    branches:
+      - chore/enterprise-modernization
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  modernize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chore/enterprise-modernization
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply deterministic modernization
+        run: python scripts/modernize.py
+      - name: Run structural audit
+        run: python scripts/repo_audit.py
+      - name: Syntax-check JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' f; do
+            echo "Checking $f"
+            node --check "$f"
+          done < <(find assets/js -type f -name '*.js' -print0)
+      - name: Validate internal links and required assets
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, sys
+          root=Path('.')
+          errors=[]
+          for page in root.rglob('*.html'):
+              if '.git' in page.parts: continue
+              text=page.read_text(encoding='utf-8',errors='replace')
+              if 'maximum-scale=1' in text or 'user-scalable=no' in text:
+                  errors.append(f'{page}: browser zoom disabled')
+              for attr in ('href','src'):
+                  for target in re.findall(fr'{attr}=["\'](/[^"\'#?]+)',text):
+                      if target.startswith('//'): continue
+                      candidate=root/target.lstrip('/')
+                      if target.endswith('/'): candidate=candidate/'index.html'
+                      if not candidate.exists(): errors.append(f'{page}: missing {target}')
+          if not (root/'404.html').exists(): errors.append('404.html missing')
+          for e in errors: print(e)
+          sys.exit(1 if errors else 0)
+          PY
+      - name: Commit generated modernization
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .audit-js audit-report.json
+          if git diff --quiet && git diff --cached --quiet; then
+            echo 'No generated changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat: modernize tools platform foundation'
+          git push origin HEAD:chore/enterprise-modernization
