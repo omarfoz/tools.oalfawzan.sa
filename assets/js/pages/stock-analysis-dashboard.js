@@ -1,0 +1,437 @@
+
+const AI_ENDPOINT = 'https://tools.niug502.workers.dev';
+const FAVORITES_KEY = 'tadawul_favorites_v1';
+const TRENDING_TICKERS = ['2222','2010','1120','7010','1211','7202','1180','2380','4210','2290','2082','4002','4260','8010','1050','8310','1150','4321','1214','8012'];
+const YAHOO_BASE = 'https://query1.finance.yahoo.com';
+const YAHOO_PROXIES = [
+  (url) => url,
+  (url) => `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
+  (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+];
+
+const I18N = {
+  ar: {
+    lang: 'ar', dir: 'rtl', title: 'لوحة تحليل الأسهم — tools.oalfawzan.sa',
+    descMeta: 'لوحة تحليل الأسهم السعودية مع RSI وMA50 وMA200 وحجم التداول والمفضلة وتوصية ذكية مبسطة.',
+    badge: 'لوحة تداول', pageTitle: 'لوحة تحليل الأسهم',
+    pageDesc: 'ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة وتوصية ذكاء اصطناعي مبسطة.',
+    back: '← الرجوع لكل الأدوات', tickerPlaceholder: 'أدخل رمز تداول (مثال: 7202)', analyze: 'تحليل', saveFavorite: 'حفظ بالمفضلة',
+    aiTitle: 'توصية الذكاء الاصطناعي', aiInitial: 'شغّل التحليل لإظهار التوصية.', favTitle: 'الأسهم المفضلة', trendingTitle: 'أكثر 20 سهماً سعودياً حركة',
+    invalidTicker: 'من فضلك أدخل رمز تداول مكوّن من 4 أرقام (مثال: 7202).', analyzing: 'جارٍ التحليل...', failed: 'تعذر تحليل هذا السهم حالياً. حاول رمزاً آخر.', favoriteFirst: 'حلّل سهماً أولاً.',
+    noFavorites: 'لا توجد أسهم مفضلة بعد.', loadingTrending: 'جارٍ تحميل الأسهم الأكثر حركة...', trendingFail: 'تعذر تحميل قائمة الأسهم الأكثر حركة حالياً.', trendingEmpty: 'لا توجد بيانات متاحة لقائمة الأسهم الأكثر حركة حالياً.',
+    aiUnavailable: 'لا تتوفر استجابة الذكاء الاصطناعي حالياً.', aiDown: 'خدمة التوصية غير متاحة الآن. يمكنك الاعتماد على المؤشرات أعلاه.',
+    notEnough: 'البيانات غير كافية', volumeIncreasing: 'متزايد', volumeDecreasing: 'متناقص', volumeStable: 'مستقر',
+    load: 'تحميل', remove: 'حذف', price: 'السعر', support: 'الدعم', resistance: 'المقاومة', volume: 'اتجاه الحجم', ticker: 'الرمز',
+    langBtn: 'EN', themeDark: '🌙', themeLight: '☀️', chartClose: 'الإغلاق',
+    aiPrompt: 'أنت مرشد استثماري مبسّط للمستخدم غير المتخصص. اكتب بالعربية الفصحى السهلة بلغة موزونة وواضحة، وتجنب المصطلحات المالية المعقدة. ممنوع كتابة كلمة RSI نهائياً. استخدم فقط عبارة "مؤشر الزخم" ثم وضّح معناها بلغة يومية مثل: يدل على ضعف الشراء، أو يدل على قوة الشراء، أو وضع متوازن. لا تستخدم markdown ولا رموز * أو - ولا أي قوائم. اكتب بالضبط 4 أسطر فقط وبالعناوين التالية حرفياً:\nالاتجاه: صاعد أو هابط أو جانبي + سبب قصير مفهوم لعامة الناس\nالمخاطرة: منخفضة أو متوسطة أو مرتفعة + سبب بسيط مرتبط بإمكانية تغير السعر\nالتوصية: شراء أو احتفاظ أو بيع + إجراء مباشر واضح لغير الماليين (مثل: اشترِ على دفعات صغيرة أو انتظر حتى يتضح الاتجاه)\nالشرح المبسط: جملتان قصيرتان جداً تشرحان القرار بعبارات يومية سهلة، بدون اختصارات وبدون أرقام تقنية.\nلا تضف أي مقدمات أو سطر خامس.'
+  },
+  en: {
+    lang: 'en', dir: 'ltr', title: 'Stock Analysis Dashboard — tools.oalfawzan.sa',
+    descMeta: 'Saudi stock dashboard with RSI, MA50, MA200, volume trend, favorites, and a simple AI recommendation.',
+    badge: 'Tadawul Dashboard', pageTitle: 'Stock Analysis Dashboard',
+    pageDesc: 'Search by ticker (example: <b>7202</b>). Data source: Yahoo Finance using <code>TICKER.SR</code>. Includes RSI, MA50, MA200, support/resistance, volume trend, favorites, and a simplified AI recommendation.',
+    back: '← Back to all tools', tickerPlaceholder: 'Enter Tadawul ticker (e.g. 7202)', analyze: 'Analyze', saveFavorite: 'Save Favorite',
+    aiTitle: 'AI Recommendation', aiInitial: 'Run analysis to generate recommendation.', favTitle: 'Favorite Stocks', trendingTitle: 'Trending 20 Saudi Stocks',
+    invalidTicker: 'Please enter a 4-digit Tadawul ticker (example: 7202).', analyzing: 'Analyzing...', failed: 'Could not analyze this stock now. Try another ticker.', favoriteFirst: 'Analyze a stock first.',
+    noFavorites: 'No favorite stocks yet.', loadingTrending: 'Loading trending stocks...', trendingFail: 'Could not load trending list right now.', trendingEmpty: 'No data is currently available for the trending list.',
+    aiUnavailable: 'AI response unavailable.', aiDown: 'AI recommendation is unavailable right now. You can still use indicators above.',
+    notEnough: 'Not enough data', volumeIncreasing: 'Increasing', volumeDecreasing: 'Decreasing', volumeStable: 'Stable',
+    load: 'Load', remove: 'Remove', price: 'Price', support: 'Support', resistance: 'Resistance', volume: 'Volume Trend', ticker: 'Ticker',
+    langBtn: 'عربي', themeDark: '🌙', themeLight: '☀️', chartClose: 'Close',
+    aiPrompt: 'You are a practical stock advisor for beginner Saudi retail investors. Use very simple everyday English and avoid financial jargon. Never use the term RSI; replace it with "momentum indicator" and briefly explain what it means (near strong drop, near strong rise, or balanced zone). No markdown, no asterisks, no bullet symbols. Return exactly 4 lines with these labels only:\nTrend: uptrend or downtrend or sideways + short plain reason\nRisk: Low or Medium or High + short beginner-friendly reason\nRecommendation: BUY or HOLD or SELL + one direct action sentence for non-experts (example: buy gradually or wait now)\nSimple explanation: exactly 2 very short beginner-friendly sentences without complex numbers or abbreviations.\nDo not add any extra lines or intro.'
+  }
+};
+
+let currentLang = localStorage.getItem('tools_lang') || 'ar';
+let currentTheme = localStorage.getItem('tools_theme') || 'dark';
+let currentTicker = '';
+let chartApi;
+let candleSeries;
+let volumeSeries;
+let sma10Series;
+let sma50Series;
+let sma200Series;
+let supportLine;
+let resistanceLine;
+let chartDataCache = null;
+let chartVisible = false;
+let chartObserver = null;
+let lastMetrics = null;
+
+function t(key){ return I18N[currentLang][key] || I18N.en[key] || key; }
+function fmt(v){ return Number.isFinite(v) ? Number(v).toFixed(2) : '—'; }
+function getFavorites(){ try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); } catch { return []; } }
+function setFavorites(v){ localStorage.setItem(FAVORITES_KEY, JSON.stringify(v)); }
+function toChartDate(ts){ return new Date(ts * 1000).toISOString().slice(0,10); }
+
+function buildSmaSeries(candles, period){
+  const out = [];
+  let sum = 0;
+  for(let i=0;i<candles.length;i++){
+    sum += candles[i].close;
+    if(i >= period) sum -= candles[i - period].close;
+    if(i >= period - 1) out.push({ time: candles[i].time, value: sum / period });
+  }
+  return out;
+}
+
+function applyTheme(theme){
+  currentTheme = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('tools_theme', currentTheme);
+  document.getElementById('themeBtn').textContent = currentTheme === 'light' ? t('themeDark') : t('themeLight');
+  if(chartDataCache) drawChart(chartDataCache);
+}
+
+function applyLanguage(lang){
+  currentLang = lang === 'en' ? 'en' : 'ar';
+  const s = I18N[currentLang];
+  document.documentElement.lang = s.lang;
+  document.documentElement.dir = s.dir;
+  document.title = s.title;
+  document.querySelector('meta[name="description"]').setAttribute('content', s.descMeta);
+  document.getElementById('badgeText').textContent = s.badge;
+  document.getElementById('pageTitle').textContent = s.pageTitle;
+  document.getElementById('pageDesc').innerHTML = s.pageDesc;
+  document.getElementById('backLink').textContent = s.back;
+  document.getElementById('tickerInput').placeholder = s.tickerPlaceholder;
+  document.getElementById('analyzeBtn').textContent = s.analyze;
+  document.getElementById('saveFavBtn').textContent = s.saveFavorite;
+  document.getElementById('aiTitle').textContent = s.aiTitle;
+  document.getElementById('favTitle').textContent = s.favTitle;
+  document.getElementById('trendingTitle').textContent = s.trendingTitle;
+  document.getElementById('kpiPriceLabel').textContent = s.price;
+  document.getElementById('kpiSupportLabel').textContent = s.support;
+  document.getElementById('kpiResistanceLabel').textContent = s.resistance;
+  document.getElementById('kpiVolumeLabel').textContent = s.volume;
+  document.getElementById('kpiTickerLabel').textContent = s.ticker;
+  document.getElementById('langBtn').textContent = s.langBtn;
+  document.getElementById('themeBtn').textContent = currentTheme === 'light' ? s.themeDark : s.themeLight;
+  if(!lastMetrics) document.getElementById('aiText').textContent = s.aiInitial;
+  localStorage.setItem('tools_lang', currentLang);
+}
+
+function sma(values, period){ if(values.length < period) return null; return values.slice(-period).reduce((a,b)=>a+b,0)/period; }
+function calcRSI(closes, period=14){ if(closes.length <= period) return null; let gains=0,losses=0; for(let i=closes.length-period;i<closes.length;i++){const d=closes[i]-closes[i-1]; if(d>0) gains+=d; else losses+=Math.abs(d);} if(losses===0) return 100; const rs=(gains/period)/(losses/period); return 100-(100/(1+rs)); }
+function volumeTrend(volumes){ if(volumes.length<30) return t('notEnough'); const recent=volumes.slice(-10).reduce((a,b)=>a+b,0)/10; const base=volumes.slice(-30,-10).reduce((a,b)=>a+b,0)/20; if(recent>base*1.15) return t('volumeIncreasing'); if(recent<base*.85) return t('volumeDecreasing'); return t('volumeStable'); }
+function supportResistance(closes){ const recent = closes.slice(-60); return { support: Math.min(...recent), resistance: Math.max(...recent) }; }
+
+function extractJson(text){
+  try { return JSON.parse(text); } catch {}
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if(start === -1 || end === -1 || start >= end) throw new Error('Invalid JSON response');
+  return JSON.parse(text.slice(start, end + 1));
+}
+
+async function fetchJsonWithFallback(path){
+  let lastErr;
+  for(const buildUrl of YAHOO_PROXIES){
+    const url = buildUrl(`${YAHOO_BASE}${path}`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    try {
+      const res = await fetch(url,{ headers:{ 'Accept':'application/json,text/plain,*/*' }, signal: controller.signal });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return extractJson(await res.text());
+    } catch(e){
+      lastErr = e;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+  throw lastErr || new Error('Unable to load market data');
+}
+
+async function fetchHistory(ticker){
+  const symbol = `${ticker}.SR`;
+  const data = await fetchJsonWithFallback(`/v8/finance/chart/${symbol}?range=1y&interval=1d`);
+  const result = data?.chart?.result?.[0];
+  const quote = result?.indicators?.quote?.[0] || {};
+  const timestamps = result?.timestamp || [];
+  const candles = [];
+  const volumes = [];
+
+  timestamps.forEach((ts, i) => {
+    const open = Number(quote.open?.[i]);
+    const high = Number(quote.high?.[i]);
+    const low = Number(quote.low?.[i]);
+    const close = Number(quote.close?.[i]);
+    const volume = Number(quote.volume?.[i]);
+    if(!Number.isFinite(open) || !Number.isFinite(high) || !Number.isFinite(low) || !Number.isFinite(close)) return;
+    candles.push({ time: toChartDate(ts), open, high, low, close });
+    volumes.push(Number.isFinite(volume) ? volume : 0);
+  });
+
+  if(candles.length < 210) throw new Error('Insufficient data from Yahoo Finance');
+  return { candles, volumes };
+}
+
+function formatCrosshairDate(timeValue){
+  if(typeof timeValue === 'string') return new Date(`${timeValue}T00:00:00`).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+  if(typeof timeValue === 'number') return new Date(timeValue * 1000).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+  if(timeValue && typeof timeValue === 'object' && 'year' in timeValue){
+    return new Date(timeValue.year, timeValue.month - 1, timeValue.day).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+  }
+  return '—';
+}
+
+function addChartSeries(type, options){
+  if(typeof chartApi.addSeries === 'function') return chartApi.addSeries(type, options);
+  if(type === LightweightCharts.CandlestickSeries && typeof chartApi.addCandlestickSeries === 'function') return chartApi.addCandlestickSeries(options);
+  if(type === LightweightCharts.LineSeries && typeof chartApi.addLineSeries === 'function') return chartApi.addLineSeries(options);
+  if(type === LightweightCharts.HistogramSeries && typeof chartApi.addHistogramSeries === 'function') return chartApi.addHistogramSeries(options);
+  throw new Error('Unsupported lightweight-charts series API');
+}
+
+function initChart(){
+  const container = document.getElementById('priceChart');
+  if(!container || chartApi) return;
+
+  chartApi = LightweightCharts.createChart(container, {
+    width: container.clientWidth,
+    height: container.clientHeight,
+    layout: { background: { color: '#0b0f14' }, textColor: '#aaa' },
+    grid: { vertLines: { color: 'rgba(255,255,255,0.05)' }, horzLines: { color: 'rgba(255,255,255,0.05)' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: 'rgba(255,255,255,0.12)' },
+    timeScale: { borderColor: 'rgba(255,255,255,0.12)', rightOffset: 8, barSpacing: 8, fixLeftEdge: false },
+    localization: { locale: currentLang === 'ar' ? 'ar-SA' : 'en-US' },
+    handleScale: { axisPressedMouseMove: true, mouseWheel: true, pinch: true },
+    handleScroll: { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: true, kineticScroll: { touch: true, mouse: true } }
+  });
+
+  candleSeries = addChartSeries(LightweightCharts.CandlestickSeries, {
+    upColor: '#26a69a', downColor: '#ef5350', borderVisible: true,
+    borderUpColor: '#26a69a', borderDownColor: '#ef5350', wickUpColor: '#26a69a', wickDownColor: '#ef5350'
+  });
+  sma10Series = addChartSeries(LightweightCharts.LineSeries, { color: '#f2c94c', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+  sma50Series = addChartSeries(LightweightCharts.LineSeries, { color: '#4c9aff', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+  sma200Series = addChartSeries(LightweightCharts.LineSeries, { color: '#ff7ab6', lineWidth: 2, priceLineVisible: false, lastValueVisible: false });
+  volumeSeries = addChartSeries(LightweightCharts.HistogramSeries, {
+    priceFormat: { type: 'volume' },
+    priceScaleId: '',
+    scaleMargins: { top: 0.8, bottom: 0 },
+    lastValueVisible: false,
+    priceLineVisible: false
+  });
+
+  const tooltip = document.getElementById('chartTooltip');
+  chartApi.subscribeCrosshairMove((param) => {
+    if(!param.point || !param.time || !param.seriesData.size){
+      tooltip.style.display = 'none';
+      return;
+    }
+    const candle = param.seriesData.get(candleSeries);
+    if(!candle) return;
+    const sma10 = param.seriesData.get(sma10Series)?.value;
+    const sma50 = param.seriesData.get(sma50Series)?.value;
+    const sma200 = param.seriesData.get(sma200Series)?.value;
+    const dateLabel = formatCrosshairDate(param.time);
+    tooltip.innerHTML = `Date: ${dateLabel}<br>O: ${fmt(candle.open)} H: ${fmt(candle.high)}<br>L: ${fmt(candle.low)} C: ${fmt(candle.close)}<br>SMA10: ${fmt(sma10)} | SMA50: ${fmt(sma50)}<br>SMA200: ${fmt(sma200)}`;
+    tooltip.style.display = 'block';
+  });
+}
+
+function drawChart(payload){
+  if(!payload?.candles?.length) return;
+  chartDataCache = payload;
+  if(!chartVisible) return;
+  initChart();
+
+  candleSeries.setData(payload.candles);
+  sma10Series.setData(payload.sma10);
+  sma50Series.setData(payload.sma50);
+  sma200Series.setData(payload.sma200);
+  volumeSeries.setData(payload.volume);
+  if(supportLine) candleSeries.removePriceLine(supportLine);
+  if(resistanceLine) candleSeries.removePriceLine(resistanceLine);
+  supportLine = candleSeries.createPriceLine({ price: 170.10, color: '#26a69a', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Support 170.10' });
+  resistanceLine = candleSeries.createPriceLine({ price: 340, color: '#ef5350', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Resistance 340' });
+  chartApi.timeScale().fitContent();
+}
+
+function sanitizeAiResponse(text){
+  const clean = String(text || '').replace(/\*+/g,'').replace(/•/g,'').replace(/\r/g,'').trim();
+  const lines = clean.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(lines.length >= 4) return lines.slice(0,4).join('\n');
+  return clean;
+}
+
+async function getAiRecommendation(metrics){
+  const prompt = `${t('aiPrompt')}\n\nData:\nprice: ${metrics.price}\nRSI: ${metrics.rsi}\nMA50: ${metrics.ma50}\nMA200: ${metrics.ma200}\nsupport: ${metrics.support}\nresistance: ${metrics.resistance}\nvolume trend: ${metrics.volumeTrend}`;
+  try {
+    const res = await fetch(AI_ENDPOINT, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ prompt }) });
+    const data = await res.json();
+    return sanitizeAiResponse(data?.text || t('aiUnavailable'));
+  } catch { return t('aiDown'); }
+}
+
+function renderMetrics(ticker, metrics){
+  document.getElementById('kpiTicker').textContent = `${ticker}.SR`;
+  document.getElementById('kpiPrice').textContent = fmt(metrics.price);
+  document.getElementById('kpiRsi').textContent = fmt(metrics.rsi);
+  document.getElementById('kpiMa50').textContent = fmt(metrics.ma50);
+  document.getElementById('kpiMa200').textContent = fmt(metrics.ma200);
+  document.getElementById('kpiSupport').textContent = fmt(metrics.support);
+  document.getElementById('kpiResistance').textContent = fmt(metrics.resistance);
+  document.getElementById('kpiVolume').textContent = metrics.volumeTrend;
+}
+
+async function analyzeTicker(ticker){
+  const cleanTicker = String(ticker || '').trim();
+  if(!/^\d{4}$/.test(cleanTicker)) return alert(t('invalidTicker'));
+  document.getElementById('aiText').textContent = t('analyzing');
+  currentTicker = cleanTicker;
+  try {
+    const { candles, volumes } = await fetchHistory(cleanTicker);
+    const closes = candles.map(c => c.close);
+    const sma10 = buildSmaSeries(candles, 10);
+    const sma50 = buildSmaSeries(candles, 50);
+    const sma200 = buildSmaSeries(candles, 200);
+    const volumeData = candles.map((c, i) => ({ time: c.time, value: volumes[i] || 0, color: c.close >= c.open ? '#26a69a' : '#ef5350' }));
+
+    const metrics = {
+      price: closes[closes.length - 1],
+      ma50: sma(closes, 50),
+      ma200: sma(closes, 200),
+      rsi: calcRSI(closes, 14),
+      ...supportResistance(closes),
+      volumeTrend: volumeTrend(volumes)
+    };
+    lastMetrics = metrics;
+    renderMetrics(cleanTicker, metrics);
+    drawChart({ candles, sma10, sma50, sma200, volume: volumeData });
+    document.getElementById('aiText').textContent = await getAiRecommendation(metrics);
+  } catch {
+    document.getElementById('aiText').textContent = t('failed');
+  }
+}
+
+function saveFavorite(){
+  if(!currentTicker) return alert(t('favoriteFirst'));
+  const favs = getFavorites();
+  if(!favs.includes(currentTicker)) favs.unshift(currentTicker);
+  setFavorites(favs.slice(0,20));
+  renderFavorites();
+}
+
+function renderFavorites(){
+  const list = document.getElementById('favoritesList');
+  const favs = getFavorites();
+  list.innerHTML = '';
+  if(!favs.length){ list.innerHTML = `<div class="muted">${t('noFavorites')}</div>`; return; }
+  favs.forEach(symbol => {
+    const row = document.createElement('div');
+    row.className = 'stock-item';
+    row.innerHTML = `<div><strong>${symbol}.SR</strong></div><div><button type="button" class="ghost" data-load="${symbol}">${t('load')}</button> <button type="button" class="ghost" data-del="${symbol}">${t('remove')}</button></div>`;
+    list.appendChild(row);
+  });
+}
+
+async function renderTrending(){
+  const list = document.getElementById('trendingList');
+  list.innerHTML = `<div class="muted">${t('loadingTrending')}</div>`;
+  try {
+    const symbols = TRENDING_TICKERS.map(s => `${s}.SR`).join(',');
+    const data = await fetchJsonWithFallback(`/v7/finance/quote?symbols=${symbols}`);
+    let items = (data?.quoteResponse?.result || []).map(q => ({
+      symbol: q.symbol,
+      name: q.shortName || '',
+      price: Number(q.regularMarketPrice || 0),
+      changePercent: Number(q.regularMarketChangePercent || 0)
+    })).filter(i => i.symbol);
+
+    if(!items.length){
+      const fallback = await Promise.allSettled(TRENDING_TICKERS.map(async ticker => {
+        const history = await fetchJsonWithFallback(`/v8/finance/chart/${ticker}.SR?range=1mo&interval=1d`);
+        const result = history?.chart?.result?.[0];
+        const closes = (result?.indicators?.quote?.[0]?.close || []).filter(v => Number.isFinite(v));
+        if(closes.length < 2) return null;
+        const prev = closes[closes.length - 2];
+        const last = closes[closes.length - 1];
+        if(!Number.isFinite(prev) || prev === 0 || !Number.isFinite(last)) return null;
+        return {
+          symbol: `${ticker}.SR`,
+          name: result?.meta?.shortName || '',
+          price: last,
+          changePercent: ((last - prev) / prev) * 100
+        };
+      }));
+      items = fallback
+        .filter(row => row.status === 'fulfilled' && row.value)
+        .map(row => row.value);
+    }
+
+    items = items
+      .sort((a,b)=>Math.abs(b.changePercent||0)-Math.abs(a.changePercent||0))
+      .slice(0,20);
+
+    list.innerHTML = '';
+    if(!items.length){
+      list.innerHTML = `<div class="muted">${t('trendingEmpty')}</div>`;
+      return;
+    }
+
+    items.forEach(q => {
+      const row = document.createElement('div');
+      const change = Number(q.changePercent || 0);
+      row.className = 'stock-item';
+      row.innerHTML = `<div class="stock-item-main"><strong>${q.symbol}</strong><div class="muted">${q.name || ''}</div></div><div class="stock-item-side"><div style="text-align:right"><div>${fmt(q.price)}</div><div style="color:${change>=0?'var(--green)':'var(--danger)'}">${change.toFixed(2)}%</div></div><button type="button" class="ghost" data-load="${q.symbol.replace('.SR','')}">${t('analyze')}</button></div>`;
+      list.appendChild(row);
+    });
+  } catch { list.innerHTML = `<div class="muted">${t('trendingFail')}</div>`; }
+}
+
+document.getElementById('analyzeBtn').addEventListener('click', () => analyzeTicker(document.getElementById('tickerInput').value));
+document.getElementById('saveFavBtn').addEventListener('click', saveFavorite);
+document.getElementById('langBtn').addEventListener('click', () => {
+  applyLanguage(currentLang === 'ar' ? 'en' : 'ar');
+  renderFavorites();
+  renderTrending();
+  if(lastMetrics) analyzeTicker(currentTicker || document.getElementById('tickerInput').value);
+});
+document.getElementById('themeBtn').addEventListener('click', () => applyTheme(currentTheme === 'dark' ? 'light' : 'dark'));
+document.getElementById('favoritesList').addEventListener('click', (e) => {
+  const load = e.target.getAttribute('data-load');
+  const del = e.target.getAttribute('data-del');
+  if(load){ document.getElementById('tickerInput').value = load; analyzeTicker(load); }
+  if(del){ setFavorites(getFavorites().filter(v => v !== del)); renderFavorites(); }
+});
+document.getElementById('trendingList').addEventListener('click', (e) => {
+  const load = e.target.getAttribute('data-load');
+  if(!load) return;
+  document.getElementById('tickerInput').value = load;
+  analyzeTicker(load);
+});
+
+function setupChartVisibility(){
+  const container = document.getElementById('priceChartContainer');
+  if(!container) return;
+  chartObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      chartVisible = entry.isIntersecting;
+      if(chartVisible && chartDataCache) drawChart(chartDataCache);
+    });
+  }, { threshold: 0.15 });
+  chartObserver.observe(container);
+}
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if(chartApi){
+      const target = document.getElementById('priceChart');
+      chartApi.applyOptions({ width: target.clientWidth, height: target.clientHeight });
+    }
+  }, 150);
+});
+
+document.getElementById('tickerInput').value = '7202';
+applyTheme(currentTheme);
+applyLanguage(currentLang);
+setupChartVisibility();
+renderFavorites();
+renderTrending();
+analyzeTicker('7202');

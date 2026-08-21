@@ -1,193 +1,33 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script>
-(() => {
-  let lastTouchEnd = 0;
-  document.addEventListener('touchstart', (event) => {
-    if (event.touches.length > 1) event.preventDefault();
-  }, { passive: false });
-  document.addEventListener('touchend', (event) => {
-    const now = Date.now();
-    if (now - lastTouchEnd <= 300) event.preventDefault();
-    lastTouchEnd = now;
-  }, { passive: false });
-  document.addEventListener('gesturestart', (event) => event.preventDefault());
-  document.addEventListener('gesturechange', (event) => event.preventDefault());
-  document.addEventListener('gestureend', (event) => event.preventDefault());
-})();
-</script>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>الأدوات — tools.oalfawzan.sa</title>
-<meta name="description" content="مجموعة أدوات عملية من عمر الفوزان للمقارنة واتخاذ القرار بسرعة.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,.07);--text:#f0f0f5;--muted:#6b6b80;--accent:#007AFF;--green:#00c896;--sans:'IBM Plex Sans',sans-serif;--arabic:'IBM Plex Sans Arabic',sans-serif;--mono:'IBM Plex Sans',sans-serif;--space:clamp(14px,2.5vw,22px)}
-:root[data-theme="light"]{--bg:#f7f8fc;--surface:#ffffff;--border:rgba(16,24,40,.12);--text:#111827;--muted:#667085;--accent:#005fcb;--green:#069c6b}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-html[lang="ar"] body{font-family:var(--arabic)}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,200,150,.04) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,122,255,.05) 0%,transparent 50%);pointer-events:none;z-index:0}
-.wrap{max-width:900px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
-header{padding:24px 0 44px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.logo{font-size:.85rem;font-weight:600;color:var(--muted);text-decoration:none;letter-spacing:.05em}
-.logo span{color:var(--text)}
-.lang-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:0 14px;min-height:44px;cursor:pointer;font-size:.78rem;font-weight:700}
-.hero{padding:0 0 52px}
-.hero-tag{display:inline-block;font-family:var(--mono);font-size:.72rem;color:var(--green);border:1px solid rgba(0,200,150,.3);padding:4px 12px;border-radius:4px;margin-bottom:20px;letter-spacing:.08em}
-.hero h1{font-size:clamp(2rem,9vw,3.7rem);font-weight:800;line-height:1.08;letter-spacing:-.03em;margin-bottom:14px}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.hero p{font-family:var(--mono);font-size:.86rem;color:var(--muted);line-height:1.8;max-width:560px;font-weight:300}
-.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space);margin-bottom:52px}
-.tool-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px;text-decoration:none;color:var(--text);display:block;position:relative;overflow:hidden;transition:border-color .3s,transform .2s;min-height:190px}
-.tool-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px)}
-.tool-card:active{transform:translateY(0)}
-.tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;opacity:0;transition:opacity .3s}
-.tool-card:hover::before{opacity:1}.tool-card.t1::before{background:linear-gradient(90deg,transparent,var(--green),transparent)}.tool-card.t2::before{background:linear-gradient(90deg,transparent,var(--accent),transparent)}.tool-card.soon{opacity:.45;pointer-events:none}
-.tool-num{font-family:var(--mono);font-size:.65rem;color:var(--muted);letter-spacing:.1em;margin-bottom:16px}.tool-icon{font-size:1.8rem;margin-bottom:12px}.tool-name{font-size:1.15rem;font-weight:700;margin-bottom:8px;letter-spacing:-.02em}.tool-desc{font-family:var(--mono);font-size:.76rem;color:var(--muted);line-height:1.7}.tool-tag{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:.62rem;font-weight:600;padding:4px 10px;border-radius:4px;letter-spacing:.06em}.t1 .tool-tag{background:rgba(0,200,150,.1);color:var(--green)}.t2 .tool-tag{background:rgba(0,122,255,.1);color:var(--accent)}.soon .tool-tag{background:rgba(255,255,255,.06);color:var(--muted)}
-footer{text-align:center;padding:26px 0;font-family:var(--mono);font-size:.72rem;color:var(--muted);border-top:1px solid var(--border)}footer a{color:var(--muted);text-decoration:none}
-a,button,.tool-card{outline:none}
-a:focus-visible,button:focus-visible,.tool-card:focus-visible{box-shadow:0 0 0 3px rgba(0,122,255,.35);border-color:rgba(0,122,255,.8)}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
-html[dir="rtl"] .header-actions{flex-direction:row-reverse}
-@media(max-width:680px){.tools-grid{grid-template-columns:1fr}.tool-card{min-height:auto;padding:18px}header{padding:18px 0 30px}.hero{padding-bottom:34px}.header-actions{width:100%;justify-content:space-between}.logo{max-width:100%;overflow-wrap:anywhere}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="description" content="مجموعة أدوات عملية للمقارنة والحساب والتحليل، تعمل مباشرة من المتصفح.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/platform.css">
+  <link rel="stylesheet" href="/assets/css/pages/home.css">
+  <title>أدوات عمر الفوزان — أدوات عملية سريعة</title>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <a href="https://tools.oalfawzan.sa" class="logo">tools.<span>oalfawzan.sa</span></a>
-    <div class="header-actions">
-      <button class="lang-btn" id="langBtn" type="button">EN</button>
-      <button class="lang-btn" id="themeBtn" type="button">☀️</button>
-      <a href="https://oalfawzan.sa" class="logo" id="backLink">← العودة للملف الشخصي</a>
-    </div>
-  </header>
-
-  <section class="hero">
-    <div class="hero-tag" id="tag">// الأدوات</div>
-    <h1 id="heroTitle">أدوات صغيرة.<br><em>قرارات أكبر.</em></h1>
-    <p id="heroDesc">مجموعة متنامية من الأدوات العملية للقرارات اليومية — مصممة لتكون بسيطة وسريعة ومفيدة فعلًا.</p>
-  </section>
-
-  <section class="tools-grid">
-    <a href="/offer/" class="tool-card t1">
-      <div class="tool-num">TOOL_01</div>
-      <div class="tool-icon">⚖️</div>
-      <div class="tool-name" id="offerName">مقارن عروض العمل</div>
-      <div class="tool-desc" id="offerDesc">قارن بين عرضين وظيفيين جنبًا إلى جنب: صافي الراتب، الإجمالي السنوي، المزايا، وتوصية ذكية.</div>
-      <div class="tool-tag" id="liveTag">متاح الآن</div>
-    </a>
-
-    <a href="/wheel-of-names/" class="tool-card t2">
-      <div class="tool-num">TOOL_02</div>
-      <div class="tool-icon">🎡</div>
-      <div class="tool-name" id="wheelName">عجلة الأسماء</div>
-      <div class="tool-desc" id="wheelDesc">أدخل مجموعة أسماء ولف العجلة لاختيار اسم عشوائي بسرعة.</div>
-      <div class="tool-tag" id="wheelTag">متاح الآن</div>
-    </a>
-
-    <a href="/qr-generator/" class="tool-card t1">
-      <div class="tool-num">TOOL_03</div>
-      <div class="tool-icon">🔳</div>
-      <div class="tool-name" id="qrName">مولد QR</div>
-      <div class="tool-desc" id="qrDesc">أنشئ رمز QR للنصوص والروابط مع خيار تنزيل الصورة.</div>
-      <div class="tool-tag" id="qrTag">متاح الآن</div>
-    </a>
-
-    <a href="/json-formatter/" class="tool-card t2">
-      <div class="tool-num">TOOL_04</div>
-      <div class="tool-icon">🧩</div>
-      <div class="tool-name" id="jsonName">منسق JSON</div>
-      <div class="tool-desc" id="jsonDesc">نسّق أو صغّر JSON بسرعة مع التحقق من الصحة ونسخ الناتج.</div>
-      <div class="tool-tag" id="jsonTag">متاح الآن</div>
-    </a>
-
-    <a href="/time/" class="tool-card t1">
-      <div class="tool-num">TOOL_05</div>
-      <div class="tool-icon">⏱️</div>
-      <div class="tool-name" id="timeName">عدة الوقت والتقويم</div>
-      <div class="tool-desc" id="timeDesc">حوّل الوقت بين المناطق، احسب فرق الأيام، وحوّل بين التاريخ الهجري والميلادي.</div>
-      <div class="tool-tag" id="timeTag">متاح الآن</div>
-    </a>
-
-    <a href="/stock-analysis-dashboard/" class="tool-card t2">
-      <div class="tool-num">TOOL_06</div>
-      <div class="tool-icon">📈</div>
-      <div class="tool-name" id="stockName">لوحة تحليل الأسهم السعودية</div>
-      <div class="tool-desc" id="stockDesc">حلّل أسهم تداول بمؤشرات RSI وMA50 وMA200 وحجم التداول مع توصية ذكية.</div>
-      <div class="tool-tag" id="stockTag">متاح الآن</div>
-    </a>
-    <a href="/loan-calculator/" class="tool-card t1">
-      <div class="tool-num">TOOL_07</div>
-      <div class="tool-icon">🏦</div>
-      <div class="tool-name" id="loanName">مقارن القروض</div>
-      <div class="tool-desc" id="loanDesc">قارن بين قروض السكن مع التقييدات التنظيمية السعودية (65% DTI) وجداول السداد.</div>
-      <div class="tool-tag" id="loanTag">متاح الآن</div>
-    </a>
-  </section>
-
-  <footer>
-    <span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa">Omar Alfawzan</a> · tools.oalfawzan.sa
-  </footer>
+<a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
+<div class="home" id="main-content" role="main">
+<header class="site-header"><a class="brand" href="/"><span>tools.</span>oalfawzan.sa</a><div class="header-actions"><a id="githubLink" class="link-btn" href="https://github.com/omarfoz/tools.oalfawzan.sa" target="_blank" rel="noopener noreferrer">GitHub</a><a id="profileLink" class="link-btn" href="https://oalfawzan.sa">الملف الشخصي</a><button class="icon-btn" id="langBtn" type="button">EN</button><button class="icon-btn" id="themeBtn" type="button" aria-label="تبديل المظهر">☀️</button></div></header>
+<section class="hero" aria-labelledby="heroTitle"><div><div class="eyebrow" id="eyebrow">TOOLS.OALFAWZAN.SA</div><h1 id="heroTitle">أدوات عملية، بدون تعقيد.</h1><p id="heroDesc">مجموعة أدوات مركّزة تساعدك على المقارنة والحساب والتحليل وإنجاز المهام اليومية مباشرة من المتصفح.</p></div><div class="hero-meta"><div class="stat"><strong>7</strong><span>Tools</span></div><div class="stat"><strong>100%</strong><span>Browser-first</span></div></div></section>
+<section class="directory" aria-labelledby="directoryTitle"><div class="directory-head"><div><h2 id="directoryTitle">دليل الأدوات</h2><p id="directorySub">اختر الأداة المناسبة أو ابحث بالاسم.</p></div><div class="search-wrap"><label id="searchLabel" for="toolSearch">البحث في الأدوات</label><input id="toolSearch" type="search" autocomplete="off" placeholder="ابحث عن أداة…"></div></div><div class="filters" aria-label="Tool categories"><button class="filter" data-category="all" data-i18n="all" aria-pressed="true">الكل</button><button class="filter" data-category="career" data-i18n="career" aria-pressed="false">العمل والمال</button><button class="filter" data-category="developer" data-i18n="developer" aria-pressed="false">للمطورين</button><button class="filter" data-category="productivity" data-i18n="productivity" aria-pressed="false">الإنتاجية</button><button class="filter" data-category="market" data-i18n="market" aria-pressed="false">الأسواق</button></div>
+<div class="tools-grid" id="toolsGrid">
+<a class="tool-card" data-category="career" href="/offer/"><div class="tool-top"><span class="tool-icon">⚖️</span><span class="category">Career</span></div><h3>مقارن عروض العمل · Job Offer Comparator</h3><p>قارن صافي الدخل والمزايا والقيمة السنوية بين عروض العمل.</p><span class="launch">فتح الأداة ←</span></a>
+<a class="tool-card" data-category="career" href="/loan-calculator/"><div class="tool-top"><span class="tool-icon">🏦</span><span class="category">Finance</span></div><h3>مقارن القروض · Loan Comparator</h3><p>قارن تمويل السكن ونسب الاستقطاع والتكلفة وجدول السداد.</p><span class="launch">فتح الأداة ←</span></a>
+<a class="tool-card" data-category="productivity" href="/time/"><div class="tool-top"><span class="tool-icon">⏱️</span><span class="category">Productivity</span></div><h3>عدة الوقت والتقويم · Time Toolkit</h3><p>تحويل مناطق زمنية وفروق تواريخ ومدد وتحويل هجري وميلادي.</p><span class="launch">فتح الأداة ←</span></a>
+<a class="tool-card" data-category="productivity" href="/wheel-of-names/"><div class="tool-top"><span class="tool-icon">🎡</span><span class="category">Productivity</span></div><h3>عجلة الأسماء · Wheel of Names</h3><p>اختيار عشوائي واضح وسريع من قائمة أسماء.</p><span class="launch">فتح الأداة ←</span></a>
+<a class="tool-card" data-category="developer" href="/json-formatter/"><div class="tool-top"><span class="tool-icon">{ }</span><span class="category">Developer</span></div><h3>منسق JSON · JSON Formatter</h3><p>تحقق ونسّق وصغّر JSON مع نسخ الناتج فوراً.</p><span class="launch">فتح الأداة ←</span></a>
+<a class="tool-card" data-category="developer" href="/qr-generator/"><div class="tool-top"><span class="tool-icon">▦</span><span class="category">Utility</span></div><h3>مولد QR · QR Generator</h3><p>أنشئ رمز QR للنص أو الرابط ثم نزّله كصورة.</p><span class="launch">فتح الأداة ←</span></a>
+<a class="tool-card" data-category="market" href="/stock-analysis-dashboard/"><div class="tool-top"><span class="tool-icon">📈</span><span class="category">Market</span></div><h3>تحليل الأسهم السعودية · Saudi Stock Analysis</h3><p>مؤشرات فنية ومفضلة ولوحة تحليل لأسهم تداول.</p><span class="launch">فتح الأداة ←</span></a>
+</div><div class="empty-tools" id="emptyTools" role="status">لا توجد أدوات مطابقة للبحث.</div></section>
+<footer class="site-footer"><span>tools.oalfawzan.sa</span><span>Built by <a href="https://oalfawzan.sa">Omar Alfawzan</a></span></footer>
 </div>
-
-<script>
-const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'الأدوات — tools.oalfawzan.sa',description:'مجموعة أدوات عملية من عمر الفوزان للمقارنة واتخاذ القرار بسرعة.',tag:'// الأدوات',heroTitle:'أدوات صغيرة.<br><em>قرارات أكبر.</em>',heroDesc:'مجموعة متنامية من الأدوات العملية للقرارات اليومية — مصممة لتكون بسيطة وسريعة ومفيدة فعلًا.',offerName:'مقارن عروض العمل',offerDesc:'قارن بين عرضين وظيفيين جنبًا إلى جنب: صافي الراتب، الإجمالي السنوي، المزايا، وتوصية ذكية.',liveTag:'متاح الآن',wheelName:'عجلة الأسماء',wheelDesc:'أدخل مجموعة أسماء ولف العجلة لاختيار اسم عشوائي بسرعة.',qrName:'مولد QR',qrDesc:'أنشئ رمز QR للنصوص والروابط مع خيار تنزيل الصورة.',jsonName:'منسق JSON',jsonDesc:'نسّق أو صغّر JSON بسرعة مع التحقق من الصحة ونسخ الناتج.',timeName:'عدة الوقت والتقويم',timeDesc:'حوّل الوقت بين المناطق، احسب فرق الأيام، وحوّل بين التاريخ الهجري والميلادي.',stockName:'لوحة تحليل الأسهم السعودية',stockDesc:'حلّل أسهم تداول بمؤشرات RSI وMA50 وMA200 وحجم التداول مع توصية ذكية.',back:'← العودة للملف الشخصي',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️'},
-  en:{lang:'en',dir:'ltr',title:'Tools — tools.oalfawzan.sa',description:'Useful tools by Omar Alfawzan. Quick practical web tools.',tag:'// TOOLS',heroTitle:'Small tools.<br><em>Big decisions.</em>',heroDesc:'A growing collection of practical tools for everyday decisions — built to be simple, fast, and actually useful.',offerName:'Job Offer Comparator',offerDesc:'Compare two job offers side by side: net salary, yearly total, benefits, and an AI recommendation.',liveTag:'LIVE',wheelName:'Wheel of Names',wheelDesc:'Enter multiple names and spin the wheel to pick one at random.',qrName:'QR Generator',qrDesc:'Generate a QR code from text or URLs and download it as an image.',jsonName:'JSON Formatter',jsonDesc:'Format or minify JSON instantly with validation and copy output.',timeName:'Time Toolkit',timeDesc:'Convert time zones, calculate day differences, and convert Hijri/Gregorian dates quickly.',stockName:'Saudi Stock Analysis Dashboard',stockDesc:'Analyze Tadawul stocks with RSI, MA50, MA200, volume trend, and an AI recommendation.',back:'← Back to portfolio',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️'}
-};
-
-let currentLang=localStorage.getItem('tools_lang')||'ar';
-let currentTheme=localStorage.getItem('tools_theme')||'dark';
-function applyTheme(theme){
-  currentTheme=theme==='light'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',currentTheme);
-  localStorage.setItem('tools_theme',currentTheme);
-  document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight);
-}
-function applyLang(lang){
-  const s=STRINGS[lang]||STRINGS.ar;
-  currentLang=lang;
-  document.documentElement.lang=s.lang;
-  document.documentElement.dir=s.dir;
-  document.title=s.title;
-  document.querySelector('meta[name="description"]').setAttribute('content',s.description);
-  document.getElementById('tag').textContent=s.tag;
-  document.getElementById('heroTitle').innerHTML=s.heroTitle;
-  document.getElementById('heroDesc').textContent=s.heroDesc;
-  document.getElementById('offerName').textContent=s.offerName;
-  document.getElementById('offerDesc').textContent=s.offerDesc;
-  document.getElementById('liveTag').textContent=s.liveTag;
-  document.getElementById('wheelName').textContent=s.wheelName;
-  document.getElementById('wheelDesc').textContent=s.wheelDesc;
-  document.getElementById('wheelTag').textContent=s.liveTag;
-  document.getElementById('qrName').textContent=s.qrName;
-  document.getElementById('qrDesc').textContent=s.qrDesc;
-  document.getElementById('qrTag').textContent=s.liveTag;
-  document.getElementById('jsonName').textContent=s.jsonName;
-  document.getElementById('jsonDesc').textContent=s.jsonDesc;
-  document.getElementById('jsonTag').textContent=s.liveTag;
-  document.getElementById('timeName').textContent=s.timeName;
-  document.getElementById('timeDesc').textContent=s.timeDesc;
-  document.getElementById('timeTag').textContent=s.liveTag;
-  document.getElementById('stockName').textContent=s.stockName;
-  document.getElementById('stockDesc').textContent=s.stockDesc;
-  document.getElementById('stockTag').textContent=s.liveTag;
-  document.getElementById('backLink').textContent=s.back;
-  document.getElementById('builtBy').textContent=s.builtBy;
-  document.getElementById('langBtn').textContent=s.langBtn;
-  document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
-  localStorage.setItem('tools_lang',lang);
-}
-document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
-document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
-applyTheme(currentTheme);
-applyLang(currentLang);
-</script>
-</body>
-</html>
+<script src="/assets/js/platform.js"></script><script src="/assets/js/pages/home.js"></script>
+</body></html>
