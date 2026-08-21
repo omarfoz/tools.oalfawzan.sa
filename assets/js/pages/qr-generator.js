@@ -1,21 +1,37 @@
-
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'QR Generator — tools.oalfawzan.sa',meta:'مولد QR سريع مع خيار تنزيل الصورة.',tag:'// أداة',heading:'QR Code Generator',desc:'اكتب نصًا أو رابطًا، ثم أنشئ رمز QR قابلًا للتنزيل.',placeholder:'https://tools.oalfawzan.sa',helper:'يدعم الروابط والنصوص العادية.',generate:'إنشاء QR',download:'تنزيل PNG',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',empty:'يرجى إدخال نص أو رابط أولًا.',ok:'تم إنشاء الرمز بنجاح.'},
-  en:{lang:'en',dir:'ltr',title:'QR Generator — tools.oalfawzan.sa',meta:'Fast QR generator with downloadable image.',tag:'// TOOL',heading:'QR Code Generator',desc:'Enter text or URL, generate a QR code, then download it.',placeholder:'https://tools.oalfawzan.sa',helper:'Supports both plain text and URLs.',generate:'Generate QR',download:'Download PNG',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',empty:'Please enter text or URL first.',ok:'QR code generated successfully.'}
+  ar:{lang:'ar',dir:'rtl',title:'QR Generator — tools.oalfawzan.sa',meta:'مولد QR سريع مع خيار تنزيل الصورة.',tag:'// أداة',heading:'QR Code Generator',desc:'اكتب نصًا أو رابطًا، ثم أنشئ رمز QR قابلًا للتنزيل.',placeholder:'https://tools.oalfawzan.sa',helper:'يدعم الروابط والنصوص العادية.',generate:'إنشاء QR',download:'تنزيل PNG',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',empty:'يرجى إدخال نص أو رابط أولًا.',ok:'تم إنشاء الرمز بنجاح.',downloaded:'تم تجهيز ملف PNG.',libraryFail:'تعذر تحميل مكتبة QR. تحقق من الاتصال ثم أعد تحميل الصفحة.'},
+  en:{lang:'en',dir:'ltr',title:'QR Generator — tools.oalfawzan.sa',meta:'Fast QR generator with downloadable image.',tag:'// TOOL',heading:'QR Code Generator',desc:'Enter text or URL, generate a QR code, then download it.',placeholder:'https://tools.oalfawzan.sa',helper:'Supports both plain text and URLs.',generate:'Generate QR',download:'Download PNG',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',empty:'Please enter text or URL first.',ok:'QR code generated successfully.',downloaded:'PNG is ready.',libraryFail:'The QR library failed to load. Check your connection and reload the page.'}
 };
 const qrText=document.getElementById('qrText');
 const statusEl=document.getElementById('status');
-const qr=new QRious({element:document.getElementById('qrCanvas'),size:260,value:'https://tools.oalfawzan.sa',background:'white',foreground:'black'});
+const canvas=document.getElementById('qrCanvas');
+let qr=null;
 let currentLang=localStorage.getItem('tools_lang')||'ar';
 let currentTheme=localStorage.getItem('tools_theme')||'dark';
-function generate(){
-  const value=qrText.value.trim();
-  if(!value){statusEl.textContent=STRINGS[currentLang].empty;return}
-  qr.value=value;statusEl.textContent=STRINGS[currentLang].ok;
+function ensureQr(){
+  if(qr) return true;
+  if(typeof QRious!=='function'){statusEl.textContent=STRINGS[currentLang].libraryFail;statusEl.classList.add('error');return false}
+  qr=new QRious({element:canvas,size:260,value:'https://tools.oalfawzan.sa',background:'white',foreground:'black'});
+  return true;
 }
+function renderValue(showSuccess=true){
+  const value=qrText.value.trim();
+  statusEl.classList.remove('error');
+  if(!value){statusEl.textContent=STRINGS[currentLang].empty;statusEl.classList.add('error');return false}
+  if(!ensureQr()) return false;
+  qr.value=value;
+  if(showSuccess) statusEl.textContent=STRINGS[currentLang].ok;
+  return true;
+}
+function generate(){renderValue(true)}
 function download(){
-  const value=qrText.value.trim();if(!value){statusEl.textContent=STRINGS[currentLang].empty;return}
-  const a=document.createElement('a');a.href=qr.toDataURL('image/png');a.download='qr-code.png';a.click();
+  if(!renderValue(false)) return;
+  const a=document.createElement('a');
+  a.href=qr.toDataURL('image/png');
+  const stamp=new Date().toISOString().slice(0,10);
+  a.download=`qr-code-${stamp}.png`;
+  document.body.append(a);a.click();a.remove();
+  statusEl.textContent=STRINGS[currentLang].downloaded;
 }
 function applyLang(lang){
   const s=STRINGS[lang]||STRINGS.ar; currentLang=lang;
@@ -27,12 +43,14 @@ function applyLang(lang){
   document.getElementById('downloadBtn').textContent=s.download;document.getElementById('backLink').textContent=s.back;
   document.getElementById('builtBy').textContent=s.builtBy;document.getElementById('langBtn').textContent=s.langBtn;
   document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
-  statusEl.textContent='';localStorage.setItem('tools_lang',lang);
+  statusEl.textContent='';statusEl.classList.remove('error');localStorage.setItem('tools_lang',lang);
 }
 document.getElementById('generateBtn').addEventListener('click',generate);
 document.getElementById('downloadBtn').addEventListener('click',download);
+qrText.addEventListener('keydown',(event)=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();generate()}});
 document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
 function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight)}
 document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
+ensureQr();
 applyTheme(currentTheme);
 applyLang(currentLang);
