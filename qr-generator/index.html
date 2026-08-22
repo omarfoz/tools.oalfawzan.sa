@@ -31,16 +31,16 @@
   <section class="panel" aria-labelledby="title">
     <div>
       <label class="field-label" id="qrTextLabel" for="qrText">النص أو الرابط</label>
-      <textarea id="qrText" placeholder="https://tools.oalfawzan.sa" aria-label="Text or URL to encode" spellcheck="false"></textarea>
+      <textarea id="qrText" placeholder="https://tools.oalfawzan.sa" spellcheck="false"></textarea>
       <div class="helper" id="helper">يدعم الروابط والنصوص العادية.</div>
       <div class="actions">
         <button class="btn primary" id="generateBtn" type="button">إنشاء QR</button>
         <button class="btn" id="downloadBtn" type="button">تنزيل PNG</button>
       </div>
-      <div class="status" id="status" aria-live="polite"></div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
     </div>
-    <div class="qr-box" aria-label="QR preview">
-      <canvas id="qrCanvas" width="260" height="260"></canvas>
+    <div class="qr-box" role="img" aria-label="QR code preview">
+      <canvas id="qrCanvas" width="260" height="260" aria-hidden="true"></canvas>
     </div>
   </section>
   <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo footer-link">Omar Alfawzan</a></footer>
