@@ -14,12 +14,12 @@
 </head>
 <body>
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap">
+<main class="wrap" id="main-content">
   <header>
     <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
     <div class="header-actions">
       <button class="lang-btn" id="langBtn" type="button">EN</button>
-      <button class="lang-btn" id="themeBtn" type="button">☀️</button>
+      <button class="lang-btn" id="themeBtn" data-platform-theme-toggle type="button" aria-label="تبديل المظهر"></button>
       <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
     </div>
   </header>
@@ -28,9 +28,10 @@
   <h1 id="title">QR Code Generator</h1>
   <p class="sub" id="desc">اكتب نصًا أو رابطًا، ثم أنشئ رمز QR قابلًا للتنزيل.</p>
 
-  <section class="panel">
+  <section class="panel" aria-labelledby="title">
     <div>
-      <textarea id="qrText" placeholder="https://tools.oalfawzan.sa" aria-label="Text or URL to encode"></textarea>
+      <label class="field-label" id="qrTextLabel" for="qrText">النص أو الرابط</label>
+      <textarea id="qrText" placeholder="https://tools.oalfawzan.sa" aria-label="Text or URL to encode" spellcheck="false"></textarea>
       <div class="helper" id="helper">يدعم الروابط والنصوص العادية.</div>
       <div class="actions">
         <button class="btn primary" id="generateBtn" type="button">إنشاء QR</button>
@@ -38,14 +39,14 @@
       </div>
       <div class="status" id="status" aria-live="polite"></div>
     </div>
-    <div class="qr-box">
+    <div class="qr-box" aria-label="QR preview">
       <canvas id="qrCanvas" width="260" height="260"></canvas>
     </div>
   </section>
-  <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
-</div>
+  <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo footer-link">Omar Alfawzan</a></footer>
+</main>
 <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
-<script src="/assets/js/pages/qr-generator.js"></script>
 <script src="/assets/js/platform.js"></script>
+<script src="/assets/js/pages/qr-generator.js"></script>
 </body>
 </html>
