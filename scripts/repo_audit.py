@@ -9,7 +9,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
-IGNORE = {'.git', '.github', 'scripts'}
+IGNORE = {'.git', '.github', 'scripts', 'node_modules', '.audit-js', 'ui-audit'}
 
 class AuditParser(HTMLParser):
     def __init__(self):
@@ -47,7 +47,6 @@ def page_info(rel: Path, p: Path):
     parser=AuditParser(); parser.feed(text)
     ids=Counter(parser.ids)
     duplicate_ids=[k for k,v in ids.items() if v>1]
-    input_ids={a.get('id') for _,a in parser.inputs if a.get('id')}
     unlabeled=[]
     for tag,a in parser.inputs:
         if tag=='input' and a.get('type') in {'hidden','button','submit','reset'}: continue
