@@ -14,12 +14,12 @@
 </head>
 <body>
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap">
+<main class="wrap" id="main-content">
 <header>
   <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
   <div class="header-actions">
     <button class="lang-btn" id="langBtn" type="button">EN</button>
-    <button class="lang-btn" id="themeBtn" type="button">☀️</button>
+    <button class="lang-btn" id="themeBtn" data-platform-theme-toggle type="button" aria-label="تبديل المظهر"></button>
   </div>
 </header>
 <a href="/" class="logo back-link" id="backLink">← الرجوع لكل الأدوات</a>
@@ -38,7 +38,7 @@
       <label><span id="toLabel">إلى منطقة</span><select id="toZone" aria-label="Destination time zone"></select></label>
     </div>
     <div class="actions"><button class="btn primary" id="convertTimeBtn" type="button">تحويل الوقت</button></div>
-    <div class="result" id="tzResult" data-empty="true"></div>
+    <div class="result" id="tzResult" data-empty="true" role="status" aria-live="polite"></div>
   </article>
 
   <article class="panel">
@@ -48,17 +48,17 @@
       <label><span id="endLabel">إلى تاريخ</span><div class="picker-field" data-kind="date"><input type="date" id="endDate" aria-label="End date"><div class="picker-value" data-for="endDate"></div></div></label>
     </div>
     <div class="actions"><button class="btn primary" id="calcDaysBtn" type="button">احسب الفرق</button></div>
-    <div class="result" id="daysResult" data-empty="true"></div>
+    <div class="result" id="daysResult" data-empty="true" role="status" aria-live="polite"></div>
   </article>
 
   <article class="panel">
     <h2 id="durationHeading">المدة بين وقتين</h2>
     <div class="form-grid">
-      <label><span id="durationStartLabel">من وقت</span><div class="picker-field" data-kind="time"><input type="time" id="durationStart" value="05:00" aria-label="Start date and time"><div class="picker-value" data-for="durationStart"></div></div></label>
-      <label><span id="durationEndLabel">إلى وقت</span><div class="picker-field" data-kind="time"><input type="time" id="durationEnd" value="12:00" aria-label="End date and time"><div class="picker-value" data-for="durationEnd"></div></div></label>
+      <label><span id="durationStartLabel">من وقت</span><div class="picker-field" data-kind="time"><input type="time" id="durationStart" value="05:00" aria-label="Start time"><div class="picker-value" data-for="durationStart"></div></div></label>
+      <label><span id="durationEndLabel">إلى وقت</span><div class="picker-field" data-kind="time"><input type="time" id="durationEnd" value="12:00" aria-label="End time"><div class="picker-value" data-for="durationEnd"></div></div></label>
     </div>
     <div class="actions"><button class="btn primary" id="durationBtn" type="button">احسب المدة</button></div>
-    <div class="result" id="durationResult" data-empty="true"></div>
+    <div class="result" id="durationResult" data-empty="true" role="status" aria-live="polite"></div>
   </article>
 
   <article class="panel">
@@ -67,29 +67,23 @@
       <label><span id="baseTimeLabel">الوقت الحالي</span><div class="picker-field" data-kind="time"><input type="time" id="baseTime" value="04:00" aria-label="Base time"><div class="picker-value" data-for="baseTime"></div></div></label>
       <label><span id="hoursToAddLabel">عدد الساعات</span>
         <select id="hoursToAdd" aria-label="Hours to add">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3" selected>3</option>
-          <option value="4">4</option>
-          <option value="6">6</option>
-          <option value="8">8</option>
-          <option value="12">12</option>
+          <option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="6">6</option><option value="8">8</option><option value="12">12</option>
         </select>
       </label>
     </div>
     <div class="actions"><button class="btn primary" id="addHoursBtn" type="button">احسب الوقت الجديد</button></div>
-    <div class="result" id="addHoursResult" data-empty="true"></div>
+    <div class="result" id="addHoursResult" data-empty="true" role="status" aria-live="polite"></div>
   </article>
 
   <article class="panel">
     <h2 id="h2gHeading">تحويل هجري → ميلادي</h2>
     <div class="form-grid">
-      <label><span id="hyLabel">سنة هجرية</span><input type="number" id="hYear" min="1" value="1446" aria-label="Hijri year"></label>
-      <label><span id="hmLabel">شهر هجري</span><input type="number" id="hMonth" min="1" max="12" value="9" aria-label="Hijri month"></label>
-      <label><span id="hdLabel">يوم هجري</span><input type="number" id="hDay" min="1" max="30" value="1" aria-label="Hijri day"></label>
+      <label><span id="hyLabel">سنة هجرية</span><input type="number" id="hYear" min="1" value="1446" aria-label="Hijri year" inputmode="numeric"></label>
+      <label><span id="hmLabel">شهر هجري</span><input type="number" id="hMonth" min="1" max="12" value="9" aria-label="Hijri month" inputmode="numeric"></label>
+      <label><span id="hdLabel">يوم هجري</span><input type="number" id="hDay" min="1" max="30" value="1" aria-label="Hijri day" inputmode="numeric"></label>
     </div>
     <div class="actions"><button class="btn primary" id="h2gBtn" type="button">حوّل لميلادي</button></div>
-    <div class="result" id="h2gResult" data-empty="true"></div>
+    <div class="result" id="h2gResult" data-empty="true" role="status" aria-live="polite"></div>
   </article>
 
   <article class="panel">
@@ -98,12 +92,12 @@
       <label><span id="gDateLabel">التاريخ الميلادي</span><div class="picker-field" data-kind="date"><input type="date" id="gDate" aria-label="Gregorian date"><div class="picker-value" data-for="gDate"></div></div></label>
     </div>
     <div class="actions"><button class="btn primary" id="g2hBtn" type="button">حوّل لهجري</button></div>
-    <div class="result" id="g2hResult" data-empty="true"></div>
+    <div class="result" id="g2hResult" data-empty="true" role="status" aria-live="polite"></div>
   </article>
 </section>
-<footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
-</div>
-<script src="/assets/js/pages/time.js"></script>
+<footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo footer-link">Omar Alfawzan</a></footer>
+</main>
 <script src="/assets/js/platform.js"></script>
+<script src="/assets/js/pages/time.js"></script>
 </body>
 </html>
