@@ -1,9 +1,9 @@
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'JSON Formatter — tools.oalfawzan.sa',meta:'منسق JSON سريع للنسخ والتحقق.',tag:'// أداة',heading:'JSON Formatter',desc:'ألصق JSON، ثم نسّقه أو صغّره وتحقق من صحته فورًا.',format:'تنسيق',minify:'تصغير',copy:'نسخ الناتج',clear:'مسح',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeDark:'🌙',themeLight:'☀️',placeholder:'{"project":"tools"}',ok:'JSON صالح.',copyOk:'تم النسخ.',copyFail:'تعذر النسخ. اسمح بالوصول إلى الحافظة أو انسخ النص يدويًا.',empty:'أدخل JSON أولًا.',noOutput:'لا يوجد JSON للإخراج.',invalid:'JSON غير صالح: '},
-  en:{lang:'en',dir:'ltr',title:'JSON Formatter — tools.oalfawzan.sa',meta:'Fast JSON formatter and validator.',tag:'// TOOL',heading:'JSON Formatter',desc:'Paste JSON, then format, minify, and validate instantly.',format:'Format',minify:'Minify',copy:'Copy Output',clear:'Clear',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeDark:'🌙',themeLight:'☀️',placeholder:'{"project":"tools"}',ok:'Valid JSON.',copyOk:'Copied.',copyFail:'Unable to copy. Allow clipboard access or copy the output manually.',empty:'Enter JSON first.',noOutput:'No output to copy.',invalid:'Invalid JSON: '}
+  ar:{lang:'ar',dir:'rtl',title:'JSON Formatter — tools.oalfawzan.sa',meta:'منسق JSON سريع للنسخ والتحقق.',tag:'// أداة',heading:'JSON Formatter',desc:'ألصق JSON، ثم نسّقه أو صغّره وتحقق من صحته فورًا.',format:'تنسيق',minify:'تصغير',copy:'نسخ الناتج',clear:'مسح',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',themeLabel:'تبديل المظهر',placeholder:'{"project":"tools"}',ok:'JSON صالح.',copyOk:'تم النسخ.',copyFail:'تعذر النسخ. اسمح بالوصول إلى الحافظة أو انسخ النص يدويًا.',empty:'أدخل JSON أولًا.',noOutput:'لا يوجد JSON للإخراج.',invalid:'JSON غير صالح: '},
+  en:{lang:'en',dir:'ltr',title:'JSON Formatter — tools.oalfawzan.sa',meta:'Fast JSON formatter and validator.',tag:'// TOOL',heading:'JSON Formatter',desc:'Paste JSON, then format, minify, and validate instantly.',format:'Format',minify:'Minify',copy:'Copy Output',clear:'Clear',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',themeLabel:'Toggle theme',placeholder:'{"project":"tools"}',ok:'Valid JSON.',copyOk:'Copied.',copyFail:'Unable to copy. Allow clipboard access or copy the output manually.',empty:'Enter JSON first.',noOutput:'No output to copy.',invalid:'Invalid JSON: '}
 };
-let currentLang=localStorage.getItem('tools_lang')||'ar';
-let currentTheme=localStorage.getItem('tools_theme')||'dark';
+let currentLang=window.ToolsPlatform?.getLanguage('ar')||'ar';
+let currentTheme=window.ToolsPlatform?.getTheme()||'dark';
 const input=document.getElementById('inputJson');
 const output=document.getElementById('outputJson');
 const status=document.getElementById('status');
@@ -41,8 +41,12 @@ function applyLang(lang){
   document.getElementById('minifyBtn').textContent=s.minify;document.getElementById('copyBtn').textContent=s.copy;
   document.getElementById('clearBtn').textContent=s.clear;document.getElementById('backLink').textContent=s.back;
   document.getElementById('builtBy').textContent=s.builtBy;document.getElementById('langBtn').textContent=s.langBtn;
-  document.getElementById('themeBtn').textContent=(currentTheme==='light'?s.themeDark:s.themeLight);
-  input.placeholder=s.placeholder;setStatus('');localStorage.setItem('tools_lang',lang);
+  document.getElementById('themeBtn').setAttribute('aria-label',s.themeLabel);
+  input.placeholder=s.placeholder;setStatus('');window.ToolsPlatform?.setLanguagePreference(lang);
+}
+function applyTheme(theme){
+  currentTheme=window.ToolsPlatform?.setTheme(theme)||(theme==='light'?'light':'dark');
+  if(!window.ToolsPlatform){document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools-theme',currentTheme)}
 }
 document.getElementById('formatBtn').addEventListener('click',formatJSON);
 document.getElementById('minifyBtn').addEventListener('click',minifyJSON);
@@ -50,7 +54,6 @@ document.getElementById('copyBtn').addEventListener('click',copyOut);
 document.getElementById('clearBtn').addEventListener('click',clearAll);
 document.getElementById('langBtn').addEventListener('click',()=>applyLang(currentLang==='ar'?'en':'ar'));
 input.addEventListener('keydown',(event)=>{if((event.ctrlKey||event.metaKey)&&event.key==='Enter'){event.preventDefault();formatJSON()}});
-function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);document.getElementById('themeBtn').textContent=(currentTheme==='light'?STRINGS[currentLang].themeDark:STRINGS[currentLang].themeLight)}
 document.getElementById('themeBtn').addEventListener('click',()=>applyTheme(currentTheme==='dark'?'light':'dark'));
 applyTheme(currentTheme);
 applyLang(currentLang);
