@@ -33,6 +33,19 @@ function fail(message) {
   console.error('QA FAIL:', message);
 }
 
+function serializeViolation(v) {
+  return {
+    id: v.id,
+    impact: v.impact,
+    help: v.help,
+    nodes: v.nodes.map(node => ({
+      target: node.target,
+      html: node.html,
+      failureSummary: node.failureSummary,
+    })),
+  };
+}
+
 for (const [routeName, route] of routes) {
   report.routes[routeName] = {};
   for (const [viewportName, viewport] of viewports) {
@@ -63,7 +76,7 @@ for (const [routeName, route] of routes) {
       const axe = await new AxeBuilder({ page }).analyze();
       const serious = axe.violations.filter(v => ['critical', 'serious'].includes(v.impact));
       if (serious.length) {
-        fail(`${routeName} ${viewportName}: ${serious.length} critical/serious axe violations: ${serious.map(v => v.id).join(', ')}`);
+        fail(`${routeName} ${viewportName}: ${serious.length} critical/serious axe violations: ${serious.map(v => `${v.id}(${v.nodes.length})`).join(', ')}`);
       }
 
       const dir = path.join(outDir, routeName);
@@ -71,7 +84,7 @@ for (const [routeName, route] of routes) {
       await page.screenshot({ path: path.join(dir, `${viewportName}.png`), fullPage: true });
       report.routes[routeName][viewportName] = {
         status, metrics, consoleErrors, pageErrors,
-        axe: axe.violations.map(v => ({ id: v.id, impact: v.impact, nodes: v.nodes.length })),
+        axe: axe.violations.map(serializeViolation),
       };
 
       // External services may legitimately fail in CI, but application exceptions must not.
@@ -134,8 +147,10 @@ await functional('wheel-input-reset', '/wheel-of-names/', async page => {
   await page.locator('#namesInput').fill('Alpha\nBeta\nGamma');
   await page.locator('#resetBtn').click();
   const value = await page.locator('#namesInput').inputValue();
-  if (!value.trim()) throw new Error('reset unexpectedly cleared all default names');
-  return { resetValueLength: value.length };
+  const result = (await page.locator('#resultText').textContent()) || '';
+  if (value !== '') throw new Error(`reset did not clear the names input: ${JSON.stringify(value)}`);
+  if (result.trim() !== '') throw new Error('reset did not clear the result state');
+  return { cleared: true };
 });
 
 await functional('time-convert-and-calculate', '/time/', async page => {
