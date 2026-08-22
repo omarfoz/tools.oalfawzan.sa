@@ -14,12 +14,12 @@
 </head>
 <body>
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap">
+<main class="wrap" id="main-content">
   <header>
     <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
     <div class="header-actions">
       <button class="lang-btn" id="langBtn" type="button">EN</button>
-      <button class="lang-btn" id="themeBtn" type="button">☀️</button>
+      <button class="lang-btn" id="themeBtn" data-platform-theme-toggle type="button" aria-label="تبديل المظهر"></button>
       <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
     </div>
   </header>
@@ -28,26 +28,27 @@
   <h1 id="title">Wheel of Names</h1>
   <p class="sub" id="desc">أدخل الأسماء (كل اسم في سطر) ثم لف العجلة لاختيار اسم عشوائي.</p>
 
-  <section class="grid">
+  <section class="grid" aria-labelledby="title">
     <div class="panel">
+      <label class="field-label" id="namesLabel" for="namesInput">الأسماء</label>
       <textarea id="namesInput" placeholder="أحمد&#10;سارة&#10;ليلى" aria-label="Names, one per line"></textarea>
-      <div class="actions" style="margin-top:12px">
+      <div class="actions">
         <button class="btn primary" id="spinBtn" type="button">لف العجلة</button>
         <button class="btn" id="resetBtn" type="button">إعادة تعيين</button>
       </div>
-      <div class="result" id="resultText"></div>
+      <div class="result" id="resultText" role="status" aria-live="polite"></div>
     </div>
 
-    <div class="panel wheel-wrap">
-      <div class="pointer"></div>
+    <div class="panel wheel-wrap" aria-label="Name wheel preview">
+      <div class="pointer" aria-hidden="true"></div>
       <canvas id="wheelCanvas" width="460" height="460"></canvas>
     </div>
   </section>
 
-  <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
-</div>
+  <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo footer-link">Omar Alfawzan</a></footer>
+</main>
 
-<script src="/assets/js/pages/wheel-of-names.js"></script>
 <script src="/assets/js/platform.js"></script>
+<script src="/assets/js/pages/wheel-of-names.js"></script>
 </body>
 </html>
