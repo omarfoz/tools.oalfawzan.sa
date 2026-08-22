@@ -1,0 +1,72 @@
+name: Frontend Visual QA
+
+on:
+  push:
+    branches:
+      - audit/full-frontend-design-qa
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install browser QA dependencies
+        run: |
+          npm install --no-save playwright@1.55.0 @axe-core/playwright@4.10.2
+          npx playwright install --with-deps chromium
+
+      - name: Run static repository audit
+        run: python scripts/repo_audit.py
+
+      - name: Syntax-check JavaScript
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in assets/js/platform.js assets/js/pages/*.js; do
+            echo "Checking $f"
+            node --check "$f"
+          done
+
+      - name: Serve repository
+        shell: bash
+        run: |
+          python -m http.server 4173 --bind 127.0.0.1 > /tmp/tools-http.log 2>&1 &
+          echo $! > /tmp/tools-http.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/tools-http.log
+          exit 1
+
+      - name: Run browser, accessibility, functional, and screenshot QA
+        env:
+          QA_BASE_URL: http://127.0.0.1:4173
+          QA_OUT_DIR: ui-audit
+        run: node scripts/frontend_visual_qa.mjs
+
+      - name: Upload QA screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-visual-qa
+          path: |
+            ui-audit/
+            audit-report.json
+          if-no-files-found: warn
+          retention-days: 14
