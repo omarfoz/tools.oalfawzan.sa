@@ -6,7 +6,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>QR Generator — tools.oalfawzan.sa</title>
 <meta name="theme-color" content="#0a0a0f">
-<meta name="description" content="مولد QR للنصوص والروابط وبطاقات جهات الاتصال.">
+<meta name="description" content="مولد QR للنصوص والروابط وبطاقات vCard لجهات الاتصال.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/pages/qr-generator.css">
@@ -28,12 +28,12 @@
   <section class="hero">
     <div class="hero-tag" id="tag">// أداة</div>
     <h1 id="title">QR Code Generator</h1>
-    <p class="sub" id="desc">أنشئ رمز QR للرابط أو النص أو بيانات جهة اتصال قابلة للحفظ مباشرة.</p>
+    <p class="sub" id="desc">أنشئ رمز QR للرابط أو النص أو بطاقة vCard قابلة للحفظ كجهة اتصال.</p>
   </section>
 
   <div class="mode-tabs" role="tablist" aria-label="QR type">
     <button class="mode-tab active" id="textTab" type="button" role="tab" aria-selected="true" data-mode="text">نص / رابط</button>
-    <button class="mode-tab" id="contactTab" type="button" role="tab" aria-selected="false" data-mode="contact">جهة اتصال</button>
+    <button class="mode-tab" id="contactTab" type="button" role="tab" aria-selected="false" data-mode="contact">vCard</button>
   </div>
 
   <section class="workspace">
@@ -45,17 +45,21 @@
       </div>
 
       <div id="contactMode" class="mode-panel" hidden>
-        <div class="contact-intro" id="contactIntro">أنشئ بطاقة اتصال vCard. عند مسح الرمز يمكن حفظ البيانات مباشرة في جهات الاتصال.</div>
+        <div class="contact-intro" id="contactIntro">أنشئ بطاقة vCard قياسية. عند مسح الرمز يمكن للهاتف عرض جهة الاتصال وحفظها مباشرة.</div>
         <div class="contact-grid">
-          <label><span id="nameLabel">الاسم الكامل *</span><input id="contactName" type="text" autocomplete="name" placeholder="Omar Alfawzan"></label>
+          <label><span id="firstNameLabel">الاسم الأول *</span><input id="contactFirstName" type="text" autocomplete="given-name" placeholder="Omar"></label>
+          <label><span id="lastNameLabel">اسم العائلة</span><input id="contactLastName" type="text" autocomplete="family-name" placeholder="Alfawzan"></label>
           <label><span id="companyLabel">الشركة</span><input id="contactCompany" type="text" autocomplete="organization" placeholder="Company"></label>
           <label><span id="jobLabel">المسمى الوظيفي</span><input id="contactJob" type="text" autocomplete="organization-title" placeholder="Cloud Technical Lead"></label>
-          <label><span id="phoneLabel">رقم الجوال</span><input id="contactPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+966 5X XXX XXXX"></label>
+          <label><span id="mobileLabel">الجوال</span><input id="contactMobile" type="tel" autocomplete="tel" inputmode="tel" placeholder="+966 5X XXX XXXX"></label>
+          <label><span id="workPhoneLabel">هاتف العمل</span><input id="contactWorkPhone" type="tel" inputmode="tel" placeholder="+966 11 XXX XXXX"></label>
           <label><span id="emailLabel">البريد الإلكتروني</span><input id="contactEmail" type="email" autocomplete="email" inputmode="email" placeholder="name@example.com"></label>
           <label><span id="websiteLabel">الموقع</span><input id="contactWebsite" type="url" autocomplete="url" inputmode="url" placeholder="https://example.com"></label>
           <label class="full"><span id="addressLabel">العنوان</span><input id="contactAddress" type="text" autocomplete="street-address" placeholder="Riyadh, Saudi Arabia"></label>
           <label class="full"><span id="noteLabel">ملاحظات</span><textarea id="contactNote" class="note-input" placeholder="Optional note"></textarea></label>
+          <label class="full"><span id="vcardVersionLabel">إصدار vCard</span><select id="vcardVersion" aria-label="vCard version"><option value="4.0">vCard 4.0 — Standard</option><option value="3.0">vCard 3.0 — Compatibility</option></select></label>
         </div>
+        <div class="helper" id="vcardHelp">vCard 4.0 يتبع RFC 6350. استخدم 3.0 فقط إذا كان جهاز أو قارئ قديم لا يتعرف على 4.0.</div>
       </div>
 
       <div class="actions">
