@@ -1,193 +1,25 @@
 (() => {
   'use strict';
   const API = {};
-  const ready = (fn) => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, {once:true}) : fn();
-
-  API.notify = (message, tone='info', timeout=2600) => {
-    if (!message) return;
-    let region = document.querySelector('.platform-toast-region');
-    if (!region) {
-      region = document.createElement('div');
-      region.className = 'platform-toast-region';
-      region.setAttribute('aria-live', 'polite');
-      region.setAttribute('aria-atomic', 'true');
-      document.body.append(region);
-    }
-    const toast = document.createElement('div');
-    toast.className = 'platform-toast';
-    toast.dataset.tone = tone;
-    toast.setAttribute('role', tone === 'error' ? 'alert' : 'status');
-    toast.textContent = String(message);
-    region.append(toast);
-    window.setTimeout(() => toast.remove(), timeout);
-  };
-
-  API.setBusy = (element, busy=true) => {
-    if (!element) return;
-    element.setAttribute('aria-busy', String(Boolean(busy)));
-    if ('disabled' in element) element.disabled = Boolean(busy);
-  };
-
-  API.downloadText = (text, filename, type='text/plain;charset=utf-8') => {
-    const blob = new Blob([text], {type});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.append(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
-
-  API.copyText = async (text) => {
-    if (!navigator.clipboard?.writeText) throw new Error('Clipboard API unavailable');
-    await navigator.clipboard.writeText(String(text ?? ''));
-    API.notify(document.documentElement.lang === 'ar' ? 'تم النسخ' : 'Copied', 'success');
-  };
-
-  const isHome = () => {
-    const path = location.pathname.replace(/\/+$/, '') || '/';
-    return path === '/' || path === '/index.html';
-  };
-
-  const brandMarkup = () => '<span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>';
-
-  const ensureStyles = () => {
-    if (!isHome() && !document.querySelector('link[data-home-parity]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = '/assets/css/home-parity.css?v=20260822b';
-      link.dataset.homeParity = 'true';
-      document.head.append(link);
-    }
-    if (location.pathname.includes('/offer') && !document.querySelector('link[data-offer-mobile]')) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = '/assets/css/offer-mobile.css?v=20260822b';
-      link.dataset.offerMobile = 'true';
-      document.head.append(link);
-    }
-  };
-
-  const ensureEmojiSvgScript = () => {
-    if (document.querySelector('script[data-emoji-svg]')) return;
-    const script = document.createElement('script');
-    script.src = '/assets/js/emoji-svg.js?v=20260822b';
-    script.defer = true;
-    script.dataset.emojiSvg = 'true';
-    document.head.append(script);
-  };
-
-  const normalizeToolChrome = () => {
-    if (isHome()) return;
-    document.body.classList.add('tool-page');
-    const shell = document.querySelector('.wrap, .container, .app, body > div');
-    if (!shell) return;
-
-    let header = shell.querySelector(':scope > header') || document.querySelector('header');
-    if (!header) {
-      header = document.createElement('header');
-      shell.prepend(header);
-    }
-    header.classList.add('site-header', 'tool-site-header');
-
-    const legacyTitle = header.querySelector(':scope > h1');
-    if (legacyTitle) {
-      const hero = document.createElement('section');
-      hero.className = 'tool-hero';
-      const subtitle = header.querySelector(':scope > .subtitle, :scope > p');
-      hero.append(legacyTitle);
-      if (subtitle) hero.append(subtitle);
-      header.after(hero);
-    }
-
-    let brand = header.querySelector('.brand');
-    if (!brand) {
-      const oldLogo = header.querySelector('.logo');
-      if (oldLogo) {
-        brand = oldLogo;
-        brand.className = 'brand';
-        brand.href = '/';
-        brand.setAttribute('aria-label', 'tools.oalfawzan.sa home');
-        brand.innerHTML = brandMarkup();
-      } else {
-        brand = document.createElement('a');
-        brand.className = 'brand';
-        brand.href = '/';
-        brand.setAttribute('aria-label', 'tools.oalfawzan.sa home');
-        brand.innerHTML = brandMarkup();
-        header.prepend(brand);
-      }
-    } else if (!brand.querySelector('.brand-mark')) {
-      brand.innerHTML = brandMarkup();
-      brand.href = '/';
-    }
-
-    let actions = header.querySelector('.header-actions, .top-actions');
-    if (!actions) {
-      actions = document.createElement('div');
-      actions.className = 'header-actions';
-      const allTools = document.createElement('a');
-      allTools.className = 'link-btn';
-      allTools.href = '/';
-      allTools.textContent = document.documentElement.lang === 'ar' ? 'كل الأدوات' : 'All tools';
-      const profile = document.createElement('a');
-      profile.className = 'link-btn';
-      profile.href = 'https://oalfawzan.sa';
-      profile.textContent = document.documentElement.lang === 'ar' ? 'الملف الشخصي' : 'Profile';
-      actions.append(allTools, profile);
-      header.append(actions);
-    } else {
-      actions.classList.add('header-actions');
-    }
-  };
-
-  window.ToolsPlatform = API;
-
-  // UI-only enhancements. Never override or wrap window.fetch here.
-  ensureStyles();
-  ensureEmojiSvgScript();
-
-  ready(() => {
-    normalizeToolChrome();
-
-    if (!document.querySelector('.skip-link')) {
-      const skip = document.createElement('a');
-      skip.className = 'skip-link';
-      skip.href = '#main-content';
-      skip.textContent = document.documentElement.lang === 'ar' ? 'تجاوز إلى المحتوى' : 'Skip to content';
-      document.body.prepend(skip);
-    }
-
-    let main = document.querySelector('main, [role="main"]');
-    if (!main) {
-      main = document.querySelector('.wrap, .container, .app, body > div');
-      if (main) {
-        main.id ||= 'main-content';
-        main.setAttribute('role','main');
-      }
-    } else main.id ||= 'main-content';
-
-    document.querySelectorAll('a[target="_blank"]').forEach(a => {
-      const rel = new Set((a.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
-      rel.add('noopener');
-      rel.add('noreferrer');
-      a.setAttribute('rel', [...rel].join(' '));
-    });
-
-    document.querySelectorAll('button:not([type])').forEach(b => b.type='button');
-
-    document.querySelectorAll('input,select,textarea').forEach(el => {
-      if (el.matches('[type="hidden"],[type="submit"],[type="button"],[type="reset"]')) return;
-      if (el.labels?.length || el.hasAttribute('aria-label') || el.hasAttribute('aria-labelledby')) return;
-      const hint = el.getAttribute('placeholder') || el.getAttribute('name') || el.id;
-      if (hint) el.setAttribute('aria-label', hint);
-    });
-
-    document.querySelectorAll('table').forEach(table => {
-      const p = table.parentElement;
-      if (p && !p.classList.contains('platform-table-scroll')) p.classList.add('platform-table-scroll');
-    });
-  });
+  const THEME_KEY='tools-theme', LANG_KEY='tools-language', LEGACY_THEME='tools_theme', LEGACY_LANG='tools_lang', OFFER_LANG='offer_lang';
+  const ICONS={sun:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg>',moon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/></svg>'};
+  const ready=fn=>document.readyState==='loading'?document.addEventListener('DOMContentLoaded',fn,{once:true}):fn();
+  const validTheme=v=>v==='light'||v==='dark';
+  const validLang=v=>v==='ar'||v==='en';
+  API.getTheme=()=>{const primary=localStorage.getItem(THEME_KEY),legacy=localStorage.getItem(LEGACY_THEME);const value=validTheme(primary)?primary:(validTheme(legacy)?legacy:null);return value||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')};
+  API.getLanguage=()=>{const primary=localStorage.getItem(LANG_KEY),legacy=localStorage.getItem(LEGACY_LANG),offer=localStorage.getItem(OFFER_LANG);const value=validLang(primary)?primary:(validLang(legacy)?legacy:(validLang(offer)?offer:null));return value||(document.documentElement.lang==='en'?'en':'ar')};
+  API.applyTheme=(theme,persist=true)=>{theme=validTheme(theme)?theme:'dark';document.documentElement.dataset.theme=theme;const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',theme==='light'?'#f4f6fa':'#090b10');if(persist){localStorage.setItem(THEME_KEY,theme);localStorage.setItem(LEGACY_THEME,theme)}document.querySelectorAll('[data-platform-theme],#themeBtn').forEach(b=>{b.innerHTML=theme==='light'?ICONS.moon:ICONS.sun;b.setAttribute('aria-label',theme==='light'?'Dark mode':'Light mode');b.title=theme==='light'?'Dark mode':'Light mode'});window.dispatchEvent(new CustomEvent('tools:themechange',{detail:{theme}}));return theme};
+  API.applyLanguage=(lang,persist=true)=>{lang=validLang(lang)?lang:'ar';document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';if(persist){localStorage.setItem(LANG_KEY,lang);localStorage.setItem(LEGACY_LANG,lang);localStorage.setItem(OFFER_LANG,lang)}document.querySelectorAll('[data-platform-language],#langBtn').forEach(b=>{b.textContent=lang==='ar'?'EN':'ع';b.setAttribute('aria-label',lang==='ar'?'Switch to English':'التبديل إلى العربية');b.title=lang==='ar'?'English':'العربية'});window.dispatchEvent(new CustomEvent('tools:languagechange',{detail:{lang}}));return lang};
+  API.notify=(message,tone='info',timeout=2600)=>{if(!message)return;let region=document.querySelector('.platform-toast-region');if(!region){region=document.createElement('div');region.className='platform-toast-region';region.setAttribute('aria-live','polite');region.setAttribute('aria-atomic','true');document.body.append(region)}const toast=document.createElement('div');toast.className='platform-toast';toast.dataset.tone=tone;toast.setAttribute('role',tone==='error'?'alert':'status');toast.textContent=String(message);region.append(toast);setTimeout(()=>toast.remove(),timeout)};
+  API.setBusy=(element,busy=true)=>{if(!element)return;element.setAttribute('aria-busy',String(Boolean(busy)));if('disabled'in element)element.disabled=Boolean(busy)};
+  API.downloadText=(text,filename,type='text/plain;charset=utf-8')=>{const blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+  API.copyText=async text=>{if(!navigator.clipboard?.writeText)throw new Error('Clipboard API unavailable');await navigator.clipboard.writeText(String(text??''));API.notify(document.documentElement.lang==='ar'?'تم النسخ':'Copied','success')};
+  const isHome=()=>{const path=location.pathname.replace(/\/+$/,'')||'/';return path==='/'||path==='/index.html'};
+  const brandMarkup=()=>'<span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>';
+  const ensureStyles=()=>{if(!isHome()&&!document.querySelector('link[data-home-parity]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/assets/css/home-parity.css?v=20260822e';l.dataset.homeParity='true';document.head.append(l)}if(location.pathname.includes('/offer')&&!document.querySelector('link[data-offer-mobile]')){const l=document.createElement('link');l.rel='stylesheet';l.href='/assets/css/offer-mobile.css?v=20260822e';l.dataset.offerMobile='true';document.head.append(l)}};
+  const ensureEmojiSvgScript=()=>{if(document.querySelector('script[data-emoji-svg]'))return;const s=document.createElement('script');s.src='/assets/js/emoji-svg.js?v=20260822e';s.defer=true;s.dataset.emojiSvg='true';document.head.append(s)};
+  const normalizeToolChrome=()=>{if(isHome())return;document.body.classList.add('tool-page');const shell=document.querySelector('.wrap,.container,.app,body > div');if(!shell)return;let header=shell.querySelector(':scope > header')||document.querySelector('header');if(!header){header=document.createElement('header');shell.prepend(header)}header.classList.add('site-header','tool-site-header');const legacyTitle=header.querySelector(':scope > h1');if(legacyTitle){const hero=document.createElement('section');hero.className='tool-hero';const subtitle=header.querySelector(':scope > .subtitle,:scope > p');hero.append(legacyTitle);if(subtitle)hero.append(subtitle);header.after(hero)}let brand=header.querySelector('.brand');if(!brand){const old=header.querySelector('.logo');if(old){brand=old;brand.className='brand';brand.href='/';brand.innerHTML=brandMarkup()}else{brand=document.createElement('a');brand.className='brand';brand.href='/';brand.innerHTML=brandMarkup();header.prepend(brand)}}else if(!brand.querySelector('.brand-mark')){brand.innerHTML=brandMarkup();brand.href='/'}brand.setAttribute('aria-label','tools.oalfawzan.sa home');let actions=header.querySelector('.header-actions,.top-actions');if(!actions){actions=document.createElement('div');header.append(actions)}actions.classList.add('header-actions','platform-header-actions');let lang=actions.querySelector('#langBtn,[data-platform-language]'),langExisting=Boolean(lang);if(!lang){lang=document.createElement('button');lang.type='button';lang.className='icon-btn platform-control';lang.dataset.platformLanguage='';actions.append(lang)}else{lang.dataset.platformLanguage='';lang.classList.add('icon-btn','platform-control')}let theme=actions.querySelector('#themeBtn,[data-platform-theme]'),themeExisting=Boolean(theme);if(!theme){theme=document.createElement('button');theme.type='button';theme.className='icon-btn platform-control';theme.dataset.platformTheme='';actions.append(theme)}else{theme.dataset.platformTheme='';theme.classList.add('icon-btn','platform-control')}if(langExisting){lang.addEventListener('click',()=>queueMicrotask(()=>API.applyLanguage(document.documentElement.lang==='en'?'en':'ar')))}else{lang.addEventListener('click',()=>API.applyLanguage(document.documentElement.lang==='ar'?'en':'ar'))}if(themeExisting){theme.addEventListener('click',()=>queueMicrotask(()=>API.applyTheme(document.documentElement.dataset.theme==='light'?'light':'dark')))}else{theme.addEventListener('click',()=>API.applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'))}};
+  window.ToolsPlatform=API;
+  const initialTheme=API.getTheme(),initialLang=API.getLanguage();localStorage.setItem(THEME_KEY,initialTheme);localStorage.setItem(LEGACY_THEME,initialTheme);localStorage.setItem(LANG_KEY,initialLang);localStorage.setItem(LEGACY_LANG,initialLang);localStorage.setItem(OFFER_LANG,initialLang);API.applyTheme(initialTheme,false);API.applyLanguage(initialLang,false);ensureStyles();ensureEmojiSvgScript();
+  ready(()=>{normalizeToolChrome();API.applyTheme(API.getTheme(),false);API.applyLanguage(API.getLanguage(),false);if(!document.querySelector('.skip-link')){const skip=document.createElement('a');skip.className='skip-link';skip.href='#main-content';skip.textContent=document.documentElement.lang==='ar'?'تجاوز إلى المحتوى':'Skip to content';document.body.prepend(skip)}let main=document.querySelector('main,[role="main"]');if(!main){main=document.querySelector('.wrap,.container,.app,body > div');if(main){main.id||='main-content';main.setAttribute('role','main')}}else main.id||='main-content';document.querySelectorAll('a[target="_blank"]').forEach(a=>{const rel=new Set((a.getAttribute('rel')||'').split(/\s+/).filter(Boolean));rel.add('noopener');rel.add('noreferrer');a.setAttribute('rel',[...rel].join(' '))});document.querySelectorAll('button:not([type])').forEach(b=>b.type='button');document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.matches('[type="hidden"],[type="submit"],[type="button"],[type="reset"]')||el.labels?.length||el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return;const hint=el.getAttribute('placeholder')||el.getAttribute('name')||el.id;if(hint)el.setAttribute('aria-label',hint)});document.querySelectorAll('table').forEach(t=>{const p=t.parentElement;if(p&&!p.classList.contains('platform-table-scroll'))p.classList.add('platform-table-scroll')})});
 })();
