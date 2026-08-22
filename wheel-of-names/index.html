@@ -31,7 +31,7 @@
   <section class="grid" aria-labelledby="title">
     <div class="panel">
       <label class="field-label" id="namesLabel" for="namesInput">الأسماء</label>
-      <textarea id="namesInput" placeholder="أحمد&#10;سارة&#10;ليلى" aria-label="Names, one per line"></textarea>
+      <textarea id="namesInput" placeholder="أحمد&#10;سارة&#10;ليلى"></textarea>
       <div class="actions">
         <button class="btn primary" id="spinBtn" type="button">لف العجلة</button>
         <button class="btn" id="resetBtn" type="button">إعادة تعيين</button>
@@ -39,9 +39,9 @@
       <div class="result" id="resultText" role="status" aria-live="polite"></div>
     </div>
 
-    <div class="panel wheel-wrap" aria-label="Name wheel preview">
+    <div class="panel wheel-wrap" role="group" aria-label="Name wheel preview">
       <div class="pointer" aria-hidden="true"></div>
-      <canvas id="wheelCanvas" width="460" height="460"></canvas>
+      <canvas id="wheelCanvas" width="460" height="460" role="img" aria-label="Interactive name wheel visualization"></canvas>
     </div>
   </section>
 
