@@ -62,6 +62,15 @@
     document.head.append(link);
   };
 
+  const ensureEmojiSvgScript = () => {
+    if (document.querySelector('script[data-emoji-svg]')) return;
+    const script = document.createElement('script');
+    script.src = '/assets/js/emoji-svg.js?v=20260822';
+    script.defer = true;
+    script.dataset.emojiSvg = 'true';
+    document.head.append(script);
+  };
+
   const normalizeToolChrome = () => {
     if (isHome()) return;
     document.body.classList.add('tool-page');
@@ -76,8 +85,6 @@
     }
     header.classList.add('site-header', 'tool-site-header');
 
-    // Legacy pages such as the loan calculator used the header as their hero.
-    // Preserve the content, but move it below the site chrome so every page has the same homepage header.
     const legacyTitle = header.querySelector(':scope > h1');
     if (legacyTitle) {
       const hero = document.createElement('section');
@@ -131,8 +138,8 @@
 
   window.ToolsPlatform = API;
 
-  // Add the final stylesheet immediately so it wins the cascade with minimal flash.
   ensureHomeParityStyles();
+  ensureEmojiSvgScript();
 
   ready(() => {
     normalizeToolChrome();
