@@ -50,6 +50,7 @@
     const path = location.pathname.replace(/\/+$/, '') || '/';
     return path === '/' || path === '/index.html';
   };
+  const isOffer = () => /^\/offer(?:\/|$)/.test(location.pathname);
 
   const brandMarkup = () => '<span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>';
 
@@ -57,8 +58,17 @@
     if (isHome() || document.querySelector('link[data-home-parity]')) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = '/assets/css/home-parity.css';
+    link.href = '/assets/css/home-parity.css?v=20260822b';
     link.dataset.homeParity = 'true';
+    document.head.append(link);
+  };
+
+  const ensureOfferMobileStyles = () => {
+    if (!isOffer() || document.querySelector('link[data-offer-mobile]')) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/assets/css/offer-mobile.css?v=20260822a';
+    link.dataset.offerMobile = 'true';
     document.head.append(link);
   };
 
@@ -177,6 +187,7 @@
   window.ToolsPlatform = API;
   normalizeAIProxyFetch();
   ensureHomeParityStyles();
+  ensureOfferMobileStyles();
   ensureEmojiSvgScript();
 
   ready(() => {
