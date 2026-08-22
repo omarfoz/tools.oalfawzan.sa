@@ -1,57 +1,84 @@
 /* Shared platform foundation: accessibility, resilient controls, and cross-tool consistency. */
 :root {
-  --ds-bg: #0a0a0f;
-  --ds-surface: #111118;
-  --ds-surface-2: #171722;
-  --ds-text: #f3f4f8;
-  --ds-muted: #8b8ba1;
-  --ds-border: rgba(255,255,255,.10);
-  --ds-primary: #2f8cff;
-  --ds-primary-hover: #5aa4ff;
-  --ds-success: #18c998;
-  --ds-warning: #f5b942;
-  --ds-danger: #ff7070;
-  --ds-radius-sm: 8px;
-  --ds-radius-md: 12px;
-  --ds-radius-lg: 18px;
-  --ds-shadow-sm: 0 1px 2px rgba(0,0,0,.18);
-  --ds-shadow-md: 0 12px 32px rgba(0,0,0,.18);
+  --ds-bg: #0d1522;
+  --ds-surface: #131f2f;
+  --ds-surface-2: #19273a;
+  --ds-field: #101b29;
+  --ds-text: #edf2f8;
+  --ds-muted: #91a0b3;
+  --ds-border: rgba(184,202,224,.16);
+  --ds-primary: #4f73ff;
+  --ds-primary-hover: #6f8cff;
+  --ds-success: #22aa91;
+  --ds-warning: #d49a3a;
+  --ds-danger: #ef6f76;
+  --ds-radius-sm: 7px;
+  --ds-radius-md: 10px;
+  --ds-radius-lg: 14px;
+  --ds-shadow-sm: 0 1px 2px rgba(0,0,0,.16);
+  --ds-shadow-md: 0 14px 36px rgba(0,0,0,.20);
   --ds-space-1: .25rem;
   --ds-space-2: .5rem;
   --ds-space-3: .75rem;
   --ds-space-4: 1rem;
   --ds-space-5: 1.5rem;
   --ds-space-6: 2rem;
+  /* Compatibility aliases for legacy page styles. */
+  --bg: var(--ds-bg);
+  --surface: var(--ds-surface);
+  --surface2: var(--ds-surface-2);
+  --surface-light: var(--ds-surface-2);
+  --surface-soft: var(--ds-surface-2);
+  --field: var(--ds-field);
+  --field-bg: var(--ds-field);
+  --text: var(--ds-text);
+  --text-muted: var(--ds-muted);
+  --muted: var(--ds-muted);
+  --muted2: #b3bfce;
+  --border: var(--ds-border);
+  --border2: rgba(184,202,224,.28);
+  --accent: var(--ds-primary);
+  --primary: var(--ds-success);
+  --green: var(--ds-success);
+  --success: var(--ds-success);
+  --warning: var(--ds-warning);
+  --danger: var(--ds-danger);
+  --error: var(--ds-danger);
 }
 :root[data-theme="light"] {
-  --ds-bg: #f7f8fc;
-  --ds-surface: #fff;
-  --ds-surface-2: #f2f4f8;
-  --ds-text: #111827;
-  --ds-muted: #667085;
-  --ds-border: rgba(16,24,40,.14);
-  --ds-primary: #075fc7;
-  --ds-primary-hover: #004da8;
-  --ds-success: #087f5b;
-  --ds-warning: #9a6700;
-  --ds-danger: #c43232;
-  --ds-shadow-md: 0 12px 32px rgba(15,23,42,.08);
+  --ds-bg: #f4f7fb;
+  --ds-surface: #ffffff;
+  --ds-surface-2: #edf2f8;
+  --ds-field: #f7f9fc;
+  --ds-text: #172234;
+  --ds-muted: #627188;
+  --ds-border: rgba(30,53,79,.16);
+  --ds-primary: #315cf5;
+  --ds-primary-hover: #2348ce;
+  --ds-success: #128a78;
+  --ds-warning: #a76a13;
+  --ds-danger: #c44750;
+  --ds-shadow-md: 0 14px 36px rgba(25,43,67,.10);
+  --muted2: #46566c;
+  --border2: rgba(30,53,79,.28);
 }
-html { color-scheme: dark; scroll-behavior: smooth; }
+html { color-scheme: dark; scroll-behavior: smooth; background: var(--ds-bg); }
 html[data-theme="light"] { color-scheme: light; }
-body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; background:var(--ds-bg); color:var(--ds-text); }
+body::before { display:none !important; }
 button, input, select, textarea { font: inherit; }
 button, [role="button"], input, select { min-height: 44px; }
 button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: not-allowed; opacity: .58; }
 a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) { outline: none; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-primary) 36%, transparent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-primary) 32%, transparent) !important;
   outline: 2px solid transparent;
 }
+input::placeholder, textarea::placeholder { color: color-mix(in srgb,var(--ds-muted) 80%,transparent); opacity:1; }
 .skip-link {
   position: fixed; inset-inline-start: 12px; top: 10px; z-index: 99999;
   transform: translateY(-180%); padding: 10px 14px; border-radius: var(--ds-radius-sm);
-  color: #fff; background: #075fc7; text-decoration: none; font-weight: 700;
+  color: #fff; background: var(--ds-primary); text-decoration: none; font-weight: 700;
 }
 .skip-link:focus { transform: translateY(0); }
 .platform-toast-region { position: fixed; inset-inline-end: 16px; bottom: 16px; z-index: 9999; display: grid; gap: 8px; width: min(360px, calc(100vw - 32px)); pointer-events: none; }
@@ -61,11 +88,84 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .platform-toast[data-tone="warning"] { border-inline-start: 3px solid var(--ds-warning); }
 .platform-field-error { color: var(--ds-danger); font-size: .8rem; margin-top: 6px; }
 .platform-empty { border: 1px dashed var(--ds-border); border-radius: var(--ds-radius-md); padding: 18px; color: var(--ds-muted); text-align: center; }
-.platform-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
+.platform-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; scrollbar-width:thin; }
 img, canvas, svg { max-width: 100%; }
 pre, code, textarea { overflow-wrap: anywhere; }
 [hidden] { display: none !important; }
-::selection { background: color-mix(in srgb, var(--ds-primary) 32%, transparent); }
+::selection { background: color-mix(in srgb, var(--ds-primary) 28%, transparent); }
+.ui-icon { width:18px; height:18px; display:inline-block; flex:0 0 auto; color:currentColor; vertical-align:-.16em; }
+.ui-icon-sm { width:16px; height:16px; }
+.icon-only { display:inline-grid !important; place-items:center; padding:0 !important; min-width:44px; }
+.platform-toolbar { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0;border-bottom:1px solid var(--ds-border);margin-bottom:28px; }
+.platform-brand { display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:var(--ds-text);font:700 .82rem/1.2 'IBM Plex Sans',system-ui,sans-serif; }
+.platform-brand-mark { width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--ds-border);background:var(--ds-surface-2);font-size:.67rem;letter-spacing:.06em; }
+.platform-back { color:var(--ds-muted);text-decoration:none;font-size:.78rem;font-weight:650;min-height:44px;display:inline-flex;align-items:center;gap:6px; }
+.platform-back:hover { color:var(--ds-text); }
+
+/* Product-wide visual normalization for the individual tools. */
+html[data-tool-page]:not([data-tool-page="home"]) .panel,
+html[data-tool-page="stock-analysis-dashboard"] .card {
+  border-color:var(--ds-border) !important;
+  box-shadow:none !important;
+}
+html[data-tool-page]:not([data-tool-page="home"]) .hero,
+html[data-tool-page]:not([data-tool-page="home"]) .panel,
+html[data-tool-page="stock-analysis-dashboard"] .card,
+html[data-tool-page="loan-calculator"] .panel {
+  background:var(--ds-surface) !important;
+}
+html[data-tool-page]:not([data-tool-page="home"]) .hero-tag,
+html[data-tool-page="stock-analysis-dashboard"] .pill {
+  border-radius:5px !important;
+  background:color-mix(in srgb,var(--ds-success) 11%,transparent) !important;
+  color:var(--ds-success) !important;
+  border:1px solid color-mix(in srgb,var(--ds-success) 28%,transparent) !important;
+}
+html[data-tool-page="json-formatter"] header,
+html[data-tool-page="qr-generator"] header,
+html[data-tool-page="wheel-of-names"] header,
+html[data-tool-page="time"] header {
+  border-bottom:1px solid var(--ds-border);
+  margin-bottom:28px;
+}
+html[data-tool-page="json-formatter"] textarea,
+html[data-tool-page="qr-generator"] textarea,
+html[data-tool-page="wheel-of-names"] textarea,
+html[data-tool-page="time"] input,
+html[data-tool-page="time"] select,
+html[data-tool-page="stock-analysis-dashboard"] input {
+  background:var(--ds-field) !important;
+  border-color:var(--ds-border) !important;
+}
+html[data-tool-page="loan-calculator"] body { font-family:'IBM Plex Sans Arabic','IBM Plex Sans',system-ui,sans-serif !important; }
+html[data-tool-page="loan-calculator"] header { text-align:start !important; padding:20px 0 28px !important; margin-bottom:28px !important; }
+html[data-tool-page="loan-calculator"] header h1 { color:var(--ds-text) !important; font-size:clamp(1.9rem,5vw,2.7rem) !important; letter-spacing:-.035em; }
+html[data-tool-page="loan-calculator"] .subtitle { max-width:720px; }
+html[data-tool-page="loan-calculator"] .panel h2,
+html[data-tool-page="loan-calculator"] .fee-section h3 { color:var(--ds-text) !important; }
+html[data-tool-page="loan-calculator"] button:not(.secondary) { background:var(--ds-primary) !important;color:#fff !important; }
+html[data-tool-page="loan-calculator"] button:hover { transform:none !important; }
+html[data-tool-page="loan-calculator"] .summary-card { border-radius:var(--ds-radius-md) !important;background:var(--ds-surface-2) !important; }
+html[data-tool-page="loan-calculator"] .summary-card .value { color:var(--ds-success) !important; }
+html[data-tool-page="loan-calculator"] .monthly-schedule { max-width:100%;overflow:auto; }
+html[data-tool-page="stock-analysis-dashboard"] .chart-wrap { border-radius:var(--ds-radius-md) !important; }
+html[data-tool-page="stock-analysis-dashboard"] .kpi,
+html[data-tool-page="stock-analysis-dashboard"] .ai-box,
+html[data-tool-page="stock-analysis-dashboard"] .stock-item { border-radius:var(--ds-radius-sm) !important; }
+html[data-tool-page="offer"] .hero-tag,
+html[data-tool-page="offer"] .nat-btn.active,
+html[data-tool-page="offer"] .card-tab[class*="active"] { background:color-mix(in srgb,var(--ds-primary) 11%,var(--ds-surface)) !important; }
+html[data-tool-page="offer"] .mode-icon .ui-icon,
+html[data-tool-page="offer"] .nat-btn .ui-icon { margin-inline-end:6px; }
+html[data-tool-page="offer"] .popup { box-shadow:var(--ds-shadow-md) !important; }
+
+@media (max-width: 700px) {
+  .platform-toolbar { padding:12px 0 16px;margin-bottom:20px; }
+  html[data-tool-page="loan-calculator"] .container { padding:12px !important; }
+  html[data-tool-page="loan-calculator"] header { padding:10px 0 20px !important; }
+  html[data-tool-page="loan-calculator"] .panel { padding:16px !important; }
+  html[data-tool-page="loan-calculator"] .button-group > button { flex:1 1 100%; }
+}
 @media (max-width: 430px) {
   body { min-width: 0; }
   .wrap { width: 100%; padding-inline: 12px !important; }
@@ -75,3 +175,41 @@ pre, code, textarea { overflow-wrap: anywhere; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* FULL_FRONTEND_PASS_OVERRIDES */
+.skip-link{min-height:44px;display:inline-flex;align-items:center}
+html[data-tool-page]:not([data-tool-page="home"]) .logo,
+html[data-tool-page]:not([data-tool-page="home"]) footer a{min-height:44px;display:inline-flex;align-items:center}
+.lang-btn,.btn-ghost,.control-btn{min-height:44px!important}
+html[data-tool-page="home"] .icon-btn,
+html[data-tool-page="home"] .link-btn,
+html[data-tool-page="home"] .filter{min-height:44px!important}
+html[data-tool-page="home"] .site-footer a{display:inline-flex;align-items:center;min-height:44px}
+html[data-tool-page="home"] .stat{grid-template-columns:1fr auto!important}
+html[data-tool-page="home"] .tool-top{justify-content:flex-end!important}
+
+/* Offer: actual 44px hit areas and accessible icon controls. */
+html[data-tool-page="offer"] .field-name-input,
+html[data-tool-page="offer"] .amount-input{min-height:44px!important}
+html[data-tool-page="offer"] .type-btn,
+html[data-tool-page="offer"] .del-btn{min-width:44px!important;min-height:44px!important}
+html[data-tool-page="offer"] .toggle{width:44px!important;height:44px!important;background:transparent!important;border-radius:0!important;position:relative}
+html[data-tool-page="offer"] .toggle::before{content:"";position:absolute;width:32px;height:18px;border-radius:9px;background:var(--border2);inset:13px 6px;transition:background .2s}
+html[data-tool-page="offer"] .toggle::after{top:16px!important;left:9px!important}
+html[data-tool-page="offer"] .toggle.on::before{background:var(--current)}
+html[data-tool-page="offer"] .toggle.on-new::before{background:var(--new)}
+html[data-tool-page="offer"] .del-btn::before{content:"";width:16px;height:16px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5 5 19' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5 5 19' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
+html[data-tool-page="offer"] .popup-overlay{padding:16px}
+html[data-tool-page="offer"] .popup{max-height:min(760px,calc(100dvh - 32px));overflow:auto}
+
+/* Time: phone layout is a sequential toolkit, not two squeezed desktop columns. */
+@media(max-width:700px){html[data-tool-page="time"] .grid{grid-template-columns:1fr!important}html[data-tool-page="time"] .panel{padding:14px!important}}
+
+/* Stock: compact utility header; primary search actions may remain full-width on phone. */
+@media(max-width:600px){html[data-tool-page="stock-analysis-dashboard"] .top-actions{display:grid!important;grid-template-columns:44px 44px 1fr!important;align-items:center}html[data-tool-page="stock-analysis-dashboard"] .top-actions .control-btn{width:44px!important;min-width:44px!important}html[data-tool-page="stock-analysis-dashboard"] .top-actions .logo{width:auto!important;justify-self:end;min-height:44px;display:inline-flex;align-items:center}html[data-tool-page="stock-analysis-dashboard"] .chart-wrap{height:340px!important}}
+
+/* Loan form density and table readability. */
+html[data-tool-page="loan-calculator"] input,html[data-tool-page="loan-calculator"] select{min-height:46px}
+html[data-tool-page="loan-calculator"] .comparison-table th,html[data-tool-page="loan-calculator"] .comparison-table td{min-width:130px}
+@media(max-width:768px){html[data-tool-page="loan-calculator"] .summary-cards{grid-template-columns:1fr 1fr!important;gap:10px!important}html[data-tool-page="loan-calculator"] .summary-card{padding:14px!important}}
+@media(max-width:430px){html[data-tool-page="loan-calculator"] .summary-cards{grid-template-columns:1fr!important}}
