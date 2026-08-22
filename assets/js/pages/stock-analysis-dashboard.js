@@ -4,7 +4,6 @@ const FAVORITES_KEY = 'tadawul_favorites_v1';
 const TRENDING_TICKERS = ['2222','2010','1120','7010','1211','7202','1180','2380','4210','2290','2082','4002','4260','8010','1050','8310','1150','4321','1214','8012'];
 const YAHOO_BASE = 'https://query1.finance.yahoo.com';
 const YAHOO_PROXIES = [
-  (url) => url,
   (url) => `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
   (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
 ];
@@ -22,7 +21,7 @@ const I18N = {
     aiUnavailable: 'لا تتوفر استجابة الذكاء الاصطناعي حالياً.', aiDown: 'خدمة التوصية غير متاحة الآن. يمكنك الاعتماد على المؤشرات أعلاه.',
     notEnough: 'البيانات غير كافية', volumeIncreasing: 'متزايد', volumeDecreasing: 'متناقص', volumeStable: 'مستقر',
     load: 'تحميل', remove: 'حذف', price: 'السعر', support: 'الدعم', resistance: 'المقاومة', volume: 'اتجاه الحجم', ticker: 'الرمز',
-    langBtn: 'EN', themeDark: '🌙', themeLight: '☀️', chartClose: 'الإغلاق',
+    langBtn: 'EN', themeDark: '', themeLight: '', chartClose: 'الإغلاق',
     aiPrompt: 'أنت مرشد استثماري مبسّط للمستخدم غير المتخصص. اكتب بالعربية الفصحى السهلة بلغة موزونة وواضحة، وتجنب المصطلحات المالية المعقدة. ممنوع كتابة كلمة RSI نهائياً. استخدم فقط عبارة "مؤشر الزخم" ثم وضّح معناها بلغة يومية مثل: يدل على ضعف الشراء، أو يدل على قوة الشراء، أو وضع متوازن. لا تستخدم markdown ولا رموز * أو - ولا أي قوائم. اكتب بالضبط 4 أسطر فقط وبالعناوين التالية حرفياً:\nالاتجاه: صاعد أو هابط أو جانبي + سبب قصير مفهوم لعامة الناس\nالمخاطرة: منخفضة أو متوسطة أو مرتفعة + سبب بسيط مرتبط بإمكانية تغير السعر\nالتوصية: شراء أو احتفاظ أو بيع + إجراء مباشر واضح لغير الماليين (مثل: اشترِ على دفعات صغيرة أو انتظر حتى يتضح الاتجاه)\nالشرح المبسط: جملتان قصيرتان جداً تشرحان القرار بعبارات يومية سهلة، بدون اختصارات وبدون أرقام تقنية.\nلا تضف أي مقدمات أو سطر خامس.'
   },
   en: {
@@ -37,7 +36,7 @@ const I18N = {
     aiUnavailable: 'AI response unavailable.', aiDown: 'AI recommendation is unavailable right now. You can still use indicators above.',
     notEnough: 'Not enough data', volumeIncreasing: 'Increasing', volumeDecreasing: 'Decreasing', volumeStable: 'Stable',
     load: 'Load', remove: 'Remove', price: 'Price', support: 'Support', resistance: 'Resistance', volume: 'Volume Trend', ticker: 'Ticker',
-    langBtn: 'عربي', themeDark: '🌙', themeLight: '☀️', chartClose: 'Close',
+    langBtn: 'عربي', themeDark: '', themeLight: '', chartClose: 'Close',
     aiPrompt: 'You are a practical stock advisor for beginner Saudi retail investors. Use very simple everyday English and avoid financial jargon. Never use the term RSI; replace it with "momentum indicator" and briefly explain what it means (near strong drop, near strong rise, or balanced zone). No markdown, no asterisks, no bullet symbols. Return exactly 4 lines with these labels only:\nTrend: uptrend or downtrend or sideways + short plain reason\nRisk: Low or Medium or High + short beginner-friendly reason\nRecommendation: BUY or HOLD or SELL + one direct action sentence for non-experts (example: buy gradually or wait now)\nSimple explanation: exactly 2 very short beginner-friendly sentences without complex numbers or abbreviations.\nDo not add any extra lines or intro.'
   }
 };

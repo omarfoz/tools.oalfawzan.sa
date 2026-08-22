@@ -175,3 +175,41 @@ html[data-tool-page="offer"] .popup { box-shadow:var(--ds-shadow-md) !important;
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* FULL_FRONTEND_PASS_OVERRIDES */
+.skip-link{min-height:44px;display:inline-flex;align-items:center}
+html[data-tool-page]:not([data-tool-page="home"]) .logo,
+html[data-tool-page]:not([data-tool-page="home"]) footer a{min-height:44px;display:inline-flex;align-items:center}
+.lang-btn,.btn-ghost,.control-btn{min-height:44px!important}
+html[data-tool-page="home"] .icon-btn,
+html[data-tool-page="home"] .link-btn,
+html[data-tool-page="home"] .filter{min-height:44px!important}
+html[data-tool-page="home"] .site-footer a{display:inline-flex;align-items:center;min-height:44px}
+html[data-tool-page="home"] .stat{grid-template-columns:1fr auto!important}
+html[data-tool-page="home"] .tool-top{justify-content:flex-end!important}
+
+/* Offer: actual 44px hit areas and accessible icon controls. */
+html[data-tool-page="offer"] .field-name-input,
+html[data-tool-page="offer"] .amount-input{min-height:44px!important}
+html[data-tool-page="offer"] .type-btn,
+html[data-tool-page="offer"] .del-btn{min-width:44px!important;min-height:44px!important}
+html[data-tool-page="offer"] .toggle{width:44px!important;height:44px!important;background:transparent!important;border-radius:0!important;position:relative}
+html[data-tool-page="offer"] .toggle::before{content:"";position:absolute;width:32px;height:18px;border-radius:9px;background:var(--border2);inset:13px 6px;transition:background .2s}
+html[data-tool-page="offer"] .toggle::after{top:16px!important;left:9px!important}
+html[data-tool-page="offer"] .toggle.on::before{background:var(--current)}
+html[data-tool-page="offer"] .toggle.on-new::before{background:var(--new)}
+html[data-tool-page="offer"] .del-btn::before{content:"";width:16px;height:16px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5 5 19' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5 5 19' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
+html[data-tool-page="offer"] .popup-overlay{padding:16px}
+html[data-tool-page="offer"] .popup{max-height:min(760px,calc(100dvh - 32px));overflow:auto}
+
+/* Time: phone layout is a sequential toolkit, not two squeezed desktop columns. */
+@media(max-width:700px){html[data-tool-page="time"] .grid{grid-template-columns:1fr!important}html[data-tool-page="time"] .panel{padding:14px!important}}
+
+/* Stock: compact utility header; primary search actions may remain full-width on phone. */
+@media(max-width:600px){html[data-tool-page="stock-analysis-dashboard"] .top-actions{display:grid!important;grid-template-columns:44px 44px 1fr!important;align-items:center}html[data-tool-page="stock-analysis-dashboard"] .top-actions .control-btn{width:44px!important;min-width:44px!important}html[data-tool-page="stock-analysis-dashboard"] .top-actions .logo{width:auto!important;justify-self:end;min-height:44px;display:inline-flex;align-items:center}html[data-tool-page="stock-analysis-dashboard"] .chart-wrap{height:340px!important}}
+
+/* Loan form density and table readability. */
+html[data-tool-page="loan-calculator"] input,html[data-tool-page="loan-calculator"] select{min-height:46px}
+html[data-tool-page="loan-calculator"] .comparison-table th,html[data-tool-page="loan-calculator"] .comparison-table td{min-width:130px}
+@media(max-width:768px){html[data-tool-page="loan-calculator"] .summary-cards{grid-template-columns:1fr 1fr!important;gap:10px!important}html[data-tool-page="loan-calculator"] .summary-card{padding:14px!important}}
+@media(max-width:430px){html[data-tool-page="loan-calculator"] .summary-cards{grid-template-columns:1fr!important}}

@@ -282,7 +282,7 @@ function makeRow(f, side) {
     <button type="button" class="type-btn ${f.isDeduction ? 'deduction' : ''}"
       title="${f.isDeduction ? t('deduction_toggle') : t('addition_toggle')}"
       onclick="toggleDeduction('${side}','${f.id}')">${f.isDeduction ? '−' : '+'}</button>
-    <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="Remove field">✕</button>
+    <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="Remove field"></button>
   `;
 
   // Double-click to edit in popup
@@ -863,7 +863,7 @@ const STRINGS = {
     gosi_note_saudi:'',
     gosi_note_non:'Non-Saudi: no GOSI deduction from employee salary',
     deduction_toggle:'Deduction — click to toggle', addition_toggle:'Addition — click to mark as deduction',
-    weight_lbl:'WEIGHT %', remove_factor:'✕ Remove',
+    weight_lbl:'WEIGHT %', remove_factor:' Remove',
     ai_unavailable:'AI unavailable. The breakdown above tells the full story.',
     breakdown_rows: {
       gross:'GROSS MONTHLY SALARY', gosi:'GOSI / DEDUCTIONS', net:'NET MONTHLY SALARY',
@@ -939,7 +939,7 @@ const STRINGS = {
     gosi_note_saudi:'',
     gosi_note_non:'غير سعودي: لا يوجد اشتراك تأمينات على الموظف',
     deduction_toggle:'خصم — انقر للتبديل', addition_toggle:'إضافة — انقر للتعيين كخصم',
-    weight_lbl:'الوزن %', remove_factor:'✕ حذف',
+    weight_lbl:'الوزن %', remove_factor:' حذف',
     ai_unavailable:'الذكاء الاصطناعي غير متاح. التفاصيل أعلاه تكفي.',
     breakdown_rows: {
       gross:'إجمالي الراتب الشهري', gosi:'التأمينات / الاستقطاعات', net:'صافي الراتب الشهري',
@@ -1200,7 +1200,7 @@ function makeFactorRow(f) {
         <input type="number" class="factor-weight-input" value="${f.weight}" min="0" max="100"
           onchange="updateFactor('${f.id}','weight',+this.value)">
       </div>
-      <button type="button" class="factor-del-btn hide-mobile" onclick="deleteFactor('${f.id}')">✕</button>
+      <button type="button" class="factor-del-btn hide-mobile" onclick="deleteFactor('${f.id}')"></button>
     </div>
   `;
   return row;
@@ -1575,3 +1575,29 @@ document.addEventListener('touchstart', function(e) {
     if (menu) menu.classList.remove('open');
   }
 }, { passive: true });
+
+/* FULL_FRONTEND_PASS: accessibility for dynamically rendered comparison fields. */
+(() => {
+  const applyDynamicA11y = () => {
+    document.querySelectorAll('.field-row').forEach((row, index) => {
+      const nameInput=row.querySelector('.field-name-input');
+      const label=(nameInput?.value || nameInput?.getAttribute('value') || `Field ${index+1}`).trim();
+      if(nameInput) nameInput.setAttribute('aria-label', `Field name: ${label}`);
+      const amount=row.querySelector('.amount-input');
+      if(amount) amount.setAttribute('aria-label', `Amount for ${label}`);
+      const toggle=row.querySelector('.toggle');
+      if(toggle) toggle.setAttribute('aria-label', `Include ${label}`);
+      const type=row.querySelector('.type-btn');
+      if(type) type.setAttribute('aria-label', `Change field type for ${label}`);
+      const del=row.querySelector('.del-btn');
+      if(del) del.setAttribute('aria-label', `Delete ${label}`);
+    });
+    document.querySelectorAll('.factor-row').forEach((row,index)=>{
+      const name=row.querySelector('input[type="text"]');
+      const label=(name?.value||`Factor ${index+1}`).trim();
+      row.querySelectorAll('input,select,button').forEach((el,i)=>{if(!el.labels?.length&&!el.getAttribute('aria-label'))el.setAttribute('aria-label',`${label} control ${i+1}`)});
+    });
+  };
+  applyDynamicA11y();
+  new MutationObserver(applyDynamicA11y).observe(document.body,{childList:true,subtree:true});
+})();

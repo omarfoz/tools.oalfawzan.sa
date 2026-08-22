@@ -1,7 +1,7 @@
 
 const STRINGS={
-  ar:{lang:'ar',dir:'rtl',title:'Wheel of Names — tools.oalfawzan.sa',descMeta:'عجلة أسماء بسيطة لاختيار اسم عشوائي بسرعة.',tag:'// أداة',heading:'Wheel of Names',desc:'أدخل الأسماء (كل اسم في سطر) ثم لف العجلة لاختيار اسم عشوائي.',placeholder:'أحمد\nسارة\nليلى',spin:'لف العجلة',reset:'إعادة تعيين',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',winner:'الاسم المختار: ',themeDark:'🌙',themeLight:'☀️'},
-  en:{lang:'en',dir:'ltr',title:'Wheel of Names — tools.oalfawzan.sa',descMeta:'Simple random name picker wheel.',tag:'// TOOL',heading:'Wheel of Names',desc:'Add names (one per line), spin the wheel, and get a random winner.',placeholder:'Alex\nSara\nLina',spin:'Spin',reset:'Reset',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',winner:'Selected name: ',themeDark:'🌙',themeLight:'☀️'}
+  ar:{lang:'ar',dir:'rtl',title:'Wheel of Names — tools.oalfawzan.sa',descMeta:'عجلة أسماء بسيطة لاختيار اسم عشوائي بسرعة.',tag:'// أداة',heading:'Wheel of Names',desc:'أدخل الأسماء (كل اسم في سطر) ثم لف العجلة لاختيار اسم عشوائي.',placeholder:'أحمد\nسارة\nليلى',spin:'لف العجلة',reset:'إعادة تعيين',back:'← الرجوع لكل الأدوات',builtBy:'من تطوير',langBtn:'EN',winner:'الاسم المختار: ',empty:'أدخل اسمًا واحدًا على الأقل قبل لف العجلة.',themeDark:'',themeLight:''},
+  en:{lang:'en',dir:'ltr',title:'Wheel of Names — tools.oalfawzan.sa',descMeta:'Simple random name picker wheel.',tag:'// TOOL',heading:'Wheel of Names',desc:'Add names (one per line), spin the wheel, and get a random winner.',placeholder:'Alex\nSara\nLina',spin:'Spin',reset:'Reset',back:'← Back to all tools',builtBy:'Built by',langBtn:'عربي',winner:'Selected name: ',empty:'Add at least one name before spinning the wheel.',themeDark:'',themeLight:''}
 };
 const canvas=document.getElementById('wheelCanvas');
 const ctx=canvas.getContext('2d');
@@ -29,7 +29,7 @@ function drawWheel(){
 }
 
 function pickWinner(){
-  const names=getNames(); if(names.length<1){resultText.textContent=''; return}
+  const names=getNames(); if(names.length<1){resultText.textContent=STRINGS[currentLang].empty;resultText.setAttribute('role','alert');namesInput.focus();return}
   if(spinning) return;
   spinning=true;
   resultText.textContent='';
@@ -43,7 +43,7 @@ function pickWinner(){
       const normalized=((Math.PI*1.5-(rotation%(Math.PI*2)))%(Math.PI*2)+(Math.PI*2))%(Math.PI*2);
       const slice=(Math.PI*2)/names.length;
       const idx=Math.floor(normalized/slice)%names.length;
-      resultText.textContent=STRINGS[currentLang].winner+names[idx];
+      resultText.removeAttribute('role');resultText.textContent=STRINGS[currentLang].winner+names[idx];
     }
   }
   requestAnimationFrame(animate);
