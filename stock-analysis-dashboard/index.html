@@ -5,33 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>لوحة تحليل الأسهم — tools.oalfawzan.sa</title>
-<meta name="theme-color" content="#0a0a0f">
+  <meta name="theme-color" content="#0a0a0f">
   <meta name="description" content="لوحة تحليل الأسهم السعودية مع RSI وMA50 وMA200 وحجم التداول والمفضلة وتوصية ذكية مبسطة.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
   <link rel="stylesheet" href="/assets/css/pages/stock-analysis-dashboard.css">
-<link rel="stylesheet" href="/assets/css/platform.css">
+  <link rel="stylesheet" href="/assets/css/platform.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap">
-  <div class="top">
-    <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
-    <div class="top-actions">
-      <button class="control-btn" id="langBtn" type="button">EN</button>
-      <button class="control-btn" id="themeBtn" type="button">☀️</button>
-      <a href="/" id="backLink" class="logo">← الرجوع لكل الأدوات</a>
+<div class="wrap" id="main-content" role="main">
+  <header class="site-header tool-site-header">
+    <a class="brand" href="/" aria-label="tools.oalfawzan.sa home">
+      <span class="brand-mark" aria-hidden="true">OF</span>
+      <span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn platform-control" data-platform-language id="langBtn" type="button" aria-label="Switch language">EN</button>
+      <button class="icon-btn platform-control" data-platform-theme id="themeBtn" type="button" aria-label="Toggle theme">☀️</button>
     </div>
-  </div>
+  </header>
 
-  <div class="card">
+  <a href="/" id="backLink" class="stock-back-link">← الرجوع لكل الأدوات</a>
+
+  <div class="card stock-hero-card">
     <div class="pill" id="badgeText">لوحة تداول</div>
     <h1 id="pageTitle">لوحة تحليل الأسهم</h1>
     <p id="pageDesc" class="muted">ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة وتوصية ذكاء اصطناعي مبسطة.</p>
     <div class="search">
-      <input id="tickerInput" placeholder="أدخل رمز تداول (مثال: 7202)" aria-label="Saudi stock ticker">
-      <button type="button" id="analyzeBtn">تحليل</button>
+      <input id="tickerInput" inputmode="numeric" placeholder="أدخل رمز تداول (مثال: 7202)" aria-label="Saudi stock ticker">
+      <button type="button" id="analyzeBtn" class="primary">تحليل</button>
       <button type="button" id="saveFavBtn" class="ghost">حفظ بالمفضلة</button>
     </div>
   </div>
