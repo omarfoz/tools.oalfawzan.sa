@@ -14,19 +14,19 @@
 </head>
 <body>
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap">
+<main class="wrap" id="main-content">
 <header>
   <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
   <div class="header-actions">
     <button class="lang-btn" id="langBtn" type="button">EN</button>
-    <button class="lang-btn" id="themeBtn" type="button">☀️</button>
+    <button class="lang-btn" id="themeBtn" data-platform-theme-toggle type="button" aria-label="تبديل المظهر"></button>
     <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
   </div>
 </header>
 <div class="hero-tag" id="tag">// أداة</div>
 <h1 id="title">JSON Formatter</h1>
 <p class="sub" id="desc">ألصق JSON، ثم نسّقه أو صغّره وتحقق من صحته فورًا.</p>
-<section class="panel">
+<section class="panel" aria-labelledby="title">
   <div class="actions">
     <button class="btn primary" id="formatBtn" type="button">تنسيق</button>
     <button class="btn" id="minifyBtn" type="button">تصغير</button>
@@ -35,13 +35,13 @@
   </div>
   <div class="status" id="status" aria-live="polite"></div>
   <div class="editors">
-    <textarea id="inputJson" placeholder='{"project":"tools"}' aria-label="JSON input"></textarea>
-    <textarea id="outputJson" aria-live="polite" readonly aria-label="Formatted JSON output"></textarea>
+    <textarea id="inputJson" placeholder='{"project":"tools"}' aria-label="JSON input" spellcheck="false"></textarea>
+    <textarea id="outputJson" aria-live="polite" readonly aria-label="Formatted JSON output" spellcheck="false"></textarea>
   </div>
 </section>
-<footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
-</div>
-<script src="/assets/js/pages/json-formatter.js"></script>
+<footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo footer-link">Omar Alfawzan</a></footer>
+</main>
 <script src="/assets/js/platform.js"></script>
+<script src="/assets/js/pages/json-formatter.js"></script>
 </body>
 </html>
