@@ -55,7 +55,9 @@ body {
   background-color: var(--ds-bg);
   color: var(--ds-text);
   position: relative;
+  font-family:'IBM Plex Sans','IBM Plex Sans Arabic',system-ui,sans-serif !important;
 }
+html[lang="ar"] body{font-family:'IBM Plex Sans Arabic','IBM Plex Sans',system-ui,sans-serif !important}
 body::before {
   content: "";
   position: fixed;
@@ -98,62 +100,69 @@ button:not(:disabled):active, .btn:not(:disabled):active, .icon-btn:not(:disable
   border-color: color-mix(in srgb, var(--ds-primary) 30%, var(--ds-border));
   box-shadow: var(--ds-shadow-md);
 }
-.skip-link {
-  position: fixed; inset-inline-start: 12px; top: 10px; z-index: 99999;
-  transform: translateY(-180%); padding: 10px 14px; border-radius: var(--ds-radius-sm);
-  color: #fff; background: #075fc7; text-decoration: none; font-weight: 700;
-}
-.skip-link:focus { transform: translateY(0); }
-.platform-toast-region { position: fixed; inset-inline-end: 16px; bottom: 16px; z-index: 9999; display: grid; gap: 8px; width: min(360px, calc(100vw - 32px)); pointer-events: none; }
-.platform-toast { background: color-mix(in srgb, var(--ds-surface) 94%, transparent); color: var(--ds-text); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md); box-shadow: var(--ds-shadow-md); padding: 12px 14px; line-height: 1.55; pointer-events: auto; backdrop-filter: blur(18px); }
-.platform-toast[data-tone="success"] { border-inline-start: 3px solid var(--ds-success); }
-.platform-toast[data-tone="error"] { border-inline-start: 3px solid var(--ds-danger); }
-.platform-toast[data-tone="warning"] { border-inline-start: 3px solid var(--ds-warning); }
-.platform-field-error { color: var(--ds-danger); font-size: .8rem; margin-top: 6px; }
-.platform-empty { border: 1px dashed var(--ds-border); border-radius: var(--ds-radius-md); padding: 18px; color: var(--ds-muted); text-align: center; background: color-mix(in srgb, var(--ds-surface) 52%, transparent); }
-.platform-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
-img, canvas, svg { max-width: 100%; }
-pre, code, textarea { overflow-wrap: anywhere; }
-[hidden] { display: none !important; }
-::selection { background: color-mix(in srgb, var(--ds-primary) 32%, transparent); }
+.skip-link {position:fixed;inset-inline-start:12px;top:10px;z-index:99999;transform:translateY(-180%);padding:10px 14px;border-radius:var(--ds-radius-sm);color:#fff;background:#075fc7;text-decoration:none;font-weight:700}
+.skip-link:focus{transform:translateY(0)}
+.platform-toast-region{position:fixed;inset-inline-end:16px;bottom:16px;z-index:9999;display:grid;gap:8px;width:min(360px,calc(100vw - 32px));pointer-events:none}
+.platform-toast{background:color-mix(in srgb,var(--ds-surface) 94%,transparent);color:var(--ds-text);border:1px solid var(--ds-border);border-radius:var(--ds-radius-md);box-shadow:var(--ds-shadow-md);padding:12px 14px;line-height:1.55;pointer-events:auto;backdrop-filter:blur(18px)}
+.platform-toast[data-tone="success"]{border-inline-start:3px solid var(--ds-success)}
+.platform-toast[data-tone="error"]{border-inline-start:3px solid var(--ds-danger)}
+.platform-toast[data-tone="warning"]{border-inline-start:3px solid var(--ds-warning)}
+.platform-field-error{color:var(--ds-danger);font-size:.8rem;margin-top:6px}
+.platform-empty{border:1px dashed var(--ds-border);border-radius:var(--ds-radius-md);padding:18px;color:var(--ds-muted);text-align:center;background:color-mix(in srgb,var(--ds-surface) 52%,transparent)}
+.platform-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}
+img,canvas,svg{max-width:100%}pre,code,textarea{overflow-wrap:anywhere}[hidden]{display:none!important}::selection{background:color-mix(in srgb,var(--ds-primary) 32%,transparent)}
 
-/* Shared studio-grade detail layer used by every tool page. */
-header, .site-header {
-  isolation: isolate;
-}
-header::after, .site-header::after {
-  content: "";
-  display: block;
-  height: 1px;
-  margin-top: .9rem;
-  background: linear-gradient(90deg, transparent, var(--ds-border-strong), transparent);
-  opacity: .65;
-}
-h1, h2, h3 { text-wrap: balance; letter-spacing: -.025em; }
-p, .sub, .description { text-wrap: pretty; }
-.logo, .brand { text-decoration-thickness: .08em; text-underline-offset: .2em; }
-.btn.primary, button.primary, .filter[aria-pressed="true"] {
-  box-shadow: 0 10px 30px color-mix(in srgb, var(--ds-primary) 18%, transparent);
-}
-textarea, pre, code { scrollbar-color: var(--ds-border-strong) transparent; }
+/* Shared design language */
+header,.site-header{isolation:isolate}
+header::after,.site-header::after{content:"";display:block;height:1px;margin-top:.9rem;background:linear-gradient(90deg,transparent,var(--ds-border-strong),transparent);opacity:.65}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.025em}p,.sub,.description{text-wrap:pretty}.logo,.brand{text-decoration-thickness:.08em;text-underline-offset:.2em}
+.btn.primary,button.primary,.filter[aria-pressed="true"]{box-shadow:0 10px 30px color-mix(in srgb,var(--ds-primary) 18%,transparent)}
+textarea,pre,code{scrollbar-color:var(--ds-border-strong) transparent}
 
-@media (hover: hover) and (pointer: fine) {
-  .tool-card:hover { transform: translateY(-4px); }
-  .btn:hover, button:hover, .icon-btn:hover, .link-btn:hover { box-shadow: 0 8px 24px rgba(0,0,0,.12); }
-}
-@media (max-width: 760px) {
-  header, .site-header { gap: .75rem; }
-  .header-actions { flex-wrap: wrap; }
-  .panel, .card, .calculator-card, .result-card { border-radius: var(--ds-radius-lg); }
-}
-@media (max-width: 430px) {
-  body { min-width: 0; }
-  .wrap { width: 100%; padding-inline: 12px !important; }
-  .card { max-width: 100%; }
-  h1 { font-size: clamp(1.9rem, 10vw, 2.75rem); }
-  button, .btn, .link-btn, .filter { min-height: 46px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-}
+/* PAGE 1 — Home: editorial tool directory */
+.home{max-width:1180px!important}
+.home .hero{position:relative;isolation:isolate}
+.home .hero::before{content:"";position:absolute;inset:18px 0 auto auto;width:220px;height:220px;border:1px solid var(--ds-border);border-radius:50%;opacity:.16;z-index:-1}
+.home .tool-card{background:color-mix(in srgb,var(--ds-surface) 54%,transparent);backdrop-filter:blur(8px)}
+.home .tool-card h3{font-weight:700}.home .tool-icon{border-radius:12px;background:var(--ds-surface-2)}
+
+/* PAGE 2 — JSON Formatter: focused code workspace */
+.editors{gap:16px!important}
+.editors textarea{background:#0b0f15!important;border-color:var(--ds-border)!important;border-radius:16px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace!important;line-height:1.72!important;padding:16px!important}
+.editors textarea[readonly]{background:#0d121a!important}
+.panel:has(.editors){padding:20px!important;border-radius:22px!important;background:linear-gradient(180deg,color-mix(in srgb,var(--ds-surface) 96%,transparent),color-mix(in srgb,var(--ds-surface-2) 82%,transparent))!important}
+
+/* PAGE 3 — Loan Calculator: analytical finance workspace */
+.main-layout{grid-template-columns:minmax(300px,.78fr) minmax(0,1.55fr)!important;gap:18px!important;align-items:start}
+.main-layout .panel,.comparison-container .panel{border-radius:20px!important;background:linear-gradient(180deg,var(--ds-surface),color-mix(in srgb,var(--ds-surface-2) 75%,var(--ds-surface)))!important}
+.main-layout label{font-size:.8rem!important;letter-spacing:.01em}.main-layout input,.main-layout select{border-radius:11px!important;background:var(--ds-surface-2)!important}
+.summary-cards{gap:12px!important}.summary-card{text-align:start!important;border-radius:16px!important;background:var(--ds-surface-2)!important}.summary-card .value{font-variant-numeric:tabular-nums}
+.comparison-table,.monthly-table{font-variant-numeric:tabular-nums}.comparison-table th,.monthly-table th{background:var(--ds-surface-2)!important;color:var(--ds-muted)!important;text-transform:uppercase;letter-spacing:.04em;font-size:.76rem}
+.option-header{background:var(--ds-primary)!important;color:#06101d!important}
+
+/* PAGE 4 — Job Offer Comparator: premium decision surface */
+.company-names{gap:12px!important}.co-name-input{border-radius:14px!important;background:var(--ds-surface)!important;border-color:var(--ds-border)!important;box-shadow:none!important}
+.main-grid{gap:14px!important}.main-grid .card,.totals-bar,.overall-card,.decision-card{background:linear-gradient(180deg,var(--ds-surface),color-mix(in srgb,var(--ds-surface-2) 72%,var(--ds-surface)))!important;border-color:var(--ds-border)!important;border-radius:18px!important;box-shadow:var(--ds-shadow-sm)!important}
+.field-row{border-color:var(--ds-border)!important}.amount-input,.factor-weight-input{background:var(--ds-surface-2)!important;border-color:var(--ds-border)!important;border-radius:10px!important}
+.card-label,.section-label,.total-label{letter-spacing:.08em!important}.overall-card{position:relative;overflow:hidden}.overall-card::before{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--ds-success),var(--ds-primary))}
+
+/* PAGE 5 — QR Generator: creation canvas */
+.panel:has(.qr-box){border-radius:22px!important;padding:20px!important;background:linear-gradient(145deg,var(--ds-surface),var(--ds-surface-2))!important;align-items:stretch}
+.qr-box{border:1px solid rgba(255,255,255,.14)!important;border-radius:20px!important;box-shadow:0 16px 50px rgba(0,0,0,.24)!important;background:linear-gradient(145deg,#fff,#f1f4f8)!important}
+.panel:has(.qr-box) textarea{min-height:180px!important;border-radius:14px!important;background:var(--ds-surface-2)!important}
+
+/* PAGE 6 — Stock Analysis: market terminal without visual noise */
+.chart-wrap{border-radius:18px!important;border-color:var(--ds-border)!important;background:#0a0e14!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+.two-col{gap:12px!important}.kpi{border-radius:14px!important;background:var(--ds-surface-2)!important;padding:14px!important}.kpi .v{font-size:1.28rem!important;font-variant-numeric:tabular-nums}.stock-item,.ai-box{border-radius:14px!important;background:var(--ds-surface-2)!important}.pill{border:1px solid color-mix(in srgb,var(--ds-primary) 30%,transparent)}
+
+/* PAGE 7 — Time Toolkit: compact utility dashboard */
+.picker-field,.form-grid{min-width:0}.grid .panel{border-radius:18px!important;padding:16px!important;background:linear-gradient(180deg,var(--ds-surface),var(--ds-surface-2))!important}.grid .panel h2{font-size:1rem!important;color:var(--ds-text)!important}.picker-value,.grid input,.grid select{background:color-mix(in srgb,var(--ds-surface-3) 78%,transparent)!important;border-color:var(--ds-border)!important;border-radius:11px!important}.result{border-radius:13px!important;border-color:color-mix(in srgb,var(--ds-primary) 25%,var(--ds-border))!important}
+
+/* PAGE 8 — Wheel of Names: playful focal interaction in same system */
+.wheel-wrap{padding:12px}.wheel-wrap canvas{border:8px solid var(--ds-surface-2)!important;box-shadow:0 24px 70px rgba(0,0,0,.28)!important;background:var(--ds-surface-2)!important}.pointer{filter:drop-shadow(0 5px 9px rgba(0,0,0,.28))}.grid:has(.wheel-wrap){gap:18px!important}.grid:has(.wheel-wrap) .panel{border-radius:20px!important;background:linear-gradient(180deg,var(--ds-surface),var(--ds-surface-2))!important}.result{font-variant-numeric:tabular-nums}
+
+@media (hover:hover) and (pointer:fine){.tool-card:hover{transform:translateY(-4px)}.btn:hover,button:hover,.icon-btn:hover,.link-btn:hover{box-shadow:0 8px 24px rgba(0,0,0,.12)}}
+@media(max-width:900px){.main-layout{grid-template-columns:1fr!important}}
+@media(max-width:760px){header,.site-header{gap:.75rem}.header-actions{flex-wrap:wrap}.panel,.card,.calculator-card,.result-card{border-radius:var(--ds-radius-lg)}.home .hero::before{display:none}}
+@media(max-width:430px){body{min-width:0}.wrap{width:100%;padding-inline:12px!important}.card{max-width:100%}h1{font-size:clamp(1.9rem,10vw,2.75rem)}button,.btn,.link-btn,.filter{min-height:46px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
