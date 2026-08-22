@@ -13,5 +13,346 @@
 <link rel="stylesheet" href="/assets/css/pages/offer.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="/assets/css/platform.css">
-<link rel="stylesheet" href="/assets/css/offer-mobile.css">
 </head>
+<body>
+<a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
+<div class="wrap">
+
+  <header>
+    <a href="https://tools.oalfawzan.sa" class="logo">tools.<span>oalfawzan.sa</span></a>
+    <div class="header-actions">
+      <button type="button" class="lang-btn" id="langBtn" onclick="toggleLang()">عربي</button>
+      <button type="button" class="lang-btn" id="themeBtn" onclick="toggleTheme()">☀️</button>
+      <button type="button" class="btn-ghost" id="saveBtn" onclick="saveData()">Save</button>
+      <div class="menu-wrap">
+        <button type="button" class="btn-ghost" onclick="toggleMenu()" id="menuBtn">⋯</button>
+        <div class="dropdown" id="headerMenu">
+          <button type="button" onclick="resetAll();toggleMenu()" id="btnReset">↺ Reset</button>
+          <a href="https://oalfawzan.sa" id="btnPortfolio">← Portfolio</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-tag"><span data-i18n="tool_tag">// TOOL_01</span></div>
+    <h1><span data-i18n="hero_h1_line1">Job Offer</span><br><em data-i18n="hero_h1_line2">Comparator</em></h1>
+    <p><span data-i18n="hero_p">Fully customizable. Rename any field, toggle it on/off, add your own, set a field as % of another. Auto-saves to your browser.</span></p>
+  </div>
+
+  <!-- Mode Switcher -->
+  <div class="mode-switcher" role="group" aria-label="Comparison mode">
+    <button type="button" class="mode-btn active-simple" id="modeSimpleBtn" onclick="setMode('simple')">
+      <span class="mode-icon">⚡</span>
+      <span class="mode-label" data-i18n="mode_simple_label">Quick Compare</span>
+      <span class="mode-sub" data-i18n="mode_simple_sub">Job Seeker · Fast answer</span>
+    </button>
+    <button type="button" class="mode-btn" id="modeDetailedBtn" onclick="setMode('detailed')">
+      <span class="mode-icon">📊</span>
+      <span class="mode-label" data-i18n="mode_detailed_label">Full Analysis</span>
+      <span class="mode-sub" data-i18n="mode_detailed_sub">HR / Finance · Every detail</span>
+    </button>
+  </div>
+
+  <div class="company-names">
+    <input class="co-name-input current" id="coNameA" type="text" placeholder="" data-i18n-ph="current_company" aria-label="First company name">
+    <input class="co-name-input new-co"  id="coNameB" type="text" placeholder="" data-i18n-ph="new_company" aria-label="Second company name">
+  </div>
+  <div class="nat-unified detailed-only">
+    <div class="nat-col">
+      <div class="nat-col-label current-col" id="natLabelA">Current</div>
+      <div class="nat-toggle-wrap">
+        <button type="button" class="nat-btn active" id="natA_saudi" onclick="setNationality('A','saudi')">🇸🇦 <span data-i18n="saudi_short">Saudi</span></button>
+        <button type="button" class="nat-btn" id="natA_nonsaudi" onclick="setNationality('A','nonsaudi')">🌍 <span data-i18n="non_saudi_short">Non-Saudi</span></button>
+      </div>
+      <span class="nat-note" id="natNoteA">GOSI: 9.75% of (Basic + Housing), capped SAR 45,000</span>
+    </div>
+    <div class="nat-divider"></div>
+    <div class="nat-col">
+      <div class="nat-col-label new-col" id="natLabelB">New Offer</div>
+      <div class="nat-toggle-wrap">
+        <button type="button" class="nat-btn active" id="natB_saudi" onclick="setNationality('B','saudi')">🇸🇦 <span data-i18n="saudi_short">Saudi</span></button>
+        <button type="button" class="nat-btn" id="natB_nonsaudi" onclick="setNationality('B','nonsaudi')">🌍 <span data-i18n="non_saudi_short">Non-Saudi</span></button>
+      </div>
+      <span class="nat-note" id="natNoteB">GOSI: 9.75% of (Basic + Housing), capped SAR 45,000</span>
+    </div>
+  </div>
+
+  <!-- Mobile card tab switcher -->
+  <div class="card-tabs">
+    <button type="button" class="card-tab active-tab-a" id="tabA" onclick="switchCard('A')"><span data-i18n="current">Current</span></button>
+    <button type="button" class="card-tab" id="tabB" onclick="switchCard('B')"><span data-i18n="new_offer">New Offer</span></button>
+  </div>
+
+  <div class="main-grid">
+    <div class="card active-card" id="cardA">
+      <div class="card-top">
+        <div class="card-label" id="labelA">Current Company</div>
+        <button type="button" class="add-field-btn detailed-only" onclick="openAddField('A')"><span data-i18n="add_field">+ Add Field</span></button>
+      </div>
+      <div id="fieldsA"></div>
+    </div>
+    <div class="card" id="cardB">
+      <div class="card-top">
+        <div class="card-label" id="labelB">New Company</div>
+        <button type="button" class="add-field-btn detailed-only" onclick="openAddField('B')"><span data-i18n="add_field">+ Add Field</span></button>
+      </div>
+      <div id="fieldsB"></div>
+    </div>
+  </div>
+
+  <!-- Qualitative Factors -->
+  <div class="factors-card detailed-only">
+    <div class="factors-header">
+      <div>
+        <div class="factors-title"><span data-i18n="qualitative_factors">// Qualitative Factors</span></div>
+        <div style="font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-top:4px"><span data-i18n="factors_hint">Rate each factor 1–10 · set weight % · affects final score</span></div>
+      </div>
+      <button type="button" class="add-factor-btn" onclick="addFactor()"><span data-i18n="add_factor">+ Add Factor</span></button>
+    </div>
+    <div id="factorsContainer"></div>
+    <div class="factor-score-bar" id="factorScoreBar" style="display:none">
+      <span class="fscore-label" data-i18n="qualitative_score">QUALITATIVE SCORE</span>
+      <span class="fscore-val fa" id="fScoreA">—</span>
+      <span class="fscore-sep">vs</span>
+      <span class="fscore-val fb" id="fScoreB">—</span>
+      <span id="fScoreBadge" style="font-family:var(--mono);font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:4px"></span>
+    </div>
+  </div>
+
+  <!-- HR Context Panel -->
+  <div class="factors-card detailed-only" id="hrContextCard" style="margin-bottom:10px">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div>
+        <div class="section-label" style="margin-bottom:6px"><span data-i18n="vacation_lbl">Vacation Days / Year</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <input class="amount-input" id="vacA" type="number" min="0" max="365" placeholder="—"
+            style="text-align:center;border-top:2px solid var(--current)"
+            oninput="autosave()" aria-label="First offer vacation days">
+          <input class="amount-input" id="vacB" type="number" min="0" max="365" placeholder="—"
+            style="text-align:center;border-top:2px solid var(--new)"
+            oninput="autosave()" aria-label="Second offer vacation days">
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:6px"><span data-i18n="notice_lbl">Notice Period (months)</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <input class="amount-input" id="noticeA" type="number" min="0" max="24" placeholder="—"
+            style="text-align:center;border-top:2px solid var(--current)"
+            oninput="autosave()" aria-label="First offer notice period">
+          <input class="amount-input" id="noticeB" type="number" min="0" max="24" placeholder="—"
+            style="text-align:center;border-top:2px solid var(--new)"
+            oninput="autosave()" aria-label="Second offer notice period">
+        </div>
+      </div>
+      <div id="vacDiffWrap" style="display:flex;flex-direction:column;justify-content:flex-end;gap:4px">
+        <div class="section-label" style="margin-bottom:6px" data-i18n="vac_diff_lbl">VACATION DIFF</div>
+        <div id="vacDiff" style="font-size:.85rem;font-weight:700;color:var(--muted)">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-row inline-compare">
+    <button type="button" class="calc-btn" onclick="calculate()"><span data-i18n="compare_btn">Compare Offers</span></button>
+    <button type="button" class="export-btn detailed-only" onclick="exportExcel()" id="exportBtn"><span data-i18n="export_btn">⬇ Export Excel</span></button>
+  </div>
+
+  <!-- Sticky compare for mobile -->
+  <div class="sticky-compare">
+    <div class="action-row">
+      <button type="button" class="calc-btn" onclick="calculate()"><span data-i18n="compare_btn">Compare Offers</span></button>
+      <button type="button" class="export-btn" onclick="exportExcel()"><span data-i18n="export_btn">⬇ Excel</span></button>
+    </div>
+  </div>
+
+  <!-- Simple Mode Result -->
+  <div class="simple-result" id="simpleResult">
+    <div class="winner-card" id="winnerCard">
+      <div class="winner-label" id="winnerLabel">WINNER</div>
+      <div class="winner-name" id="winnerName">—</div>
+      <div class="winner-uplift" id="winnerUplift"></div>
+      <div class="winner-reason" id="winnerReason">—</div>
+      <div class="simple-metrics">
+        <div class="sm-cell">
+          <div class="sm-label" data-i18n="net_monthly">NET MONTHLY</div>
+          <div class="sm-vals">
+            <span class="sm-val current-col" id="smNetA">—</span>
+            <span style="color:var(--muted);font-size:.75rem">→</span>
+            <span class="sm-val new-col" id="smNetB">—</span>
+            <span class="sm-badge" id="smNetBadge"></span>
+          </div>
+        </div>
+        <div class="sm-cell">
+          <div class="sm-label" data-i18n="yearly_total">YEARLY TOTAL</div>
+          <div class="sm-vals">
+            <span class="sm-val current-col" id="smYearA">—</span>
+            <span style="color:var(--muted);font-size:.75rem">→</span>
+            <span class="sm-val new-col" id="smYearB">—</span>
+            <span class="sm-badge" id="smYearBadge"></span>
+          </div>
+        </div>
+        <div class="sm-cell" id="smVacCell" style="display:none">
+          <div class="sm-label" data-i18n="vacation_lbl">Vacation Days / Year</div>
+          <div class="sm-vals">
+            <span class="sm-val current-col" id="smVacA">—</span>
+            <span style="color:var(--muted);font-size:.75rem">→</span>
+            <span class="sm-val new-col" id="smVacB">—</span>
+            <span class="sm-badge" id="smVacBadge"></span>
+          </div>
+        </div>
+        <div class="sm-cell" id="smNoticeCell" style="display:none">
+          <div class="sm-label" data-i18n="notice_lbl">Notice Period (months)</div>
+          <div class="sm-vals">
+            <span class="sm-val current-col" id="smNoticeA">—</span>
+            <span style="color:var(--muted);font-size:.75rem">→</span>
+            <span class="sm-val new-col" id="smNoticeB">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky totals bar -->
+  <div id="totalsBar" style="display:none" class="detailed-only">
+    <div class="totals-bar">
+      <div class="total-item">
+        <div class="total-label"><span data-i18n="net_monthly">NET MONTHLY</span></div>
+        <div class="total-vals">
+          <span class="total-val current-col" id="tNetA">—</span>
+          <span class="total-arrow">→</span>
+          <span class="total-val new-col" id="tNetB">—</span>
+          <span class="total-badge" id="tNetBadge"></span>
+        </div>
+      </div>
+      <div class="total-divider"></div>
+      <div class="total-item">
+        <div class="total-label"><span data-i18n="yearly_total">YEARLY TOTAL</span></div>
+        <div class="total-vals">
+          <span class="total-val current-col" id="tYearA">—</span>
+          <span class="total-arrow">→</span>
+          <span class="total-val new-col" id="tYearB">—</span>
+          <span class="total-badge" id="tYearBadge"></span>
+        </div>
+      </div>
+      <div class="total-divider"></div>
+      <div class="total-item">
+        <div class="total-label"><span data-i18n="eff_monthly">EFF. MONTHLY</span></div>
+        <div class="total-vals">
+          <span class="total-val current-col" id="tEffA">—</span>
+          <span class="total-arrow">→</span>
+          <span class="total-val new-col" id="tEffB">—</span>
+          <span class="total-badge" id="tEffBadge"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall salary with benefits -->
+  <div id="overallWrap" class="detailed-only">
+    <div class="overall-card">
+      <div class="overall-row">
+        <div class="overall-label"><span data-i18n="overall_year">OVERALL SALARY WITH BENEFITS / YEAR</span></div>
+        <div class="overall-vals">
+          <span class="overall-val current-col" id="oYearA">—</span>
+          <span class="overall-arrow">→</span>
+          <span class="overall-val new-col" id="oYearB">—</span>
+          <span id="oYearBadge" class="total-badge"></span>
+        </div>
+      </div>
+      <div style="height:1px;background:var(--border);margin:14px 0"></div>
+      <div class="overall-row">
+        <div class="overall-label"><span data-i18n="overall_month">OVERALL SALARY WITH BENEFITS / MONTH</span></div>
+        <div class="overall-vals">
+          <span class="overall-val current-col" id="oMonthA">—</span>
+          <span class="overall-arrow">→</span>
+          <span class="overall-val new-col" id="oMonthB">—</span>
+          <span id="oMonthBadge" class="total-badge"></span>
+        </div>
+      </div>
+      <div class="helper-note" id="packageHelper"><span data-i18n="package_helper">Total annual package includes enabled annual bonus and annual benefits. Effective monthly value = total annual package ÷ 12.</span></div>
+    </div>
+  </div>
+
+  <div id="resultsWrap" style="display:none">
+    <div class="audit-card">
+      <div class="audit-title"><span data-i18n="decision_summary">// Decision Summary</span></div>
+      <div class="audit-text" id="decisionSummaryText">—</div>
+    </div>
+    <div class="breakdown-card">
+      <div class="breakdown-title"><span data-i18n="full_breakdown">// Full Breakdown</span></div>
+      <div id="breakdownRows"></div>
+    </div>
+    <div class="ai-card">
+      <div class="ai-header">
+        <div class="ai-icon">✦</div>
+        <div class="ai-title"><span data-i18n="ai_title">AI Recommendation</span></div>
+      </div>
+      <div id="aiText" aria-live="polite"><div class="dot-pulse"><span></span><span></span><span></span></div></div>
+    </div>
+  </div>
+
+  <footer>
+    <span data-i18n="built_by">Built by</span> <a href="https://oalfawzan.sa">Omar Alfawzan</a> · tools.oalfawzan.sa · <span data-i18n="figures_note">Figures are estimates</span>
+  </footer>
+</div>
+
+<!-- Popup -->
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup">
+    <div class="popup-title" id="popupTitle"><span data-i18n="add_field_title">Add Field</span></div>
+    <div class="popup-field">
+      <label class="popup-label"><span data-i18n="field_name_lbl">FIELD NAME</span></label>
+      <input class="popup-input" id="pName" placeholder="e.g. Housing Allowance" aria-label="Custom benefit name">
+    </div>
+    <div class="popup-field" id="pValueWrap">
+      <label class="popup-label">AMOUNT (SAR / month)</label>
+      <input class="popup-input" id="pValue" type="number" placeholder="0" aria-label="Custom benefit value">
+    </div>
+    <div class="popup-field" id="pPctWrap" style="display:none">
+      <label class="popup-label" id="pPctLabel"><span data-i18n="pct_lbl">% OF FIELD</span></label>
+      <div class="pct-row">
+        <input class="popup-input" id="pPct" type="number" placeholder="25" aria-label="Custom benefit percentage">
+        <span id="pPctUnit">% of</span>
+        <select id="pPctRef" aria-label="Percentage reference"></select>
+      </div>
+      <div style="margin-top:8px">
+        <label class="popup-label" style="margin-bottom:4px;display:flex;align-items:center;gap:8px">
+          <input type="checkbox" class="popup-check" id="pHasRef2" onchange="toggleRef2()" aria-label="Enable second reference">
+          <span data-i18n="ref2_hint">Add a second field (e.g. GOSI = Basic + Housing)</span>
+        </label>
+        <div id="pRef2Wrap" style="display:none;margin-top:8px">
+          <div class="pct-row">
+            <span style="font-family:var(--mono);font-size:.75rem;color:var(--muted);white-space:nowrap">+ also % of</span>
+            <select id="pPctRef2" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:.82rem;outline:none" aria-label="Second percentage reference"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup-row">
+      <input type="checkbox" class="popup-check" id="pIsPct" onchange="togglePctMode()">
+      <label class="popup-check-label" for="pIsPct"><span data-i18n="calc_pct">Calculate as % of another field</span></label>
+    </div>
+
+    <div class="popup-row">
+      <input type="checkbox" class="popup-check" id="pIsDeduction">
+      <label class="popup-check-label" for="pIsDeduction"><span data-i18n="deduction_lbl">Deduction (subtracted from total)</span></label>
+    </div>
+    <div class="popup-row">
+      <input type="checkbox" class="popup-check" id="pIsAnnual">
+      <label class="popup-check-label" for="pIsAnnual"><span data-i18n="annual_amt">Annual amount (enter full yearly value)</span></label>
+    </div>
+    <div class="popup-row" id="pIsMonthsRow" style="display:none">
+      <input type="checkbox" class="popup-check" id="pIsMonths" onchange="toggleMonthsMode()">
+      <label class="popup-check-label" for="pIsMonths"><span data-i18n="multiplier_unit">× basic salaries of</span></label>
+    </div>
+    <div class="popup-actions">
+      <button type="button" class="popup-btn cancel" onclick="closePopup()"><span data-i18n="cancel_btn">Cancel</span></button>
+      <button type="button" class="popup-btn confirm" id="popupConfirmBtn" onclick="confirmField()"><span data-i18n="add_field_btn">Add Field</span></button>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/pages/offer.js"></script>
+<script src="/assets/js/platform.js"></script>
+</body>
+</html>
