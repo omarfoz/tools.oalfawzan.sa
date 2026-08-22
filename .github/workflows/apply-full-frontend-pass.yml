@@ -1,9 +1,6 @@
 name: Apply Full Frontend Pass
 
 on:
-  push:
-    branches:
-      - audit/full-frontend-validation
   workflow_dispatch:
 
 permissions:
@@ -11,7 +8,6 @@ permissions:
 
 jobs:
   apply:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +29,6 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add 404.html assets loan-calculator index.html
+          git add -A
           git commit -m 'Apply repository-wide frontend quality pass'
           git push origin HEAD:audit/full-frontend-validation
