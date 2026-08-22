@@ -2,6 +2,7 @@
   'use strict';
   const API = {};
   const ready = (fn) => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn, {once:true}) : fn();
+
   API.notify = (message, tone='info', timeout=2600) => {
     if (!message) return;
     let region = document.querySelector('.platform-toast-region');
@@ -20,46 +21,160 @@
     region.append(toast);
     window.setTimeout(() => toast.remove(), timeout);
   };
+
   API.setBusy = (element, busy=true) => {
     if (!element) return;
     element.setAttribute('aria-busy', String(Boolean(busy)));
     if ('disabled' in element) element.disabled = Boolean(busy);
   };
+
   API.downloadText = (text, filename, type='text/plain;charset=utf-8') => {
     const blob = new Blob([text], {type});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download=filename; document.body.append(a); a.click(); a.remove();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.append(a);
+    a.click();
+    a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
+
   API.copyText = async (text) => {
     if (!navigator.clipboard?.writeText) throw new Error('Clipboard API unavailable');
     await navigator.clipboard.writeText(String(text ?? ''));
     API.notify(document.documentElement.lang === 'ar' ? 'تم النسخ' : 'Copied', 'success');
   };
+
+  const isHome = () => {
+    const path = location.pathname.replace(/\/+$/, '') || '/';
+    return path === '/' || path === '/index.html';
+  };
+
+  const brandMarkup = () => '<span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>';
+
+  const ensureHomeParityStyles = () => {
+    if (isHome() || document.querySelector('link[data-home-parity]')) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/assets/css/home-parity.css';
+    link.dataset.homeParity = 'true';
+    document.head.append(link);
+  };
+
+  const normalizeToolChrome = () => {
+    if (isHome()) return;
+    document.body.classList.add('tool-page');
+
+    const shell = document.querySelector('.wrap, .container, .app, body > div');
+    if (!shell) return;
+
+    let header = shell.querySelector(':scope > header') || document.querySelector('header');
+    if (!header) {
+      header = document.createElement('header');
+      shell.prepend(header);
+    }
+    header.classList.add('site-header', 'tool-site-header');
+
+    // Legacy pages such as the loan calculator used the header as their hero.
+    // Preserve the content, but move it below the site chrome so every page has the same homepage header.
+    const legacyTitle = header.querySelector(':scope > h1');
+    if (legacyTitle) {
+      const hero = document.createElement('section');
+      hero.className = 'tool-hero';
+      const subtitle = header.querySelector(':scope > .subtitle, :scope > p');
+      hero.append(legacyTitle);
+      if (subtitle) hero.append(subtitle);
+      header.after(hero);
+    }
+
+    let brand = header.querySelector('.brand');
+    if (!brand) {
+      const oldLogo = header.querySelector('.logo');
+      if (oldLogo) {
+        brand = oldLogo;
+        brand.className = 'brand';
+        brand.href = '/';
+        brand.setAttribute('aria-label', 'tools.oalfawzan.sa home');
+        brand.innerHTML = brandMarkup();
+      } else {
+        brand = document.createElement('a');
+        brand.className = 'brand';
+        brand.href = '/';
+        brand.setAttribute('aria-label', 'tools.oalfawzan.sa home');
+        brand.innerHTML = brandMarkup();
+        header.prepend(brand);
+      }
+    } else if (!brand.querySelector('.brand-mark')) {
+      brand.innerHTML = brandMarkup();
+      brand.href = '/';
+    }
+
+    let actions = header.querySelector('.header-actions, .top-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'header-actions';
+      const allTools = document.createElement('a');
+      allTools.className = 'link-btn';
+      allTools.href = '/';
+      allTools.textContent = document.documentElement.lang === 'ar' ? 'كل الأدوات' : 'All tools';
+      const profile = document.createElement('a');
+      profile.className = 'link-btn';
+      profile.href = 'https://oalfawzan.sa';
+      profile.textContent = document.documentElement.lang === 'ar' ? 'الملف الشخصي' : 'Profile';
+      actions.append(allTools, profile);
+      header.append(actions);
+    } else {
+      actions.classList.add('header-actions');
+    }
+  };
+
   window.ToolsPlatform = API;
+
+  // Add the final stylesheet immediately so it wins the cascade with minimal flash.
+  ensureHomeParityStyles();
+
   ready(() => {
+    normalizeToolChrome();
+
     if (!document.querySelector('.skip-link')) {
-      const skip = document.createElement('a'); skip.className='skip-link'; skip.href='#main-content';
+      const skip = document.createElement('a');
+      skip.className = 'skip-link';
+      skip.href = '#main-content';
       skip.textContent = document.documentElement.lang === 'ar' ? 'تجاوز إلى المحتوى' : 'Skip to content';
       document.body.prepend(skip);
     }
+
     let main = document.querySelector('main, [role="main"]');
     if (!main) {
       main = document.querySelector('.wrap, .container, .app, body > div');
-      if (main) { main.id ||= 'main-content'; main.setAttribute('role','main'); }
-    } else main.id ||= 'main-content';
+      if (main) {
+        main.id ||= 'main-content';
+        main.setAttribute('role','main');
+      }
+    } else {
+      main.id ||= 'main-content';
+    }
+
     document.querySelectorAll('a[target="_blank"]').forEach(a => {
-      const rel = new Set((a.getAttribute('rel') || '').split(/\s+/).filter(Boolean)); rel.add('noopener'); rel.add('noreferrer'); a.setAttribute('rel', [...rel].join(' '));
+      const rel = new Set((a.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
+      rel.add('noopener');
+      rel.add('noreferrer');
+      a.setAttribute('rel', [...rel].join(' '));
     });
+
     document.querySelectorAll('button:not([type])').forEach(b => b.type='button');
+
     document.querySelectorAll('input,select,textarea').forEach(el => {
       if (el.matches('[type="hidden"],[type="submit"],[type="button"],[type="reset"]')) return;
       if (el.labels?.length || el.hasAttribute('aria-label') || el.hasAttribute('aria-labelledby')) return;
       const hint = el.getAttribute('placeholder') || el.getAttribute('name') || el.id;
       if (hint) el.setAttribute('aria-label', hint);
     });
+
     document.querySelectorAll('table').forEach(table => {
-      const p=table.parentElement; if (p && !p.classList.contains('platform-table-scroll')) p.classList.add('platform-table-scroll');
+      const p = table.parentElement;
+      if (p && !p.classList.contains('platform-table-scroll')) p.classList.add('platform-table-scroll');
     });
   });
 })();
