@@ -1,0 +1,112 @@
+/* design-taste-frontend compatibility layer.
+   Applied repo-wide by platform.js after the existing design-system runtime.
+   Redesign mode: preserve. Dials: variance 5, motion 3, density 6. */
+
+:root{
+  --taste-accent:#3b82f6;
+  --taste-accent-hover:#2563eb;
+  --taste-accent-soft:color-mix(in srgb,var(--taste-accent) 14%,transparent);
+  --taste-focus:color-mix(in srgb,var(--taste-accent) 62%,transparent);
+  --taste-radius-control:8px;
+  --taste-radius-surface:16px;
+  --taste-content:1180px;
+}
+
+:root[data-theme="dark"]{
+  --color-brand-primary:var(--taste-accent);
+  --color-brand-hover:#60a5fa;
+  --color-brand-soft:color-mix(in srgb,var(--taste-accent) 16%,transparent);
+}
+
+:root[data-theme="light"]{
+  --color-bg-surface:#fdfdfd;
+  --color-brand-primary:#2563eb;
+  --color-brand-hover:#1d4ed8;
+  --color-brand-soft:rgba(37,99,235,.10);
+}
+
+/* One palette, one shape language. */
+.card,.panel,.editor-card,.preview-card,.summary-card,.metric-card,.result-card,
+.calculator-card,.factors-card,.overall-card,.decision-card,.winner-card,.audit-card,
+.breakdown-card,.ai-card,.tool-card{
+  border-radius:var(--taste-radius-surface)!important;
+}
+button,.btn,.link-btn,.control-btn,.icon-btn,.platform-control,.lang-btn,.theme-btn,
+.calc-btn,.export-btn,.mode-btn,.mode-tab,.card-tab,
+input:not([type="radio"]):not([type="checkbox"]),select,textarea,.back-link,.stock-back-link{
+  border-radius:var(--taste-radius-control)!important;
+}
+
+/* Strong keyboard focus across every tool. */
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:3px solid var(--taste-focus)!important;
+  outline-offset:2px!important;
+}
+
+/* Controls should read as controls and primary CTAs must not wrap on desktop. */
+button,.btn,.link-btn,.calc-btn,.export-btn,.back-link,.stock-back-link{
+  text-wrap:nowrap;
+}
+button:active,.btn:active,.link-btn:active,.calc-btn:active,.export-btn:active,
+.back-link:active,.stock-back-link:active{
+  transform:translateY(1px) scale(.99)!important;
+}
+
+/* Avoid pure white foregrounds while retaining accessible contrast. */
+button.primary,.btn.primary,.calc-btn,button[type="submit"],button.danger,button.destructive,
+.btn.danger,.btn.destructive{
+  color:#f8fafc!important;
+}
+
+/* Labels remain visible; placeholders never substitute for labels. */
+label,.field-label,.section-label,.card-label{
+  color:var(--color-text-secondary)!important;
+}
+.helper,.field-help,.form-help{
+  color:var(--color-text-muted)!important;
+}
+
+/* Stable, bounded app canvases on large screens. */
+.home,.wrap,.container,.app{
+  max-width:var(--taste-content);
+}
+
+/* Data surfaces are product UI: preserve density, improve scanability. */
+.platform-table-scroll{
+  max-width:100%;
+  overflow:auto;
+  overscroll-behavior-inline:contain;
+  scrollbar-gutter:stable;
+  border-radius:var(--taste-radius-control);
+}
+thead th{
+  position:sticky;
+  top:0;
+  z-index:1;
+}
+
+/* Purposeful motion only. */
+.tool-card,.card,.panel,button,.btn,.link-btn,input,select,textarea{
+  transition-property:background-color,border-color,color,opacity,transform,box-shadow!important;
+  transition-duration:160ms!important;
+  transition-timing-function:cubic-bezier(.16,1,.3,1)!important;
+}
+
+/* Respect system preferences and remove non-essential motion. */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* Explicit mobile collapse and touch behavior. */
+@media(max-width:767px){
+  .home,.wrap,.container,.app{width:100%;max-width:100%;padding-inline:16px}
+  .main-layout,.main-grid,.two-col,.contact-grid,.summary-cards,.workspace{grid-template-columns:minmax(0,1fr)!important}
+  button,.btn,.link-btn,.control-btn,.icon-btn,.platform-control,.lang-btn,.theme-btn,
+  .calc-btn,.export-btn,.mode-btn,.mode-tab,.card-tab,.back-link,.stock-back-link,
+  input:not([type="radio"]):not([type="checkbox"]),select,textarea{min-height:44px}
+}
+
+@media(max-width:420px){
+  button,.btn,.link-btn,.calc-btn,.export-btn{max-width:100%}
+}
