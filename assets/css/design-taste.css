@@ -71,6 +71,23 @@ label,.field-label,.section-label,.card-label{
   max-width:var(--taste-content);
 }
 
+/* Remove decorative numbering/status micro-labels from the directory UI. */
+.home .status-dot,.home .stat-index,.home .section-index,.home .tool-index{
+  display:none!important;
+}
+.home .stat{
+  grid-template-columns:1fr auto!important;
+}
+.home .eyebrow{
+  letter-spacing:.08em!important;
+}
+.home .tool-top{
+  justify-content:flex-end!important;
+}
+.home .category{
+  letter-spacing:.06em!important;
+}
+
 /* Data surfaces are product UI: preserve density, improve scanability. */
 .platform-table-scroll{
   max-width:100%;
