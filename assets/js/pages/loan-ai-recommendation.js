@@ -10,8 +10,64 @@ const copy={
  en:{title:'AI Recommendation',loading:'Analyzing affordability, risk, and financing options…',error:'AI recommendation is currently unavailable. You can still use the comparison and risk assessment above.',note:'Guidance based on the figures entered; not financial advice or credit approval.'}
 };
 const PROMPTS={
- ar:`أنت مستشار تمويل شخصي وعقاري خبير في السوق السعودي. حلّل بيانات المستخدم كمستشار مستقل هدفه حماية السيولة وتقليل المخاطر والتكلفة، وليس تشجيعه على الاقتراض. قارن بوضوح بين خيار الدفعة النقدية وخيار استخدام قرض شخصي مع التمويل العقاري. ركّز على: نسبة الالتزامات إلى الدخل DTI، القسط الشهري، صافي الراتب المتبقي بعد الأقساط، إجمالي تكلفة التمويل والفوائد، ضغط أول خمس سنوات عند تداخل القرض الشخصي والعقاري، حجم الدفعة الأولى والرسوم، وأثر دعم إسكان إن وُجد. قيّم هامش الأمان المالي: هل المتبقي الشهري معقول لمصاريف المعيشة والطوارئ؟ لا تفترض مصاريف أو مدخرات غير موجودة في البيانات، واذكر بوضوح عندما تحتاج معلومة إضافية. لا تعتبر الحد التنظيمي هدفاً آمناً؛ فرّق بين "ممكن نظامياً" و"مريح مالياً". اكتشف أي أرقام أو افتراضات تبدو غير منطقية ونبّه لها. اقترح تحسينات عملية مثل زيادة الدفعة، تخفيض سعر العقار، تقليل مبلغ القرض الشخصي، تقصير/تعديل المدة أو الاحتفاظ باحتياطي نقدي، لكن فقط عندما تدعمها الأرقام. ابدأ بحكم واضح من سطر واحد: مريح / مقبول بحذر / مرتفع المخاطر / غير مناسب. ثم اشرح في 4–6 جمل قصيرة أهم الأسباب بالأرقام. اختم بتوصية صريحة بالخيار الأفضل ولماذا، ثم اذكر أهم سؤال واحد يجب على المستخدم الإجابة عنه قبل اتخاذ القرار. استخدم رمز الريال السعودي ⃁، واكتب بالعربية الطبيعية الواضحة. لا تخترع أنظمة أو نسباً تنظيمية غير موجودة في البيانات ولا تدّعي ضمان موافقة البنك.`,
- en:`You are an independent personal-finance and mortgage advisor with strong knowledge of the Saudi market. Analyze the user's figures with one goal: protect liquidity, reduce risk, and minimize unnecessary financing cost—not encourage borrowing. Clearly compare the cash-down-payment option with the personal-loan-plus-mortgage option. Focus on debt-to-income (DTI), monthly installments, salary remaining after debt service, total financing/interest cost, the first-five-year payment burden while personal and mortgage loans overlap, upfront cash and fees, and Eskan support when applicable. Assess the financial safety margin: is the remaining monthly income reasonably resilient for living costs and emergencies? Never invent expenses, savings, regulations, or eligibility criteria; explicitly flag missing information that could change the decision. Do not treat a regulatory maximum as a comfortable target; distinguish between potentially permissible and financially comfortable. Detect suspicious or inconsistent inputs and call them out. Suggest practical improvements—larger down payment, lower property price, smaller personal loan, different term, or preserving an emergency reserve—only when supported by the numbers. Start with a one-line verdict: Comfortable / Acceptable with caution / High risk / Not advisable. Then give 4–6 concise sentences explaining the decisive factors with exact figures. End with a clear recommendation on which option is financially stronger and why, followed by the single most important question the user should answer before committing. Use the Saudi Riyal symbol ⃁. Do not claim bank approval or invent Saudi regulatory thresholds not supplied in the data.`
+ ar:`أنت مستشار تمويل شخصي وعقاري مستقل وخبير في السوق السعودي. المطلوب قرار مالي مختصر وسهل القراءة على شاشة الجوال. لا تكتب مقالاً، لا تكرر البيانات، لا تستخدم Markdown، ولا تخلط العربية بالإنجليزية إلا DTI عند الحاجة.
+
+حلّل خيارين: (1) دفع المبلغ المطلوب نقداً + تمويل عقاري فقط، و(2) قرض شخصي لتغطية المبلغ المطلوب + التمويل العقاري. أعطِ الأولوية للسيولة، DTI، المتبقي من الراتب، ضغط أول 5 سنوات، وإجمالي تكلفة الاقتراض. لا تخترع مصاريف أو مدخرات أو أنظمة أو حدوداً تنظيمية. إذا كانت معلومة حاسمة غير موجودة فاذكرها في السؤال الأخير فقط.
+
+يجب أن يكون الرد بهذا الشكل حرفياً وبنفس العناوين، وبحد أقصى 120 كلمة:
+
+الحكم: [🟢 مريح | 🟡 مقبول بحذر | 🟠 مرتفع المخاطر | 🔴 غير مناسب]
+
+الخيار الأفضل: [الدفع النقدي | القرض الشخصي]
+[سبب واحد مباشر في سطر واحد]
+
+الأرقام المهمة:
+• القسط الشهري: ⃁ X
+• نسبة DTI: X%
+• المتبقي من الراتب: ⃁ X
+• النقد المطلوب الآن: ⃁ X
+
+لماذا؟
+• [سبب قصير جداً]
+• [سبب قصير جداً]
+• [سبب قصير جداً عند الحاجة فقط]
+
+التوصية:
+[جملة واحدة عملية ومباشرة]
+
+قبل القرار:
+[سؤال واحد فقط عن أهم معلومة ناقصة]
+
+قواعد صارمة: استخدم الأرقام الفعلية من البيانات. لا تعرض الحسابات خطوة بخطوة. لا تكرر نفس الرقم في أكثر من قسم إلا إذا كان ضرورياً. لا تستخدم ** أو # أو جداول أو فقرات طويلة. اجعل كل نقطة سطراً مستقلاً. استخدم رمز الريال ⃁ فقط.`,
+ en:`You are an independent personal-finance and mortgage advisor familiar with the Saudi market. Produce a short decision card that is effortless to scan on a mobile screen. Do not write an essay, repeat the dataset, use Markdown formatting, or add unnecessary explanations.
+
+Compare: (1) paying the required upfront amount in cash plus mortgage only, and (2) using a personal loan for the required upfront amount plus the mortgage. Prioritize liquidity, DTI, salary remaining after debt, the first-five-year burden, and borrowing cost. Never invent expenses, savings, regulations, or regulatory thresholds. Put the single most important missing fact only in the final question.
+
+Your response MUST follow exactly this structure and stay under 120 words:
+
+Verdict: [🟢 Comfortable | 🟡 Acceptable with caution | 🟠 High risk | 🔴 Not advisable]
+
+Best option: [Cash payment | Personal loan]
+[One-line reason]
+
+Key numbers:
+• Monthly payment: ⃁ X
+• DTI: X%
+• Salary remaining: ⃁ X
+• Cash needed now: ⃁ X
+
+Why:
+• [very short reason]
+• [very short reason]
+• [third reason only if necessary]
+
+Recommendation:
+[one practical, direct sentence]
+
+Before deciding:
+[one question only about the most important missing information]
+
+Strict rules: use exact figures from the supplied data; do not show calculations; avoid repeating figures across sections unless essential; no **, #, tables, or long paragraphs; one point per line; use only the ⃁ symbol for SAR.`
 };
 function calc(){
  const property=num('propertyPrice'),rate=num('interestRate'),years=num('loanTerm'),salary=num('salary');
@@ -24,11 +80,14 @@ function calc(){
  const mortgageTotal=mortgagePmt*years*12,personalTotal=personalPmt*60;
  return {propertyPrice:money(property),annualRate:`${rate}%`,termYears:years,monthlySalary:money(salary),maritalStatus:married?'married':'single',upfrontDownPayment:money(down),additionalFees:money(fees),eskanSupport:money(support),cashNeededAfterSupport:money(needed),cashOption:{mortgageAmount:money(mortgage),monthlyMortgage:money(mortgagePmt),dti:`${salary?(mortgagePmt/salary*100).toFixed(1):0}%`,salaryAfterDebt:money(salary-mortgagePmt),estimatedMortgageInterest:money(mortgageTotal-mortgage)},personalLoanOption:{personalLoanAmount:money(personal),personalLoanPayment:money(personalPmt),mortgagePayment:money(mortgagePmt),combinedFirstFiveYears:money(combined),dtiFirstFiveYears:`${salary?(combined/salary*100).toFixed(1):0}%`,salaryAfterDebtFirstFiveYears:money(salary-combined),estimatedPersonalLoanCost:money(personalTotal-personal)}};
 }
+function clean(text){
+ return String(text||'').replace(/\*\*/g,'').replace(/^#{1,6}\s*/gm,'').replace(/```[\s\S]*?```/g,'').replace(/\n{3,}/g,'\n\n').trim();
+}
 async function recommend(){
  const box=$('loanAiText'); if(!box)return; const l=lang(); box.textContent=copy[l].loading; $('loanAiCard')?.classList.remove('hidden');
  const payload=calc();
  const prompt=`${PROMPTS[l]}\n\nCALCULATOR DATA (treat these as user-provided/calculated estimates):\n${JSON.stringify(payload,null,2)}`;
- try{const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});if(!r.ok)throw new Error(String(r.status));const d=await r.json();box.textContent=d?.text||copy[l].error;}catch(e){box.textContent=copy[l].error;}
+ try{const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});if(!r.ok)throw new Error(String(r.status));const d=await r.json();box.textContent=clean(d?.text)||copy[l].error;}catch(e){box.textContent=copy[l].error;}
  const title=$('loanAiTitle'),note=$('loanAiNote');if(title)title.textContent=copy[l].title;if(note)note.textContent=copy[l].note;
 }
 function sync(){const l=lang();if($('loanAiTitle'))$('loanAiTitle').textContent=copy[l].title;if($('loanAiNote'))$('loanAiNote').textContent=copy[l].note;}
