@@ -6,8 +6,8 @@ const num=id=>Number(String($(id)?.value||'0').replace(/,/g,''))||0;
 const money=n=>`⃁ ${Math.round(n).toLocaleString('en-US')}`;
 const lang=()=>document.documentElement.lang==='en'?'en':'ar';
 const copy={
- ar:{title:'توصية الذكاء الاصطناعي',loading:'جاري تحليل قدرتك المالية والخيارات…',error:'تعذر الحصول على توصية الذكاء الاصطناعي حالياً. يمكنك الاعتماد على المقارنة وتقييم المخاطر أعلاه.',note:'تحليل إرشادي مبني على الأرقام المدخلة، وليس نصيحة مالية أو موافقة ائتمانية.'},
- en:{title:'AI Recommendation',loading:'Analyzing affordability, risk, and financing options…',error:'AI recommendation is currently unavailable. You can still use the comparison and risk assessment above.',note:'Guidance based on the figures entered; not financial advice or credit approval.'}
+ ar:{title:'توصية الذكاء الاصطناعي',loading:'جاري تحليل قدرتك المالية والخيارات…',loadingSub:'نقارن الأقساط والسيولة ونسبة الالتزامات',error:'تعذر الحصول على توصية الذكاء الاصطناعي حالياً. يمكنك الاعتماد على المقارنة وتقييم المخاطر أعلاه.',note:'تحليل إرشادي مبني على الأرقام المدخلة، وليس نصيحة مالية أو موافقة ائتمانية.'},
+ en:{title:'AI Recommendation',loading:'Analyzing your financing options…',loadingSub:'Comparing payments, liquidity, and debt ratio',error:'AI recommendation is currently unavailable. You can still use the comparison and risk assessment above.',note:'Guidance based on the figures entered; not financial advice or credit approval.'}
 };
 const PROMPTS={
  ar:`أنت مستشار تمويل شخصي وعقاري مستقل وخبير في السوق السعودي. المطلوب قرار مالي مختصر وسهل القراءة على شاشة الجوال. لا تكتب مقالاً، لا تكرر البيانات، لا تستخدم Markdown، ولا تخلط العربية بالإنجليزية إلا DTI عند الحاجة.
@@ -83,13 +83,37 @@ function calc(){
 function clean(text){
  return String(text||'').replace(/\*\*/g,'').replace(/^#{1,6}\s*/gm,'').replace(/```[\s\S]*?```/g,'').replace(/\n{3,}/g,'\n\n').trim();
 }
+function ensureLoaderStyle(){
+ if(document.getElementById('loanAiLoaderStyle'))return;
+ const style=document.createElement('style');
+ style.id='loanAiLoaderStyle';
+ style.textContent=`
+ .loan-ai-loading{display:flex;align-items:center;gap:14px;padding:6px 0 4px;min-height:58px}
+ .loan-ai-spinner{width:28px;height:28px;border:3px solid color-mix(in srgb,var(--primary,#3b82f6) 22%,transparent);border-top-color:var(--primary,#3b82f6);border-radius:50%;animation:loanAiSpin .8s linear infinite;flex:0 0 auto}
+ .loan-ai-loading-copy{min-width:0}
+ .loan-ai-loading-title{font-weight:650;line-height:1.35;color:var(--text,#fff)}
+ .loan-ai-loading-sub{margin-top:4px;font-size:.88rem;line-height:1.45;color:var(--text-muted,#9ca3af)}
+ .loan-ai-dots{display:inline-flex;gap:4px;margin-inline-start:5px;vertical-align:middle}
+ .loan-ai-dots i{display:block;width:4px;height:4px;border-radius:50%;background:currentColor;animation:loanAiDot 1.15s ease-in-out infinite}
+ .loan-ai-dots i:nth-child(2){animation-delay:.14s}.loan-ai-dots i:nth-child(3){animation-delay:.28s}
+ @keyframes loanAiSpin{to{transform:rotate(360deg)}}
+ @keyframes loanAiDot{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+ @media (prefers-reduced-motion:reduce){.loan-ai-spinner,.loan-ai-dots i{animation:none}.loan-ai-spinner{border-top-color:transparent}}
+ `;
+ document.head.appendChild(style);
+}
+function showLoading(box,l){
+ ensureLoaderStyle();
+ box.setAttribute('aria-busy','true');
+ box.innerHTML=`<div class="loan-ai-loading" role="status" aria-live="polite"><span class="loan-ai-spinner" aria-hidden="true"></span><div class="loan-ai-loading-copy"><div class="loan-ai-loading-title">${copy[l].loading}<span class="loan-ai-dots" aria-hidden="true"><i></i><i></i><i></i></span></div><div class="loan-ai-loading-sub">${copy[l].loadingSub}</div></div></div>`;
+}
 async function recommend(){
- const box=$('loanAiText'); if(!box)return; const l=lang(); box.textContent=copy[l].loading; $('loanAiCard')?.classList.remove('hidden');
+ const box=$('loanAiText'); if(!box)return; const l=lang(); $('loanAiCard')?.classList.remove('hidden'); showLoading(box,l);
  const payload=calc();
  const prompt=`${PROMPTS[l]}\n\nCALCULATOR DATA (treat these as user-provided/calculated estimates):\n${JSON.stringify(payload,null,2)}`;
- try{const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});if(!r.ok)throw new Error(String(r.status));const d=await r.json();box.textContent=clean(d?.text)||copy[l].error;}catch(e){box.textContent=copy[l].error;}
+ try{const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});if(!r.ok)throw new Error(String(r.status));const d=await r.json();box.textContent=clean(d?.text)||copy[l].error;}catch(e){box.textContent=copy[l].error;}finally{box.removeAttribute('aria-busy');}
  const title=$('loanAiTitle'),note=$('loanAiNote');if(title)title.textContent=copy[l].title;if(note)note.textContent=copy[l].note;
 }
 function sync(){const l=lang();if($('loanAiTitle'))$('loanAiTitle').textContent=copy[l].title;if($('loanAiNote'))$('loanAiNote').textContent=copy[l].note;}
-document.addEventListener('DOMContentLoaded',()=>{sync();const btn=document.querySelector('[onclick="calculateComprehensive()"]');if(btn)btn.addEventListener('click',()=>setTimeout(()=>{if(!$('results')?.classList.contains('hidden'))recommend();},0));window.addEventListener('tools:languagechange',()=>setTimeout(sync,0));});
+document.addEventListener('DOMContentLoaded',()=>{ensureLoaderStyle();sync();const btn=document.querySelector('[onclick="calculateComprehensive()"]');if(btn)btn.addEventListener('click',()=>setTimeout(()=>{if(!$('results')?.classList.contains('hidden'))recommend();},0));window.addEventListener('tools:languagechange',()=>setTimeout(sync,0));});
 })();
