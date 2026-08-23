@@ -21,11 +21,43 @@
 
         // Eskan support amount (constant)
         const ESKAN_SUPPORT_AMOUNT = 111750;
+        const NUMBER_LOCALE = 'en-US';
+        const MONEY_INPUT_IDS = ['propertyPrice', 'salary', 'salesCommission', 'bankFees', 'taxAmount', 'additionalFees'];
 
         let currentData = null;
         let option1Data = null;
         let option2Data = null;
         let activeSchedule = 'option1';
+
+        function toEnglishDigits(value) {
+            return String(value ?? '')
+                .replace(/[٠-٩]/g, digit => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit))
+                .replace(/[۰-۹]/g, digit => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit));
+        }
+
+        function parseFormattedNumber(value) {
+            const normalized = toEnglishDigits(value).replace(/,/g, '').replace(/\s/g, '');
+            const parsed = Number.parseFloat(normalized);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+
+        function formatNumber(value, maximumFractionDigits = 0) {
+            return new Intl.NumberFormat(NUMBER_LOCALE, {
+                maximumFractionDigits,
+                minimumFractionDigits: 0,
+                useGrouping: true
+            }).format(Number(value) || 0);
+        }
+
+        function formatMoneyInput(input) {
+            if (!input) return;
+            const value = parseFormattedNumber(input.value);
+            input.value = formatNumber(value);
+        }
+
+        function formatLoanInputs() {
+            MONEY_INPUT_IDS.forEach(id => formatMoneyInput(document.getElementById(id)));
+        }
 
         // Standard amortization formula
         function calculateMRC(principal, annualRate, years) {
@@ -63,11 +95,15 @@
         }
 
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('ar-SA').format(Math.round(amount)) + ' ر.س';
+            return formatNumber(Math.round(amount)) + ' ر.س';
         }
 
         function formatPercent(value) {
-            return (value * 100).toFixed(2) + '%';
+            return new Intl.NumberFormat(NUMBER_LOCALE, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+                useGrouping: true
+            }).format(value * 100) + '%';
         }
 
         function assessRisk(debtRatio) {
@@ -83,14 +119,14 @@
         }
 
         function calculateComprehensive() {
-            const propertyPrice = parseFloat(document.getElementById('propertyPrice').value) || 0;
-            const interestRate = parseFloat(document.getElementById('interestRate').value) || 0;
-            const loanTerm = parseInt(document.getElementById('loanTerm').value) || 0;
-            const salary = parseFloat(document.getElementById('salary').value) || 0;
-            const salesCommission = parseFloat(document.getElementById('salesCommission').value) || 0;
-            const bankFees = parseFloat(document.getElementById('bankFees').value) || 0;
-            const taxAmount = parseFloat(document.getElementById('taxAmount').value) || 0;
-            const additionalFees = parseFloat(document.getElementById('additionalFees').value) || 0;
+            const propertyPrice = parseFormattedNumber(document.getElementById('propertyPrice').value);
+            const interestRate = parseFormattedNumber(document.getElementById('interestRate').value);
+            const loanTerm = Math.trunc(parseFormattedNumber(document.getElementById('loanTerm').value));
+            const salary = parseFormattedNumber(document.getElementById('salary').value);
+            const salesCommission = parseFormattedNumber(document.getElementById('salesCommission').value);
+            const bankFees = parseFormattedNumber(document.getElementById('bankFees').value);
+            const taxAmount = parseFormattedNumber(document.getElementById('taxAmount').value);
+            const additionalFees = parseFormattedNumber(document.getElementById('additionalFees').value);
             const maritalStatus = document.querySelector('input[name="maritalStatus"]:checked').value;
 
             if (!propertyPrice || !interestRate || !loanTerm || !salary) {
@@ -177,6 +213,7 @@
             
             // Show schedule for option 1 by default
             showSchedule('option1');
+            formatLoanInputs();
         }
 
         function populateComparisonTable(option1, option2) {
@@ -262,7 +299,7 @@
                 const row = table[i];
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row.month}</td>
+                    <td>${formatNumber(row.month)}</td>
                     <td>${formatCurrency(row.payment)}</td>
                     <td>${formatCurrency(row.principal)}</td>
                     <td>${formatCurrency(row.interest)}</td>
@@ -275,7 +312,7 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">
-                        عرض 60 من ${table.length} شهر
+                        عرض ${formatNumber(60)} من ${formatNumber(table.length)} شهر
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -309,7 +346,7 @@
                     <div class="label">إجمالي المدفوعات</div>
                 </div>
                 <div class="summary-card">
-                    <div class="value">${Math.round(20 * 12)}</div>
+                    <div class="value">${formatNumber(Math.round(20 * 12))}</div>
                     <div class="label">عدد الأشهر</div>
                 </div>
             `;
@@ -333,21 +370,44 @@
             currentData = null;
             option1Data = null;
             option2Data = null;
+            formatLoanInputs();
         }
 
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            MONEY_INPUT_IDS.forEach(id => {
+                const input = document.getElementById(id);
+                if (!input) return;
+                input.type = 'text';
+                input.inputMode = 'decimal';
+                input.dir = 'ltr';
+                input.autocomplete = 'off';
+                input.addEventListener('focus', function() {
+                    this.value = toEnglishDigits(this.value).replace(/,/g, '');
+                });
+                input.addEventListener('blur', function() {
+                    formatMoneyInput(this);
+                });
+            });
+
+            ['interestRate', 'loanTerm'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.dir = 'ltr';
+            });
+
             // Add event listener for property price to auto-calculate tax
             document.getElementById('propertyPrice').addEventListener('input', function() {
-                const price = parseFloat(this.value) || 0;
+                const price = parseFormattedNumber(this.value);
                 if (price > 1000000) {
                     // Tax is applied on amount above 1M (approximate calculation)
                     const taxableAmount = price - 1000000;
                     // Using the ratio from Excel: 211750 / 1450000 ≈ 14.6%
                     const estimatedTax = Math.round(taxableAmount * 0.146);
-                    document.getElementById('taxAmount').value = estimatedTax;
+                    document.getElementById('taxAmount').value = formatNumber(estimatedTax);
                 } else {
                     document.getElementById('taxAmount').value = '0';
                 }
             });
+
+            formatLoanInputs();
         });
