@@ -71,8 +71,9 @@ label,.field-label,.section-label,.card-label{
   max-width:var(--taste-content);
 }
 
-/* Remove decorative numbering/status micro-labels from the directory UI. */
-.home .status-dot,.home .stat-index,.home .section-index,.home .tool-index{
+/* Remove decorative numbering/status micro-labels from marketing chrome. */
+.home .status-dot,.home .stat-index,.home .section-index,.home .tool-index,
+.tool-page .hero-tag{
   display:none!important;
 }
 .home .stat{
