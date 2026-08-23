@@ -1,14 +1,15 @@
 (() => {
     'use strict';
 
+    const RIYAL_SYMBOL = '⃁';
     const COPY = {
         ar: {
             title:'مقارن القروض الشامل', subtitle:'حاسبة القروض مع جميع التفاصيل والتقييدات التنظيمية السعودية', basicData:'البيانات الأساسية',
-            propertyPrice:'سعر العقار (ريال سعودي)', propertyHint:'السعر الإجمالي للعقار (فوق 1 مليون تطبق ضريبة)', interestRate:'معدل الفائدة السنوي (%)', loanTerm:'مدة القرض (سنوات)',
-            salary:'الراتب الشهري (ريال سعودي)', salaryHint:'لحساب نسبة الدين إلى الدخل (DTI)', additionalCosts:'التكاليف الإضافية', salesCommission:'عمولة المبيعات (ريال)', bankFees:'رسوم البنك (ريال)',
-            taxAmount:'الضريبة (للعقارات فوق 1 مليون ريال)', taxHint:'تُحسب تلقائيًا إذا كان السعر > 1,000,000 ريال', additionalFees:'رسوم أخرى (ريال)', maritalSection:'الحالة الاجتماعية', maritalStatus:'الحالة الاجتماعية',
+            propertyPrice:`سعر العقار (${RIYAL_SYMBOL})`, propertyHint:`السعر الإجمالي للعقار (فوق ${RIYAL_SYMBOL} 1,000,000 تطبق ضريبة)`, interestRate:'معدل الفائدة السنوي (%)', loanTerm:'مدة القرض (سنوات)',
+            salary:`الراتب الشهري (${RIYAL_SYMBOL})`, salaryHint:'لحساب نسبة الدين إلى الدخل (DTI)', additionalCosts:'التكاليف الإضافية', salesCommission:`عمولة المبيعات (${RIYAL_SYMBOL})`, bankFees:`رسوم البنك (${RIYAL_SYMBOL})`,
+            taxAmount:`الضريبة (للعقارات فوق ${RIYAL_SYMBOL} 1,000,000)`, taxHint:`تُحسب تلقائيًا إذا كان السعر > ${RIYAL_SYMBOL} 1,000,000`, additionalFees:`رسوم أخرى (${RIYAL_SYMBOL})`, maritalSection:'الحالة الاجتماعية', maritalStatus:'الحالة الاجتماعية',
             single:'أعزب', married:'متزوج (يحصل على دعم إسكان تلقائيًا)', calculate:'حساب شامل', clear:'مسح البيانات', resultsTitle:'النتائج والمقارنة', noResults:'أدخل البيانات واضغط "حساب شامل" لعرض النتائج',
-            downPaymentLabel:'الدفعة الأولى (10% + 10,000 ريال)', totalFeesLabel:'إجمالي التكاليف (بدون دعم إسكان)', amountNeededLabel:'المبلغ النهائي المطلوب', withSupportLabel:'بعد خصم دعم إسكان', compareOptions:'مقارنة الخيارات',
+            downPaymentLabel:`الدفعة الأولى (10% + ${RIYAL_SYMBOL} 10,000)`, totalFeesLabel:'إجمالي التكاليف (بدون دعم إسكان)', amountNeededLabel:'المبلغ النهائي المطلوب', withSupportLabel:'بعد خصم دعم إسكان', compareOptions:'مقارنة الخيارات',
             item:'البند', option1:'الخيار 1: دفعة كاش', option2:'الخيار 2: قرض شخصي', difference:'الفرق', riskAssessment:'تقييم المخاطر', recommendations:'التوصيات', scheduleTitle:'جدول السداد الشهري (120 شهر)', month:'الشهر',
             monthlyPayment:'القسط الشهري', principal:'أصل القرض', interest:'الفوائد', balance:'الرصيد', loanAmount:'مبلغ القرض', totalInterest:'إجمالي الفوائد', totalAmount:'إجمالي المبلغ المدفوع', debtRatio:'نسبة الدين إلى الدخل (DTI)',
             eskanSupport:'دعم إسكان المخصص', netSalary:'صافي الراتب الشهري', personalLoanAmount:'مبلغ القرض الشخصي', personalLoanPayment:'قسط القرض الشخصي', combinedPayment:'القسط المجمع (5 سنوات)', totalPayments:'إجمالي المدفوعات', monthsCount:'عدد الأشهر',
@@ -17,11 +18,11 @@
         },
         en: {
             title:'Comprehensive Loan Comparator', subtitle:'Compare housing loan scenarios with Saudi financing constraints and full repayment details.', basicData:'Basic Information',
-            propertyPrice:'Property Price (SAR)', propertyHint:'Total property price. Tax is applied when the price exceeds SAR 1,000,000.', interestRate:'Annual Interest Rate (%)', loanTerm:'Loan Term (Years)',
-            salary:'Monthly Salary (SAR)', salaryHint:'Used to calculate the debt-to-income ratio (DTI).', additionalCosts:'Additional Costs', salesCommission:'Sales Commission (SAR)', bankFees:'Bank Fees (SAR)',
-            taxAmount:'Tax (properties above SAR 1,000,000)', taxHint:'Calculated automatically when the property price exceeds SAR 1,000,000.', additionalFees:'Other Fees (SAR)', maritalSection:'Marital Status', maritalStatus:'Marital Status',
+            propertyPrice:`Property Price (${RIYAL_SYMBOL})`, propertyHint:`Total property price. Tax is applied when the price exceeds ${RIYAL_SYMBOL} 1,000,000.`, interestRate:'Annual Interest Rate (%)', loanTerm:'Loan Term (Years)',
+            salary:`Monthly Salary (${RIYAL_SYMBOL})`, salaryHint:'Used to calculate the debt-to-income ratio (DTI).', additionalCosts:'Additional Costs', salesCommission:`Sales Commission (${RIYAL_SYMBOL})`, bankFees:`Bank Fees (${RIYAL_SYMBOL})`,
+            taxAmount:`Tax (properties above ${RIYAL_SYMBOL} 1,000,000)`, taxHint:`Calculated automatically when the property price exceeds ${RIYAL_SYMBOL} 1,000,000.`, additionalFees:`Other Fees (${RIYAL_SYMBOL})`, maritalSection:'Marital Status', maritalStatus:'Marital Status',
             single:'Single', married:'Married (Eskan support applied automatically)', calculate:'Calculate', clear:'Clear', resultsTitle:'Results and Comparison', noResults:'Enter the details and select "Calculate" to view the results.',
-            downPaymentLabel:'Down Payment (10% + SAR 10,000)', totalFeesLabel:'Total Costs (before Eskan support)', amountNeededLabel:'Total Amount Required', withSupportLabel:'After Eskan Support', compareOptions:'Option Comparison',
+            downPaymentLabel:`Down Payment (10% + ${RIYAL_SYMBOL} 10,000)`, totalFeesLabel:'Total Costs (before Eskan support)', amountNeededLabel:'Total Amount Required', withSupportLabel:'After Eskan Support', compareOptions:'Option Comparison',
             item:'Item', option1:'Option 1: Cash Down Payment', option2:'Option 2: Personal Loan', difference:'Difference', riskAssessment:'Risk Assessment', recommendations:'Recommendations', scheduleTitle:'Monthly Repayment Schedule (120 Months)', month:'Month',
             monthlyPayment:'Monthly Payment', principal:'Principal', interest:'Interest', balance:'Balance', loanAmount:'Loan Amount', totalInterest:'Total Interest', totalAmount:'Total Amount Paid', debtRatio:'Debt-to-Income Ratio (DTI)',
             eskanSupport:'Allocated Eskan Support', netSalary:'Monthly Net Salary', personalLoanAmount:'Personal Loan Amount', personalLoanPayment:'Personal Loan Payment', combinedPayment:'Combined Payment (5 Years)', totalPayments:'Total Payments', monthsCount:'Number of Months',
@@ -42,7 +43,7 @@
     const toEnglishDigits = value => String(value ?? '').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
     const parseFormattedNumber = value => { const n = Number.parseFloat(toEnglishDigits(value).replace(/,/g,'').replace(/\s/g,'')); return Number.isFinite(n) ? n : 0; };
     const formatNumber = (value, maximumFractionDigits=0) => new Intl.NumberFormat(NUMBER_LOCALE,{maximumFractionDigits,minimumFractionDigits:0,useGrouping:true}).format(Number(value)||0);
-    const formatCurrency = amount => `${formatNumber(Math.round(amount))} ${currentLang==='ar'?'ر.س':'SAR'}`;
+    const formatCurrency = amount => `${RIYAL_SYMBOL} ${formatNumber(Math.round(amount))}`;
     const formatPercent = value => `${new Intl.NumberFormat(NUMBER_LOCALE,{minimumFractionDigits:2,maximumFractionDigits:2,useGrouping:true}).format(value*100)}%`;
 
     function formatMoneyInput(input){ if(!input)return; input.value=formatNumber(parseFormattedNumber(input.value)); }
