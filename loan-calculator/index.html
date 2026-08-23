@@ -4,195 +4,155 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>مقارن القروض الشامل - Comprehensive Loan Comparator</title>
-<meta name="theme-color" content="#0a0a0f">
+    <meta name="theme-color" content="#0a0a0f">
     <link rel="stylesheet" href="/assets/css/pages/loan-calculator.css">
-<link rel="stylesheet" href="/assets/css/platform.css">
+    <link rel="stylesheet" href="/assets/css/platform.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-    <div class="container">
-        <header>
-            <h1>مقارن القروض الشامل</h1>
-            <p class="subtitle">حاسبة القروض مع جميع التفاصيل والتقييدات التنظيمية السعودية</p>
-        </header>
+<div class="container">
+    <header>
+        <h1 data-loan-i18n="title">مقارن القروض الشامل</h1>
+        <p class="subtitle" data-loan-i18n="subtitle">حاسبة القروض مع جميع التفاصيل والتقييدات التنظيمية السعودية</p>
+    </header>
 
-        <div class="main-layout">
-            <!-- Input Panel -->
-            <div class="panel">
-                <h2>البيانات الأساسية</h2>
-                
+    <div class="main-layout">
+        <div class="panel">
+            <h2 data-loan-i18n="basicData">البيانات الأساسية</h2>
+
+            <div class="form-group">
+                <label for="propertyPrice" data-loan-i18n="propertyPrice">سعر العقار (ريال سعودي)</label>
+                <input type="number" id="propertyPrice" placeholder="1,450,000" value="1450000">
+                <p class="info-text" data-loan-i18n="propertyHint">السعر الإجمالي للعقار (فوق 1 مليون تطبق ضريبة)</p>
+            </div>
+
+            <div class="input-group">
                 <div class="form-group">
-                    <label for="propertyPrice">سعر العقار (ريال سعودي)</label>
-                    <input type="number" id="propertyPrice" placeholder="1450000" value="1450000">
-                    <p class="info-text">السعر الإجمالي للعقار (فوق 1 مليون تطبق ضريبة)</p>
+                    <label for="interestRate" data-loan-i18n="interestRate">معدل الفائدة السنوي (%)</label>
+                    <input type="number" id="interestRate" placeholder="3.89" step="0.01" value="3.89">
                 </div>
-
-                <div class="input-group">
-                    <div class="form-group">
-                        <label for="interestRate">معدل الفائدة السنوي (%)</label>
-                        <input type="number" id="interestRate" placeholder="3.89" step="0.01" value="3.89">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="loanTerm">مدة القرض (سنوات)</label>
-                        <input type="number" id="loanTerm" placeholder="20" value="20">
-                    </div>
-                </div>
-
                 <div class="form-group">
-                    <label for="salary">الراتب الشهري (ريال سعودي)</label>
-                    <input type="number" id="salary" placeholder="30000" value="30000">
-                    <p class="info-text">لحساب نسبة الدين إلى الدخل (DTI)</p>
-                </div>
-
-                <div class="section-divider"></div>
-
-                <h3>التكاليف الإضافية</h3>
-                
-                <div class="input-group">
-                    <div class="form-group">
-                        <label for="salesCommission">عمولة المبيعات (ريال)</label>
-                        <input type="number" id="salesCommission" placeholder="36250" value="36250">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="bankFees">رسوم البنك (ريال)</label>
-                        <input type="number" id="bankFees" placeholder="8000" value="8000">
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <div class="form-group">
-                        <label for="taxAmount">الضريبة (للعقارات فوق 1 مليون ريال)</label>
-                        <input type="number" id="taxAmount" placeholder="211750" value="211750">
-                        <p class="info-text">تُحسب تلقائيًا إذا كان السعر > 1,000,000 ريال</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="additionalFees">رسوم أخرى (ريال)</label>
-                        <input type="number" id="additionalFees" placeholder="0" value="0">
-                    </div>
-                </div>
-
-                <div class="section-divider"></div>
-
-                <h3>الحالة الاجتماعية</h3>
-                
-                <div class="form-group">
-                    <label>الحالة الاجتماعية</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="single" name="maritalStatus" value="single" checked>
-                            <label for="single">أعزب</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="married" name="maritalStatus" value="married">
-                            <label for="married">متزوج (يحصل على دعم إسكان تلقائيًا)</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" onclick="calculateComprehensive()">حساب شامل</button>
-                    <button type="button" class="secondary" onclick="clearForm()">مسح البيانات</button>
+                    <label for="loanTerm" data-loan-i18n="loanTerm">مدة القرض (سنوات)</label>
+                    <input type="number" id="loanTerm" placeholder="20" value="20">
                 </div>
             </div>
 
-            <!-- Results Panel -->
-            <div class="panel">
-                <h2>النتائج والمقارنة</h2>
-                
-                <div id="noResults" style="text-align: center; color: var(--text-muted); padding: 40px;">
-                    أدخل البيانات والاضغط "حساب شامل" لعرض النتائج
+            <div class="form-group">
+                <label for="salary" data-loan-i18n="salary">الراتب الشهري (ريال سعودي)</label>
+                <input type="number" id="salary" placeholder="30,000" value="30000">
+                <p class="info-text" data-loan-i18n="salaryHint">لحساب نسبة الدين إلى الدخل (DTI)</p>
+            </div>
+
+            <div class="section-divider"></div>
+            <h3 data-loan-i18n="additionalCosts">التكاليف الإضافية</h3>
+
+            <div class="input-group">
+                <div class="form-group">
+                    <label for="salesCommission" data-loan-i18n="salesCommission">عمولة المبيعات (ريال)</label>
+                    <input type="number" id="salesCommission" placeholder="36,250" value="36250">
                 </div>
+                <div class="form-group">
+                    <label for="bankFees" data-loan-i18n="bankFees">رسوم البنك (ريال)</label>
+                    <input type="number" id="bankFees" placeholder="8,000" value="8000">
+                </div>
+            </div>
 
-                <div id="results" aria-live="polite" class="hidden">
-                    <!-- Summary Cards -->
-                    <div class="summary-cards">
-                        <div class="summary-card">
-                            <div class="value" id="downPayment">-</div>
-                            <div class="label">الدفعة الأولى (10% + 10,000 ريال)</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="value" id="totalFees">-</div>
-                            <div class="label">إجمالي التكاليف (بدون دعم إسكان)</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="value" id="amountNeeded">-</div>
-                            <div class="label">المبلغ النهائي المطلوب</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="value" id="amountNeededWithSupport">-</div>
-                            <div class="label">بعد خصم دعم إسكان</div>
-                        </div>
+            <div class="input-group">
+                <div class="form-group">
+                    <label for="taxAmount" data-loan-i18n="taxAmount">الضريبة (للعقارات فوق 1 مليون ريال)</label>
+                    <input type="number" id="taxAmount" placeholder="211,750" value="211750">
+                    <p class="info-text" data-loan-i18n="taxHint">تُحسب تلقائيًا إذا كان السعر &gt; 1,000,000 ريال</p>
+                </div>
+                <div class="form-group">
+                    <label for="additionalFees" data-loan-i18n="additionalFees">رسوم أخرى (ريال)</label>
+                    <input type="number" id="additionalFees" placeholder="0" value="0">
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+            <h3 data-loan-i18n="maritalSection">الحالة الاجتماعية</h3>
+            <div class="form-group">
+                <label data-loan-i18n="maritalStatus">الحالة الاجتماعية</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="single" name="maritalStatus" value="single" checked>
+                        <label for="single" data-loan-i18n="single">أعزب</label>
                     </div>
-
-                    <!-- Comparison Table -->
-                    <div class="comparison-container">
-                        <h3 style="color: var(--primary); margin-bottom: 20px;">مقارنة الخيارات</h3>
-                        
-                        <table class="comparison-table" id="comparisonTable">
-                            <thead>
-                                <tr>
-                                    <th>البند</th>
-                                    <th>الخيار 1: دفعة كاش</th>
-                                    <th>الخيار 2: قرض شخصي</th>
-                                    <th>الفرق</th>
-                                </tr>
-                            </thead>
-                            <tbody id="comparisonBody">
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Risk Assessment -->
-                    <div id="riskAssessment" class="hidden" style="margin-top: 30px;">
-                        <h3 style="color: var(--primary); margin-bottom: 20px;">تقييم المخاطر</h3>
-                        <div id="option1Risk"></div>
-                        <div id="option2Risk"></div>
-                    </div>
-
-                    <!-- Recommendations -->
-                    <div id="recommendations" class="recommendation-box hidden">
-                        <h4>التوصيات</h4>
-                        <div id="recommendationText"></div>
+                    <div class="radio-option">
+                        <input type="radio" id="married" name="maritalStatus" value="married">
+                        <label for="married" data-loan-i18n="married">متزوج (يحصل على دعم إسكان تلقائيًا)</label>
                     </div>
                 </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" onclick="calculateComprehensive()" data-loan-i18n="calculate">حساب شامل</button>
+                <button type="button" class="secondary" onclick="clearForm()" data-loan-i18n="clear">مسح البيانات</button>
             </div>
         </div>
 
-        <!-- Monthly Schedule -->
-        <div class="panel results-section hidden" id="scheduleSection">
-            <h2>جدول السداد الشهري (120 شهر)</h2>
-            
-            <div id="scheduleTabs" class="button-group">
-                <button type="button" class="secondary active" onclick="showSchedule('option1')">الخيار 1: دفعة كاش</button>
-                <button type="button" class="secondary" onclick="showSchedule('option2')">الخيار 2: قرض شخصي</button>
-            </div>
-            
-            <div class="monthly-schedule">
-                <table class="monthly-table" id="monthlyTable">
-                    <thead>
-                        <tr>
-                            <th>الشهر</th>
-                            <th>القسط الشهري</th>
-                            <th>أصل القرض</th>
-                            <th>الفوائد</th>
-                            <th>الرصيد</th>
-                        </tr>
-                    </thead>
-                    <tbody id="scheduleBody">
-                    </tbody>
-                </table>
-            </div>
-            
-            <div id="scheduleSummary" class="summary-cards" style="margin-top: 20px;">
-                <!-- Will be populated by JavaScript -->
+        <div class="panel">
+            <h2 data-loan-i18n="resultsTitle">النتائج والمقارنة</h2>
+            <div id="noResults" style="text-align:center;color:var(--text-muted);padding:40px" data-loan-i18n="noResults">أدخل البيانات واضغط "حساب شامل" لعرض النتائج</div>
+
+            <div id="results" aria-live="polite" class="hidden">
+                <div class="summary-cards">
+                    <div class="summary-card"><div class="value" id="downPayment">-</div><div class="label" data-loan-i18n="downPaymentLabel">الدفعة الأولى (10% + 10,000 ريال)</div></div>
+                    <div class="summary-card"><div class="value" id="totalFees">-</div><div class="label" data-loan-i18n="totalFeesLabel">إجمالي التكاليف (بدون دعم إسكان)</div></div>
+                    <div class="summary-card"><div class="value" id="amountNeeded">-</div><div class="label" data-loan-i18n="amountNeededLabel">المبلغ النهائي المطلوب</div></div>
+                    <div class="summary-card"><div class="value" id="amountNeededWithSupport">-</div><div class="label" data-loan-i18n="withSupportLabel">بعد خصم دعم إسكان</div></div>
+                </div>
+
+                <div class="comparison-container">
+                    <h3 style="color:var(--primary);margin-bottom:20px" data-loan-i18n="compareOptions">مقارنة الخيارات</h3>
+                    <table class="comparison-table" id="comparisonTable">
+                        <thead><tr>
+                            <th data-loan-i18n="item">البند</th>
+                            <th data-loan-i18n="option1">الخيار 1: دفعة كاش</th>
+                            <th data-loan-i18n="option2">الخيار 2: قرض شخصي</th>
+                            <th data-loan-i18n="difference">الفرق</th>
+                        </tr></thead>
+                        <tbody id="comparisonBody"></tbody>
+                    </table>
+                </div>
+
+                <div id="riskAssessment" class="hidden" style="margin-top:30px">
+                    <h3 style="color:var(--primary);margin-bottom:20px" data-loan-i18n="riskAssessment">تقييم المخاطر</h3>
+                    <div id="option1Risk"></div>
+                    <div id="option2Risk"></div>
+                </div>
+
+                <div id="recommendations" class="recommendation-box hidden">
+                    <h4 data-loan-i18n="recommendations">التوصيات</h4>
+                    <div id="recommendationText"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="/assets/js/pages/loan-calculator.js"></script>
+    <div class="panel results-section hidden" id="scheduleSection">
+        <h2 data-loan-i18n="scheduleTitle">جدول السداد الشهري (120 شهر)</h2>
+        <div id="scheduleTabs" class="button-group">
+            <button type="button" class="secondary active" onclick="showSchedule('option1')" data-loan-i18n="option1">الخيار 1: دفعة كاش</button>
+            <button type="button" class="secondary" onclick="showSchedule('option2')" data-loan-i18n="option2">الخيار 2: قرض شخصي</button>
+        </div>
+        <div class="monthly-schedule">
+            <table class="monthly-table" id="monthlyTable">
+                <thead><tr>
+                    <th data-loan-i18n="month">الشهر</th>
+                    <th data-loan-i18n="monthlyPayment">القسط الشهري</th>
+                    <th data-loan-i18n="principal">أصل القرض</th>
+                    <th data-loan-i18n="interest">الفوائد</th>
+                    <th data-loan-i18n="balance">الرصيد</th>
+                </tr></thead>
+                <tbody id="scheduleBody"></tbody>
+            </table>
+        </div>
+        <div id="scheduleSummary" class="summary-cards" style="margin-top:20px"></div>
+    </div>
+</div>
+
+<script src="/assets/js/pages/loan-calculator.js"></script>
 <script src="/assets/js/platform.js"></script>
 </body>
 </html>
