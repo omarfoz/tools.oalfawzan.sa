@@ -18,11 +18,64 @@
   const brandMarkup=()=>'<span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>';
   const appendStylesheet=(href,key)=>{if(document.querySelector(`link[data-${key}]`))return;const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.dataset[key]='true';document.head.append(l)};
   const appendScript=(src,key)=>{if(document.querySelector(`script[data-${key}]`))return;const s=document.createElement('script');s.src=src;s.defer=true;s.dataset[key]='true';document.head.append(s)};
-  const ensureStyles=()=>{if(!isHome())appendStylesheet('/assets/css/home-parity.css?v=20260823f','homeParity');if(location.pathname.includes('/offer'))appendStylesheet('/assets/css/offer-mobile.css?v=20260823f','offerMobile');appendStylesheet('/assets/css/design-system.css?v=20260823a','designSystem');appendStylesheet('/assets/css/design-taste.css?v=20260823a','designTaste')};
+  const ensureStyles=()=>{if(!isHome())appendStylesheet('/assets/css/home-parity.css?v=20260823f','homeParity');if(location.pathname.includes('/offer'))appendStylesheet('/assets/css/offer-mobile.css?v=20260823f','offerMobile');appendStylesheet('/assets/css/design-system.css?v=20260823a','designSystem');appendStylesheet('/assets/css/design-taste.css?v=20260826scrollcraft','designTaste')};
   const ensureEmojiSvgScript=()=>{if(document.querySelector('script[data-emoji-svg]'))return;const s=document.createElement('script');s.src='/assets/js/emoji-svg.js?v=20260823f';s.defer=true;s.dataset.emojiSvg='true';document.head.append(s)};
   const ensurePageScripts=()=>{if(location.pathname.includes('/offer'))appendScript('/assets/js/pages/offer-riyal.js?v=20260823a','offerRiyal')};
   const normalizeToolChrome=()=>{if(isHome())return;document.body.classList.add('tool-page');const shell=document.querySelector('.wrap,.container,.app,body > div');if(!shell)return;let header=shell.querySelector(':scope > header')||document.querySelector('header');if(!header){header=document.createElement('header');shell.prepend(header)}header.classList.add('site-header','tool-site-header');const legacyTitle=header.querySelector(':scope > h1');if(legacyTitle){const hero=document.createElement('section');hero.className='tool-hero';const subtitle=header.querySelector(':scope > .subtitle,:scope > p');hero.append(legacyTitle);if(subtitle)hero.append(subtitle);header.after(hero)}let brand=header.querySelector('.brand');if(!brand){const old=header.querySelector('.logo');if(old){brand=old;brand.className='brand';brand.href='/';brand.innerHTML=brandMarkup()}else{brand=document.createElement('a');brand.className='brand';brand.href='/';brand.innerHTML=brandMarkup();header.prepend(brand)}}else if(!brand.querySelector('.brand-mark')){brand.innerHTML=brandMarkup();brand.href='/'}brand.setAttribute('aria-label','tools.oalfawzan.sa home');let actions=header.querySelector('.header-actions,.top-actions');if(!actions){actions=document.createElement('div');header.append(actions)}actions.classList.add('header-actions','platform-header-actions');let lang=actions.querySelector('#langBtn,[data-platform-language]'),langExisting=Boolean(lang);if(!lang){lang=document.createElement('button');lang.type='button';lang.className='icon-btn platform-control';lang.dataset.platformLanguage='';actions.append(lang)}else{lang.dataset.platformLanguage='';lang.classList.add('icon-btn','platform-control')}let theme=actions.querySelector('#themeBtn,[data-platform-theme]'),themeExisting=Boolean(theme);if(!theme){theme=document.createElement('button');theme.type='button';theme.className='icon-btn platform-control';theme.dataset.platformTheme='';actions.append(theme)}else{theme.dataset.platformTheme='';theme.classList.add('icon-btn','platform-control')}if(langExisting){lang.addEventListener('click',()=>queueMicrotask(()=>API.applyLanguage(document.documentElement.lang==='en'?'en':'ar')))}else{lang.addEventListener('click',()=>API.applyLanguage(document.documentElement.lang==='ar'?'en':'ar'))}if(themeExisting){theme.addEventListener('click',()=>queueMicrotask(()=>API.applyTheme(document.documentElement.dataset.theme==='light'?'light':'dark')))}else{theme.addEventListener('click',()=>API.applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'))}};
   window.ToolsPlatform=API;
   const initialTheme=API.getTheme(),initialLang=API.getLanguage();localStorage.setItem(THEME_KEY,initialTheme);localStorage.setItem(LEGACY_THEME,initialTheme);localStorage.setItem(LANG_KEY,initialLang);localStorage.setItem(LEGACY_LANG,initialLang);localStorage.setItem(OFFER_LANG,initialLang);API.applyTheme(initialTheme,false);API.applyLanguage(initialLang,false);ensureStyles();ensureEmojiSvgScript();ensurePageScripts();
   ready(()=>{normalizeToolChrome();API.applyTheme(API.getTheme(),false);API.applyLanguage(API.getLanguage(),false);if(!document.querySelector('.skip-link')){const skip=document.createElement('a');skip.className='skip-link';skip.href='#main-content';skip.textContent=document.documentElement.lang==='ar'?'تجاوز إلى المحتوى':'Skip to content';document.body.prepend(skip)}let main=document.querySelector('main,[role="main"]');if(!main){main=document.querySelector('.wrap,.container,.app,body > div');if(main){main.id||='main-content';main.setAttribute('role','main')}}else main.id||='main-content';document.querySelectorAll('a[target="_blank"]').forEach(a=>{const rel=new Set((a.getAttribute('rel')||'').split(/\s+/).filter(Boolean));rel.add('noopener');rel.add('noreferrer');a.setAttribute('rel',[...rel].join(' '))});document.querySelectorAll('button:not([type])').forEach(b=>b.type='button');document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.matches('[type="hidden"],[type="submit"],[type="button"],[type="reset"]')||el.labels?.length||el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return;const hint=el.getAttribute('placeholder')||el.getAttribute('name')||el.id;if(hint)el.setAttribute('aria-label',hint)});document.querySelectorAll('table').forEach(t=>{const p=t.parentElement;if(p&&!p.classList.contains('platform-table-scroll'))p.classList.add('platform-table-scroll')})});
+})();
+
+/* Scrollcraft-inspired interaction layer for every tool page.
+   It never generates application UI or changes calculation logic; it only
+   publishes scroll/pointer state and progressively reveals existing surfaces. */
+(() => {
+  'use strict';
+  const ready=fn=>document.readyState==='loading'?document.addEventListener('DOMContentLoaded',fn,{once:true}):fn();
+  const reduce=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const isHome=()=>{const p=location.pathname.replace(/\/+$/,'')||'/';return p==='/'||p==='/index.html'};
+  ready(()=>{
+    if(isHome()) return;
+    document.documentElement.classList.add('sc-tools-enabled');
+    const shell=document.querySelector('#main-content,.wrap,.container,.app,main,[role="main"]');
+    if(!shell) return;
+
+    let progress=document.querySelector('.sc-tool-progress');
+    if(!progress){progress=document.createElement('div');progress.className='sc-tool-progress';progress.setAttribute('aria-hidden','true');progress.innerHTML='<span></span>';document.body.prepend(progress)}
+    const progressFill=progress.firstElementChild;
+
+    const hero=shell.querySelector(':scope > .hero,:scope > .tool-hero,.hero,.tool-hero');
+    if(hero) hero.classList.add('sc-tool-hero');
+
+    const candidates=[...shell.querySelectorAll('section,article,.panel,.card,.editor-card,.preview-card,.calculator-card,.summary-card,.metric-card,.result-card,.workspace,.mode-tabs,.filters,.tabs,.stock-card,.chart-card')]
+      .filter(el=>!el.closest('.sc-no-reveal')&&!el.matches('.site-header,.tool-site-header,.sc-tool-hero')&&!el.closest('.sc-tool-hero'));
+    candidates.forEach((el,i)=>{el.classList.add('sc-reveal-surface');el.style.setProperty('--sc-order',String(i%6))});
+
+    const io='IntersectionObserver' in window&&!reduce()?new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('sc-in');io.unobserve(entry.target)}}),{rootMargin:'0px 0px -7% 0px',threshold:.07}):null;
+    candidates.forEach(el=>{if(io)io.observe(el);else el.classList.add('sc-in')});
+
+    const interactive=[...shell.querySelectorAll('.panel,.card,.editor-card,.preview-card,.calculator-card,.summary-card,.metric-card,.result-card,.workspace')];
+    if(!reduce()&&window.matchMedia?.('(hover:hover) and (pointer:fine)').matches){
+      interactive.forEach(el=>{
+        el.classList.add('sc-pointer-surface');
+        el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.setProperty('--sc-mx',`${((e.clientX-r.left)/r.width)*100}%`);el.style.setProperty('--sc-my',`${((e.clientY-r.top)/r.height)*100}%`)});
+        el.addEventListener('pointerleave',()=>{el.style.removeProperty('--sc-mx');el.style.removeProperty('--sc-my')});
+      });
+    }
+
+    let ticking=false;
+    const paint=()=>{
+      ticking=false;
+      const doc=document.documentElement,max=Math.max(1,doc.scrollHeight-innerHeight),p=Math.min(1,Math.max(0,scrollY/max));
+      progressFill.style.transform=`scaleX(${p})`;
+      doc.style.setProperty('--sc-page-p',p.toFixed(4));
+      if(hero&&!reduce()){
+        const r=hero.getBoundingClientRect(),hp=Math.min(1,Math.max(0,-r.top/Math.max(1,r.height)));
+        hero.style.setProperty('--sc-hero-p',hp.toFixed(4));
+      }
+    };
+    const onScroll=()=>{if(!ticking){ticking=true;requestAnimationFrame(paint)}};
+    addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll,{passive:true});paint();
+  });
 })();
