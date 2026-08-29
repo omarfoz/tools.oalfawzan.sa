@@ -1,53 +1,97 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>Wheel of Names — tools.oalfawzan.sa</title>
-<meta name="theme-color" content="#0a0a0f">
-<meta name="description" content="عجلة أسماء بسيطة لاختيار اسم عشوائي بسرعة.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/pages/wheel-of-names.css">
-<link rel="stylesheet" href="/assets/css/platform.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>عجلة الأسماء — tools.oalfawzan.sa</title>
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="عجلة أسماء تفاعلية لاختيار اسم عشوائي بعدالة وسهولة.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/pages/wheel-of-names.css?v=20260829">
+  <link rel="stylesheet" href="/assets/css/platform.css">
 </head>
 <body>
-<a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap">
-  <header>
-    <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
-    <div class="header-actions">
-      <button class="lang-btn" id="langBtn" type="button">EN</button>
-      <button class="lang-btn" id="themeBtn" type="button">☀️</button>
-      <a href="/" class="logo" id="backLink">← الرجوع لكل الأدوات</a>
-    </div>
-  </header>
-
-  <div class="hero-tag" id="tag">// أداة</div>
-  <h1 id="title">Wheel of Names</h1>
-  <p class="sub" id="desc">أدخل الأسماء (كل اسم في سطر) ثم لف العجلة لاختيار اسم عشوائي.</p>
-
-  <section class="grid">
-    <div class="panel">
-      <textarea id="namesInput" placeholder="أحمد&#10;سارة&#10;ليلى" aria-label="Names, one per line"></textarea>
-      <div class="actions" style="margin-top:12px">
-        <button class="btn primary" id="spinBtn" type="button">لف العجلة</button>
-        <button class="btn" id="resetBtn" type="button">إعادة تعيين</button>
+  <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
+  <div class="wrap">
+    <header>
+      <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
+      <div class="header-actions">
+        <button class="lang-btn" id="langBtn" type="button" aria-label="English">EN</button>
+        <button class="lang-btn" id="themeBtn" type="button" aria-label="تغيير المظهر">☀️</button>
+        <a href="/" class="logo" id="backLink">← كل الأدوات</a>
       </div>
-      <div class="result" id="resultText"></div>
-    </div>
-
-    <div class="panel wheel-wrap">
-      <div class="pointer"></div>
-      <canvas id="wheelCanvas" width="460" height="460"></canvas>
-    </div>
-  </section>
-
-  <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
-</div>
-
-<script src="/assets/js/pages/wheel-of-names.js"></script>
-<script src="/assets/js/platform.js"></script>
+    </header>
+    <main id="main-content">
+      <div class="tool-heading">
+        <div>
+          <div class="hero-tag" id="tag">// اختيار عشوائي</div>
+          <h1 id="title">عجلة الأسماء</h1>
+          <p class="sub" id="desc">أضف الأسماء، اضغط العجلة، ودع الحظ يختار.</p>
+        </div>
+        <div class="quick-actions" aria-label="أدوات العجلة">
+          <button class="icon-action" id="soundBtn" type="button" aria-pressed="true" title="الصوت"><span aria-hidden="true">♪</span><span id="soundLabel">الصوت</span></button>
+          <button class="icon-action" id="fullscreenBtn" type="button" title="ملء الشاشة"><span aria-hidden="true">⛶</span><span id="fullscreenLabel">ملء الشاشة</span></button>
+        </div>
+      </div>
+      <section class="wheel-app" aria-label="عجلة الأسماء">
+        <div class="wheel-column">
+          <div class="wheel-stage" id="wheelStage">
+            <div class="pointer" aria-hidden="true"></div>
+            <button class="wheel-hit-area" id="wheelHitArea" type="button" aria-label="لف العجلة">
+              <canvas id="wheelCanvas" width="720" height="720"></canvas>
+              <span class="spin-center" id="spinCenter"><strong id="spinCenterText">لف</strong><small id="spinHint">اضغط هنا</small></span>
+            </button>
+            <p class="wheel-empty" id="wheelEmpty" hidden>أضف اسمين على الأقل للبدء</p>
+          </div>
+          <button class="spin-button" id="spinBtn" type="button"><span aria-hidden="true">↻</span><span id="spinButtonText">لف العجلة</span></button>
+          <p class="shortcut-hint" id="shortcutHint">اختصار: Ctrl + Enter</p>
+        </div>
+        <aside class="control-panel">
+          <div class="panel-tabs" role="tablist" aria-label="لوحة العجلة">
+            <button class="tab is-active" id="entriesTab" role="tab" aria-selected="true" aria-controls="entriesPanel" type="button">الأسماء <span class="count-badge" id="namesCount">0</span></button>
+            <button class="tab" id="resultsTab" role="tab" aria-selected="false" aria-controls="resultsPanel" type="button">النتائج <span class="count-badge" id="resultsCount">0</span></button>
+          </div>
+          <div class="tab-panel" id="entriesPanel" role="tabpanel" aria-labelledby="entriesTab">
+            <label class="sr-only" for="namesInput" id="namesLabel">الأسماء، اسم في كل سطر</label>
+            <textarea id="namesInput" spellcheck="false" placeholder="أحمد&#10;سارة&#10;ليلى" aria-describedby="inputHelp"></textarea>
+            <p class="input-help" id="inputHelp">اسم واحد في كل سطر • تُحفظ الأسماء تلقائيًا على جهازك</p>
+            <div class="entry-tools" aria-label="تنظيم الأسماء">
+              <button type="button" data-entry-action="shuffle" id="shuffleBtn">⇄ <span>خلط</span></button>
+              <button type="button" data-entry-action="sort" id="sortBtn">↓ <span>ترتيب</span></button>
+              <button type="button" data-entry-action="dedupe" id="dedupeBtn">≠ <span>حذف المكرر</span></button>
+              <button type="button" data-entry-action="clear" id="clearBtn" class="danger">× <span>مسح</span></button>
+            </div>
+            <details class="settings" id="settingsDetails">
+              <summary id="settingsSummary">إعدادات اللف</summary>
+              <div class="settings-grid">
+                <label for="durationSelect" id="durationLabel">مدة اللف</label>
+                <select id="durationSelect"><option value="3">3 ثوانٍ</option><option value="5" selected>5 ثوانٍ</option><option value="8">8 ثوانٍ</option><option value="12">12 ثانية</option></select>
+                <label class="switch-row" for="autoRemoveInput"><span id="autoRemoveLabel">حذف الفائز تلقائيًا</span><span class="switch"><input id="autoRemoveInput" type="checkbox"><span></span></span></label>
+              </div>
+            </details>
+          </div>
+          <div class="tab-panel" id="resultsPanel" role="tabpanel" aria-labelledby="resultsTab" hidden>
+            <div class="history-empty" id="historyEmpty"><span aria-hidden="true">↻</span><strong id="historyEmptyTitle">لا توجد نتائج بعد</strong><p id="historyEmptyText">ستظهر الأسماء الفائزة هنا بعد كل لفة.</p></div>
+            <ol class="history-list" id="historyList"></ol>
+            <button class="clear-history" id="clearHistoryBtn" type="button">مسح سجل النتائج</button>
+          </div>
+        </aside>
+      </section>
+    </main>
+    <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo">Omar Alfawzan</a></footer>
+  </div>
+  <div class="winner-overlay" id="winnerOverlay" hidden>
+    <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+    <section class="winner-card" role="dialog" aria-modal="true" aria-labelledby="winnerTitle" aria-describedby="winnerName">
+      <button class="modal-close" id="closeWinnerBtn" type="button" aria-label="إغلاق">×</button>
+      <span class="winner-kicker" id="winnerKicker">والفائز هو</span><h2 id="winnerName">—</h2><p id="winnerTitle">تم الاختيار عشوائيًا</p>
+      <div class="winner-actions"><button class="btn primary" id="removeWinnerBtn" type="button">حذف الاسم</button><button class="btn" id="closeWinnerAction" type="button">إغلاق</button></div>
+    </section>
+  </div>
+  <div class="sr-only" id="liveResult" role="status" aria-live="assertive"></div>
+  <script src="/assets/js/pages/wheel-of-names.js?v=20260829"></script>
+  <script src="/assets/js/platform.js"></script>
 </body>
 </html>
