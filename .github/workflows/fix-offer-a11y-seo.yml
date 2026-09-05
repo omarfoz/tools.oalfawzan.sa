@@ -8,16 +8,31 @@ on:
       - .github/workflows/fix-offer-a11y-seo.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  validate:
+  fix-and-validate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           ref: fix-offer-accessibility-seo
+          fetch-depth: 0
+      - name: Apply final two accessibility fixes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('offer/index.html')
+          s=p.read_text()
+          s=s.replace('<a href="/" class="brand">', '<a href="/" class="brand" aria-label="OF tools.oalfawzan.sa">', 1)
+          marker='/* Final Offer mobile touch-target override */'
+          if marker not in s:
+              css='''\n<style>\n/* Final Offer mobile touch-target override */\n@media (max-width:640px){\n  body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 112px 30px!important}\n  html[dir="rtl"] body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 112px 30px!important}\n  body.tool-page .main-grid button.toggle{width:48px!important;min-width:48px!important;max-width:48px!important;height:48px!important;min-height:48px!important;max-height:48px!important;background:transparent!important;border:0!important;border-radius:10px!important;position:relative!important}\n  body.tool-page .main-grid button.toggle::before{content:"";position:absolute;width:32px;height:18px;left:8px;top:15px;border-radius:999px;background:var(--border2);transition:background .2s}\n  body.tool-page .main-grid button.toggle.on::before{background:var(--current)}\n  body.tool-page .main-grid button.toggle.on-new::before{background:var(--new)}\n  body.tool-page .main-grid button.toggle::after{top:18px!important;left:11px!important;width:12px!important;height:12px!important}\n}\n@media (max-width:390px){body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 100px 26px!important}}\n</style>\n'''
+              s=s.replace('<link rel="stylesheet" href="/assets/css/offer-runtime.css">', '<link rel="stylesheet" href="/assets/css/offer-runtime.css">'+css, 1)
+          p.write_text(s)
+          PY
       - name: Install Lighthouse
         run: npm install -g lighthouse@13.4.1
       - name: Run local server
@@ -25,7 +40,7 @@ jobs:
         run: |
           python3 -m http.server 8080 >/tmp/offer-server.log 2>&1 &
           sleep 2
-      - name: Inspect remaining Offer accessibility audits
+      - name: Require 100 accessibility and SEO
         shell: bash
         run: |
           set -euo pipefail
@@ -40,18 +55,20 @@ jobs:
           node - "$out" <<'NODE'
           const fs=require('fs');
           const j=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
-          for (const name of ['accessibility','seo']) {
-            const cat=j.categories[name];
-            console.log(`${name.toUpperCase()} SCORE: ${Math.round((cat.score||0)*100)}`);
-            for (const ref of cat.auditRefs) {
-              const a=j.audits[ref.id];
-              if (!a || a.score === 1 || a.score === null) continue;
-              console.log(`FAIL\t${name}\t${ref.id}\t${a.title}`);
-              for (const item of (a.details?.items || [])) {
-                const node=item.node || item;
-                const text=node.snippet || node.selector || node.nodeLabel || item.href || JSON.stringify(item);
-                console.log(`ITEM\t${String(text).replace(/\s+/g,' ').slice(0,700)}`);
-              }
-            }
+          const a=Math.round((j.categories.accessibility.score||0)*100);
+          const s=Math.round((j.categories.seo.score||0)*100);
+          console.log(`ACCESSIBILITY SCORE: ${a}`);
+          console.log(`SEO SCORE: ${s}`);
+          if(a!==100||s!==100){
+            for(const name of ['accessibility','seo']) for(const ref of j.categories[name].auditRefs){const x=j.audits[ref.id];if(x&&x.score!==1&&x.score!==null)console.log(`FAIL\t${name}\t${ref.id}\t${x.title}`)}
+            process.exit(1);
           }
           NODE
+      - name: Commit final fixes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add offer/index.html
+          git commit -m "Finish Offer accessibility fixes"
+          git push origin HEAD:fix-offer-accessibility-seo
