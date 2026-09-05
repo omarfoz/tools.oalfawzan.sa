@@ -1,10 +1,61 @@
 (() => {
-const DATA={ar:{lang:'ar',dir:'rtl',title:'أدوات عمر الفوزان — أدوات عملية سريعة',eyebrow:'TOOLS.OALFAWZAN.SA',h1a:'أدوات عملية،',h1b:'بدون تعقيد.',desc:'مجموعة أدوات مركّزة تساعدك على المقارنة والحساب والتحليل وإنجاز المهام اليومية مباشرة من المتصفح.',manifestoKicker:'الفكرة بسيطة',manifestoTitle:'افتح الأداة. أنجز المهمة. وارجع لشيء أهم.',manifestoDesc:'لا حسابات، لا تتبع، ولا خطوات زائدة. كل أداة مصممة لتؤدي وظيفة واضحة داخل المتصفح.',directory:'دليل الأدوات',sub:'اختر الأداة المناسبة أو ابحث بالاسم.',searchLabel:'البحث في الأدوات',search:'ابحث عن أداة…',all:'الكل',career:'العمل والمال',developer:'للمطورين',productivity:'الإنتاجية',market:'الأسواق',launch:'فتح الأداة',none:'لا توجد أدوات مطابقة للبحث.',profile:'الملف الشخصي',github:'GitHub',theme:'تبديل المظهر'},en:{lang:'en',dir:'ltr',title:'Omar Alfawzan Tools — focused browser utilities',eyebrow:'TOOLS.OALFAWZAN.SA',h1a:'Useful tools,',h1b:'without the overhead.',desc:'Focused browser utilities for comparing, calculating, analyzing, and getting everyday tasks done quickly.',manifestoKicker:'THE IDEA IS SIMPLE',manifestoTitle:'Open the tool. Finish the task. Get back to what matters.',manifestoDesc:'No accounts, no tracking, no unnecessary steps. Every tool is designed to do one clear job in your browser.',directory:'Tool directory',sub:'Choose a tool or search by name.',searchLabel:'Search tools',search:'Search tools…',all:'All',career:'Career & finance',developer:'Developer',productivity:'Productivity',market:'Markets',launch:'Open tool',none:'No tools match your search.',profile:'Profile',github:'GitHub',theme:'Toggle theme'}};
-const cards=[...document.querySelectorAll('.tool-card')],filters=[...document.querySelectorAll('.filter')];let category='all';
-function apply(){const q=document.getElementById('toolSearch').value.trim().toLocaleLowerCase();let shown=0;cards.forEach(c=>{const okCat=category==='all'||c.dataset.category===category,okQ=!q||c.textContent.toLocaleLowerCase().includes(q);c.hidden=!(okCat&&okQ);if(!c.hidden)shown++});document.getElementById('emptyTools').style.display=shown?'none':'block'}
-function setHeroTitle(s){const el=document.getElementById('heroTitle');if(el)el.innerHTML=`<span>${s.h1a}</span><span>${s.h1b}</span>`}
-function setLang(lang,persist=true){const s=DATA[lang]||DATA.ar;if(window.ToolsPlatform)ToolsPlatform.applyLanguage(lang,persist);else{document.documentElement.lang=s.lang;document.documentElement.dir=s.dir;if(persist)localStorage.setItem('tools-language',lang)}document.title=s.title;setHeroTitle(s);for(const [id,key] of Object.entries({eyebrow:'eyebrow',heroDesc:'desc',manifestoKicker:'manifestoKicker',manifestoTitle:'manifestoTitle',manifestoDesc:'manifestoDesc',directoryTitle:'directory',directorySub:'sub',searchLabel:'searchLabel',profileLink:'profile',githubLink:'github',emptyTools:'none'})){const el=document.getElementById(id);if(el)el.textContent=s[key]}const inp=document.getElementById('toolSearch');if(inp)inp.placeholder=s.search;filters.forEach(f=>f.textContent=s[f.dataset.i18n]);document.querySelectorAll('.launch').forEach(e=>e.textContent=s.launch)}
-function setTheme(theme){window.ToolsPlatform?ToolsPlatform.applyTheme(theme):(()=>{document.documentElement.dataset.theme=theme;localStorage.setItem('tools-theme',theme)})()}
-function initScrollCraft(){const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,hero=document.getElementById('hero'),meter=document.getElementById('scrollMeterFill'),orbit=document.getElementById('toolOrbit'),manifesto=document.querySelector('.manifesto');let ticking=false;const update=()=>{ticking=false;const max=Math.max(1,document.documentElement.scrollHeight-innerHeight),page=Math.min(1,Math.max(0,scrollY/max));if(meter)meter.style.transform=`scaleX(${page})`;if(hero&&!reduce){const r=hero.getBoundingClientRect(),travel=Math.max(1,hero.offsetHeight-innerHeight),p=Math.min(1,Math.max(0,-r.top/travel));hero.style.setProperty('--hero-p',p.toFixed(4))}};const request=()=>{if(!ticking){ticking=true;requestAnimationFrame(update)}};addEventListener('scroll',request,{passive:true});addEventListener('resize',request,{passive:true});update();const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}}),{threshold:.14});if(manifesto)observer.observe(manifesto);cards.forEach((card,i)=>{card.style.transitionDelay=`${Math.min(i%3,2)*65}ms`;observer.observe(card);if(!reduce)card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect();card.style.setProperty('--card-x',`${((e.clientX-r.left)/r.width)*100}%`);card.style.setProperty('--card-y',`${((e.clientY-r.top)/r.height)*100}%`)})});if(orbit&&!reduce&&matchMedia('(hover:hover) and (pointer:fine)').matches){addEventListener('pointermove',e=>{const x=(e.clientX/innerWidth-.5)*18,y=(e.clientY/innerHeight-.5)*18;orbit.querySelectorAll('[data-depth]').forEach(el=>{const d=Number(el.dataset.depth)||.5;el.style.setProperty('--mx',`${x*d}px`);el.style.setProperty('--my',`${y*d}px`)})},{passive:true})}}
-document.getElementById('toolSearch').addEventListener('input',apply);filters.forEach(f=>f.addEventListener('click',()=>{category=f.dataset.category;filters.forEach(x=>x.setAttribute('aria-pressed',String(x===f)));apply()}));document.getElementById('langBtn').addEventListener('click',()=>setLang(document.documentElement.lang==='ar'?'en':'ar'));document.getElementById('themeBtn').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='light'?'dark':'light'));setTheme(window.ToolsPlatform?ToolsPlatform.getTheme():(localStorage.getItem('tools-theme')||'dark'));setLang(window.ToolsPlatform?ToolsPlatform.getLanguage():(localStorage.getItem('tools-language')||'ar'),false);window.addEventListener('tools:languagechange',e=>{if(e.detail.lang!==document.documentElement.lang)setLang(e.detail.lang,false)});initScrollCraft();
+  const DATA={ar:{lang:'ar',dir:'rtl',title:'أدوات عمر الفوزان — أدوات عملية سريعة',eyebrow:'TOOLS.OALFAWZAN.SA',h1a:'أدوات عملية،',h1b:'بدون تعقيد.',desc:'مجموعة أدوات مركّزة تساعدك على المقارنة والحساب والتحليل وإنجاز المهام اليومية مباشرة من المتصفح.',manifestoKicker:'الفكرة بسيطة',manifestoTitle:'افتح الأداة. أنجز المهمة. وارجع لشيء أهم.',manifestoDesc:'لا حسابات، لا تتبع، ولا خطوات زائدة. كل أداة مصممة لتؤدي وظيفة واضحة داخل المتصفح.',directory:'دليل الأدوات',sub:'اختر الأداة المناسبة أو ابحث بالاسم.',searchLabel:'البحث في الأدوات',search:'ابحث عن أداة…',all:'الكل',career:'العمل والمال',developer:'للمطورين',productivity:'الإنتاجية',market:'الأسواق',launch:'فتح الأداة',none:'لا توجد أدوات مطابقة للبحث.',profile:'الملف الشخصي',github:'GitHub'},en:{lang:'en',dir:'ltr',title:'Omar Alfawzan Tools — focused browser utilities',eyebrow:'TOOLS.OALFAWZAN.SA',h1a:'Useful tools,',h1b:'without the overhead.',desc:'Focused browser utilities for comparing, calculating, analyzing, and getting everyday tasks done quickly.',manifestoKicker:'THE IDEA IS SIMPLE',manifestoTitle:'Open the tool. Finish the task. Get back to what matters.',manifestoDesc:'No accounts, no tracking, no unnecessary steps. Every tool is designed to do one clear job in your browser.',directory:'Tool directory',sub:'Choose a tool or search by name.',searchLabel:'Search tools',search:'Search tools…',all:'All',career:'Career & finance',developer:'Developer',productivity:'Productivity',market:'Markets',launch:'Open tool',none:'No tools match your search.',profile:'Profile',github:'GitHub'}};
+  const cards=[...document.querySelectorAll('.tool-card')];
+  const filters=[...document.querySelectorAll('.filter')];
+  const search=document.getElementById('toolSearch');
+  const empty=document.getElementById('emptyTools');
+  let category='all';
+
+  function applyFilter(){
+    const q=search.value.trim().toLocaleLowerCase();
+    let shown=0;
+    cards.forEach(card=>{
+      const visible=(category==='all'||card.dataset.category===category)&&(!q||card.textContent.toLocaleLowerCase().includes(q));
+      card.hidden=!visible;
+      if(visible)shown++;
+    });
+    empty.style.display=shown?'none':'block';
+  }
+
+  function setHeroTitle(strings){
+    const el=document.getElementById('heroTitle');
+    if(el)el.innerHTML=`<span>${strings.h1a}</span><span>${strings.h1b}</span>`;
+  }
+
+  function setLang(lang,persist=true){
+    const strings=DATA[lang]||DATA.ar;
+    if(window.ToolsPlatform)ToolsPlatform.applyLanguage(lang,persist);
+    else{
+      document.documentElement.lang=strings.lang;
+      document.documentElement.dir=strings.dir;
+      if(persist)localStorage.setItem('tools-language',lang);
+    }
+    document.title=strings.title;
+    setHeroTitle(strings);
+    const map={eyebrow:'eyebrow',heroDesc:'desc',manifestoKicker:'manifestoKicker',manifestoTitle:'manifestoTitle',manifestoDesc:'manifestoDesc',directoryTitle:'directory',directorySub:'sub',searchLabel:'searchLabel',profileLink:'profile',githubLink:'github',emptyTools:'none'};
+    Object.entries(map).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=strings[key]});
+    search.placeholder=strings.search;
+    filters.forEach(filter=>{filter.textContent=strings[filter.dataset.i18n]});
+    document.querySelectorAll('.launch').forEach(el=>{el.textContent=strings.launch});
+  }
+
+  function setTheme(theme){
+    if(window.ToolsPlatform)ToolsPlatform.applyTheme(theme);
+    else{
+      document.documentElement.dataset.theme=theme;
+      localStorage.setItem('tools-theme',theme);
+    }
+  }
+
+  search.addEventListener('input',applyFilter);
+  filters.forEach(filter=>filter.addEventListener('click',()=>{
+    category=filter.dataset.category;
+    filters.forEach(item=>item.setAttribute('aria-pressed',String(item===filter)));
+    applyFilter();
+  }));
+  document.getElementById('langBtn').addEventListener('click',()=>setLang(document.documentElement.lang==='ar'?'en':'ar'));
+  document.getElementById('themeBtn').addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='light'?'dark':'light'));
+
+  setTheme(window.ToolsPlatform?ToolsPlatform.getTheme():(localStorage.getItem('tools-theme')||'dark'));
+  setLang(window.ToolsPlatform?ToolsPlatform.getLanguage():(localStorage.getItem('tools-language')||'ar'),false);
 })();
