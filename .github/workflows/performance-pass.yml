@@ -6,6 +6,7 @@ on:
       - performance-all-pages
     paths:
       - scripts/performance_pass.py
+      - scripts/performance_pass_phase2.py
       - .github/workflows/performance-pass.yml
 
 permissions:
@@ -27,7 +28,9 @@ jobs:
           python-version: '3.12'
 
       - name: Apply repo-wide performance pass
-        run: python scripts/performance_pass.py
+        run: |
+          python scripts/performance_pass.py
+          python scripts/performance_pass_phase2.py
 
       - name: Commit optimized pages
         shell: bash
@@ -38,6 +41,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add 404.html assets/js/platform.js json-formatter/index.html loan-calculator/index.html offer/index.html qr-generator/index.html stock-analysis-dashboard/index.html time/index.html wheel-of-names/index.html
-          git commit -m "[perf-pass] optimize all tool pages"
+          git add 404.html assets/css/tool-runtime.css assets/css/offer-runtime.css assets/js/platform.js assets/js/pages/offer.js assets/js/pages/qr-generator.js assets/js/pages/stock-analysis-dashboard.js json-formatter/index.html loan-calculator/index.html offer/index.html qr-generator/index.html stock-analysis-dashboard/index.html time/index.html wheel-of-names/index.html
+          git commit -m "[perf-pass] optimize all tool pages and lazy-load heavy dependencies"
           git push origin HEAD:performance-all-pages
