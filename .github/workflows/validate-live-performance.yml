@@ -1,0 +1,90 @@
+name: Validate Live Performance
+
+on:
+  push:
+    branches:
+      - validate-all-pages-performance
+    paths:
+      - .github/workflows/validate-live-performance.yml
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for GitHub Pages deployment
+        shell: bash
+        run: |
+          set -e
+          echo "Waiting for deployed tool-runtime.css marker..."
+          for i in $(seq 1 36); do
+            if curl -fsSL --max-time 10 https://tools.oalfawzan.sa/json-formatter/ | grep -q '/assets/css/tool-runtime.css'; then
+              echo "Deployment is live."
+              exit 0
+            fi
+            echo "Not live yet ($i/36); waiting 5s..."
+            sleep 5
+          done
+          echo "Timed out waiting for deployment"
+          exit 1
+
+      - name: Install Lighthouse
+        run: npm install -g lighthouse@13.4.1
+
+      - name: Run mobile Lighthouse on every page
+        shell: bash
+        run: |
+          set -euo pipefail
+          routes=(
+            "/"
+            "/json-formatter/"
+            "/loan-calculator/"
+            "/offer/"
+            "/qr-generator/"
+            "/stock-analysis-dashboard/"
+            "/time/"
+            "/wheel-of-names/"
+          )
+          printf 'ROUTE\tPERF\tFCP\tLCP\tTBT\tCLS\tSI\n'
+          for route in "${routes[@]}"; do
+            slug=$(echo "$route" | tr '/ ' '__' | sed 's/^_*$/home/')
+            out="/tmp/lh-${slug}.json"
+            url="https://tools.oalfawzan.sa${route}"
+            lighthouse "$url" \
+              --quiet \
+              --only-categories=performance \
+              --output=json \
+              --output-path="$out" \
+              --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" \
+              --max-wait-for-load=45000
+            node - "$route" "$out" <<'NODE'
+          const fs=require('fs');
+          const route=process.argv[2];
+          const p=process.argv[3];
+          const j=JSON.parse(fs.readFileSync(p,'utf8'));
+          const a=j.audits;
+          const score=Math.round((j.categories.performance.score||0)*100);
+          const val=id=>a[id]?.displayValue||'n/a';
+          console.log([route,score,val('first-contentful-paint'),val('largest-contentful-paint'),val('total-blocking-time'),a['cumulative-layout-shift']?.numericValue?.toFixed(3)??'n/a',val('speed-index')].join('\t'));
+          NODE
+          done
+
+      - name: Confirm deployed HTML uses optimized runtime
+        shell: bash
+        run: |
+          set -e
+          for route in /json-formatter/ /loan-calculator/ /offer/ /qr-generator/ /stock-analysis-dashboard/ /time/ /wheel-of-names/; do
+            html=$(curl -fsSL --max-time 15 "https://tools.oalfawzan.sa$route")
+            echo "$html" | grep -q 'tool-runtime.css\|offer-runtime.css'
+            if echo "$html" | grep -q 'fonts.googleapis.com'; then
+              echo "Google Fonts still present on $route"
+              exit 1
+            fi
+          done
+          echo "All tool pages are serving the optimized runtime and no Google Fonts."
