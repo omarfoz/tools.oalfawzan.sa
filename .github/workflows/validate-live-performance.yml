@@ -13,22 +13,38 @@ permissions:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Wait for Offer deployment
+        shell: bash
+        run: |
+          set -e
+          for i in $(seq 1 48); do
+            html=$(curl -fsSL --max-time 10 https://tools.oalfawzan.sa/offer/ || true)
+            if echo "$html" | grep -q 'OF tools.oalfawzan.sa' && echo "$html" | grep -q 'meta name="description"'; then
+              echo "Updated Offer deployment is live."
+              exit 0
+            fi
+            echo "Waiting for deployment ($i/48)..."
+            sleep 5
+          done
+          echo "Timed out waiting for updated Offer deployment"
+          exit 1
+
       - name: Install Lighthouse
         run: npm install -g lighthouse@13.4.1
 
-      - name: Inspect Offer accessibility and SEO
+      - name: Validate deployed Offer
         shell: bash
         run: |
           set -euo pipefail
-          out=/tmp/offer-a11y-seo.json
+          out=/tmp/offer-live.json
           lighthouse "https://tools.oalfawzan.sa/offer/" \
             --quiet \
-            --only-categories=accessibility,seo \
+            --only-categories=performance,accessibility,best-practices,seo \
             --output=json \
             --output-path="$out" \
             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" \
@@ -36,20 +52,15 @@ jobs:
           node - "$out" <<'NODE'
           const fs=require('fs');
           const j=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
-          for (const catName of ['accessibility','seo']) {
-            const cat=j.categories[catName];
-            console.log(`\n${catName.toUpperCase()} SCORE: ${Math.round((cat.score||0)*100)}`);
-            for (const ref of cat.auditRefs) {
-              const a=j.audits[ref.id];
-              if (a && a.score !== 1 && a.score !== null) {
-                console.log(`FAIL\t${ref.id}\t${a.score}\t${a.title}${a.displayValue ? '\t'+a.displayValue : ''}`);
-                const items=a.details?.items || [];
-                for (const item of items.slice(0,8)) {
-                  const node=item.node || item;
-                  const snippet=node.snippet || node.selector || node.explanation || item.href || item.source || '';
-                  if (snippet) console.log(`ITEM\t${String(snippet).replace(/\s+/g,' ').slice(0,500)}`);
-                }
-              }
-            }
+          const names=['performance','accessibility','best-practices','seo'];
+          for(const name of names){
+            const score=Math.round((j.categories[name].score||0)*100);
+            console.log(`${name.toUpperCase()} SCORE: ${score}`);
           }
+          const a=j.audits;
+          const val=id=>a[id]?.displayValue||'n/a';
+          console.log(`FCP: ${val('first-contentful-paint')}`);
+          console.log(`LCP: ${val('largest-contentful-paint')}`);
+          console.log(`TBT: ${val('total-blocking-time')}`);
+          console.log(`CLS: ${a['cumulative-layout-shift']?.numericValue?.toFixed(3)??'n/a'}`);
           NODE
