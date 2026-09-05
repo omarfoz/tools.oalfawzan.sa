@@ -1,0 +1,130 @@
+name: Fix Offer Accessibility SEO
+
+on:
+  push:
+    branches:
+      - fix-offer-accessibility-seo
+    paths:
+      - .github/workflows/fix-offer-a11y-seo.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix-offer-accessibility-seo
+          fetch-depth: 0
+
+      - name: Apply exact Lighthouse fixes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # SEO + brand accessible-name fix
+          p = Path('offer/index.html')
+          s = p.read_text()
+          title = '<title>مقارن عروض العمل — tools.oalfawzan.sa</title>'
+          if '<meta name="description"' not in s:
+              s = s.replace(title, title + '\n<meta name="description" content="قارن بين عرضي عمل من حيث الراتب الصافي والبدلات والمزايا السنوية والتأمينات والعوامل المهنية لاتخاذ قرار أوضح.">\n<link rel="canonical" href="https://tools.oalfawzan.sa/offer/">')
+          s = s.replace(' aria-label="tools.oalfawzan.sa home"', '', 1)
+          p.write_text(s)
+
+          # Dynamic controls: accessible names + form labels + contrast
+          p = Path('assets/js/pages/offer.js')
+          s = p.read_text()
+          needle = "  const toggleClass = f.enabled ? (side === 'A' ? 'on' : 'on-new') : '';\n"
+          insert = needle + "  const fieldAccessibleName = tFieldName(f);\n  const toggleLabel = currentLang === 'ar'\n    ? `${f.enabled ? 'تعطيل' : 'تفعيل'} ${fieldAccessibleName}`\n    : `${f.enabled ? 'Disable' : 'Enable'} ${fieldAccessibleName}`;\n  const nameInputLabel = currentLang === 'ar' ? `اسم الحقل: ${fieldAccessibleName}` : `Field name: ${fieldAccessibleName}`;\n  const amountInputLabel = currentLang === 'ar' ? `قيمة ${fieldAccessibleName}` : `${fieldAccessibleName} amount`;\n"
+          if 'const fieldAccessibleName = tFieldName(f);' not in s:
+              s = s.replace(needle, insert, 1)
+          s = s.replace(
+              "<button type=\"button\" class=\"toggle ${toggleClass}\" onclick=\"toggleField('${side}','${f.id}')\"></button>",
+              "<button type=\"button\" class=\"toggle ${toggleClass}\" onclick=\"toggleField('${side}','${f.id}')\" aria-label=\"${esc(toggleLabel)}\" aria-pressed=\"${f.enabled ? 'true' : 'false'}\"></button>",
+              1
+          )
+          s = s.replace(
+              '<input class="field-name-input" value="${esc(tFieldName(f))}"\n        onchange=',
+              '<input class="field-name-input" value="${esc(tFieldName(f))}" aria-label="${esc(nameInputLabel)}"\n        onchange=',
+              1
+          )
+          s = s.replace(
+              '<input class="amount-input" type="number" step="0.5" min="0"\n              value=',
+              '<input class="amount-input" type="number" step="0.5" min="0" aria-label="${esc(amountInputLabel)}"\n              value=',
+              1
+          )
+          s = s.replace(
+              'type="number" value="${display.toFixed(0)}"\n            ${isReadonly',
+              'type="number" value="${display.toFixed(0)}" aria-label="${esc(amountInputLabel)}"\n            ${isReadonly',
+              1
+          )
+          s = s.replace('style="font-size:.65rem;opacity:.5"', 'style="font-size:.65rem"')
+          s = s.replace('style="border-color:rgba(192,57,43,.3);color:var(--danger);opacity:.8"', 'style="border-color:rgba(255,107,107,.55);color:var(--danger);font-weight:700"')
+          p.write_text(s)
+
+          # Keep the visual switch small while making the actual touch target 44x44.
+          p = Path('assets/css/pages/offer.css')
+          s = p.read_text()
+          marker = '/* Lighthouse accessibility: 44px switch hit area without enlarging the visual track. */'
+          if marker not in s:
+              s += r'''
+
+          /* Lighthouse accessibility: 44px switch hit area without enlarging the visual track. */
+          @media (max-width: 640px) {
+            html body .main-grid .field-row {
+              grid-template-columns: 44px minmax(0, 1fr) 112px 30px !important;
+            }
+            html[dir='rtl'] body .main-grid .field-row {
+              grid-template-columns: 44px minmax(0, 1fr) 112px 30px !important;
+            }
+            html body .main-grid .toggle {
+              width: 44px !important;
+              min-width: 44px !important;
+              max-width: 44px !important;
+              height: 44px !important;
+              min-height: 44px !important;
+              max-height: 44px !important;
+              background: transparent !important;
+              border-radius: 10px !important;
+              position: relative !important;
+            }
+            html body .main-grid .toggle::before {
+              content: '';
+              position: absolute;
+              width: 32px;
+              height: 18px;
+              left: 6px;
+              top: 13px;
+              border-radius: 999px;
+              background: var(--border2);
+              transition: background .2s;
+            }
+            html body .main-grid .toggle.on::before { background: var(--current); }
+            html body .main-grid .toggle.on-new::before { background: var(--new); }
+            html body .main-grid .toggle::after {
+              top: 16px !important;
+              left: 9px !important;
+              width: 12px !important;
+              height: 12px !important;
+            }
+          }
+          @media (max-width: 390px) {
+            html body .main-grid .field-row {
+              grid-template-columns: 44px minmax(0, 1fr) 100px 26px !important;
+            }
+          }
+          '''
+          p.write_text(s)
+          PY
+
+      - name: Commit fixes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add offer/index.html assets/js/pages/offer.js assets/css/pages/offer.css
+          git commit -m "Fix Offer accessibility and SEO Lighthouse audits"
+          git push origin HEAD:fix-offer-accessibility-seo
