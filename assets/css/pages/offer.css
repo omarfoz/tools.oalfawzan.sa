@@ -206,3 +206,49 @@
     font-size: .82rem !important;
   }
 }
+
+
+/* Lighthouse accessibility: 44px switch hit area without enlarging the visual track. */
+@media (max-width: 640px) {
+  html body .main-grid .field-row {
+    grid-template-columns: 44px minmax(0, 1fr) 112px 30px !important;
+  }
+  html[dir='rtl'] body .main-grid .field-row {
+    grid-template-columns: 44px minmax(0, 1fr) 112px 30px !important;
+  }
+  html body .main-grid .toggle {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    background: transparent !important;
+    border-radius: 10px !important;
+    position: relative !important;
+  }
+  html body .main-grid .toggle::before {
+    content: '';
+    position: absolute;
+    width: 32px;
+    height: 18px;
+    left: 6px;
+    top: 13px;
+    border-radius: 999px;
+    background: var(--border2);
+    transition: background .2s;
+  }
+  html body .main-grid .toggle.on::before { background: var(--current); }
+  html body .main-grid .toggle.on-new::before { background: var(--new); }
+  html body .main-grid .toggle::after {
+    top: 16px !important;
+    left: 9px !important;
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+@media (max-width: 390px) {
+  html body .main-grid .field-row {
+    grid-template-columns: 44px minmax(0, 1fr) 100px 26px !important;
+  }
+}
