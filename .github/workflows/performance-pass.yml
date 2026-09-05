@@ -1,0 +1,43 @@
+name: Performance Pass
+
+on:
+  push:
+    branches:
+      - performance-all-pages
+    paths:
+      - scripts/performance_pass.py
+      - .github/workflows/performance-pass.yml
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: performance-all-pages
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Apply repo-wide performance pass
+        run: python scripts/performance_pass.py
+
+      - name: Commit optimized pages
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No performance changes needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 404.html assets/js/platform.js json-formatter/index.html loan-calculator/index.html offer/index.html qr-generator/index.html stock-analysis-dashboard/index.html time/index.html wheel-of-names/index.html
+          git commit -m "[perf-pass] optimize all tool pages"
+          git push origin HEAD:performance-all-pages
