@@ -5,14 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>QR Generator — tools.oalfawzan.sa</title>
+<script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
 <meta name="theme-color" content="#0a0a0f">
 <meta name="description" content="مولد QR للنصوص والروابط وبطاقات vCard لجهات الاتصال.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/pages/qr-generator.css">
 <link rel="stylesheet" href="/assets/css/platform.css">
+<link rel="stylesheet" href="/assets/css/home-parity.css">
+<link rel="stylesheet" href="/assets/css/design-system.css">
+<link rel="stylesheet" href="/assets/css/design-taste.css">
 </head>
-<body>
+<body class="tool-page">
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
 <div class="wrap" id="main-content" role="main">
   <header class="site-header tool-site-header"><a href="/" class="brand" aria-label="tools.oalfawzan.sa home"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a><div class="header-actions"><button class="icon-btn" id="langBtn" type="button">EN</button><button class="icon-btn" id="themeBtn" type="button" aria-label="تبديل المظهر">☀️</button></div></header>
@@ -25,5 +27,5 @@
   <div class="actions"><button class="btn primary" id="generateBtn" type="button">إنشاء QR</button><button class="btn" id="downloadBtn" type="button">تنزيل PNG</button></div><div class="status" id="status" aria-live="polite"></div></div><aside class="preview-card" aria-label="QR preview"><div class="preview-head"><span id="previewLabel">معاينة</span><span class="preview-type" id="previewType">URL / TEXT</span></div><div class="qr-box"><div id="qrOutput" aria-label="Generated QR code"></div></div><p class="preview-help" id="previewHelp">امسح الرمز بكاميرا الجوال للتجربة قبل التنزيل.</p></aside></section>
   <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa">Omar Alfawzan</a></footer>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script><script src="/assets/js/pages/qr-generator.js?v=20260823d"></script><script src="/assets/js/platform.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script><script defer src="/assets/js/pages/qr-generator.js?v=20260823d"></script><script defer src="/assets/js/platform.js"></script>
 </body></html>

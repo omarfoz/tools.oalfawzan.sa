@@ -8,18 +8,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>مقارن عروض العمل — tools.oalfawzan.sa</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
 <link rel="stylesheet" href="/assets/css/pages/offer.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="/assets/css/platform.css">
+<link rel="stylesheet" href="/assets/css/home-parity.css">
+<link rel="stylesheet" href="/assets/css/offer-mobile.css">
+<link rel="stylesheet" href="/assets/css/design-system.css">
+<link rel="stylesheet" href="/assets/css/design-taste.css">
 </head>
-<body>
+<body class="tool-page">
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap">
+<div class="wrap" id="main-content" role="main">
 
-  <header>
-    <a href="https://tools.oalfawzan.sa" class="logo">tools.<span>oalfawzan.sa</span></a>
+  <header class="site-header tool-site-header">
+    <a href="/" class="brand" aria-label="tools.oalfawzan.sa home"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a>
     <div class="header-actions">
       <button type="button" class="lang-btn" id="langBtn" onclick="toggleLang()">عربي</button>
       <button type="button" class="lang-btn" id="themeBtn" onclick="toggleTheme()">☀️</button>
@@ -352,7 +355,8 @@
   </div>
 </div>
 
-<script src="/assets/js/pages/offer.js"></script>
-<script src="/assets/js/platform.js"></script>
+<script defer src="/assets/js/pages/offer.js"></script>
+<script defer src="/assets/js/platform.js"></script>
+<script defer src="/assets/js/pages/offer-riyal.js?v=20260823a"></script>
 </body>
 </html>

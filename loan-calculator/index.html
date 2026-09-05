@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>مقارن القروض الشامل - Comprehensive Loan Comparator</title>
+<script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
     <meta name="theme-color" content="#0a0a0f">
     <link rel="stylesheet" href="/assets/css/pages/loan-calculator.css">
-    <link rel="stylesheet" href="/assets/css/platform.css">
+<link rel="stylesheet" href="/assets/css/platform.css">
+<link rel="stylesheet" href="/assets/css/home-parity.css">
+<link rel="stylesheet" href="/assets/css/design-system.css">
+<link rel="stylesheet" href="/assets/css/design-taste.css">
 </head>
-<body>
+<body class="tool-page">
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="container">
-    <header><h1 data-loan-i18n="title">مقارن القروض الشامل</h1><p class="subtitle" data-loan-i18n="subtitle">حاسبة القروض مع جميع التفاصيل والتقييدات التنظيمية السعودية</p></header>
+<div class="container" id="main-content" role="main">
+    <header class="site-header tool-site-header"><a href="/" class="brand" aria-label="tools.oalfawzan.sa home"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a><div class="header-actions"><button class="icon-btn platform-control" data-platform-language type="button">EN</button><button class="icon-btn platform-control" data-platform-theme type="button" aria-label="تبديل المظهر">☀️</button></div></header>
+    <section class="tool-hero"><h1 data-loan-i18n="title">مقارن القروض الشامل</h1><p class="subtitle" data-loan-i18n="subtitle">حاسبة القروض مع جميع التفاصيل والتقييدات التنظيمية السعودية</p></section>
     <div class="main-layout">
         <div class="panel">
             <h2 data-loan-i18n="basicData">البيانات الأساسية</h2>
@@ -38,8 +43,8 @@
     </div>
     <div class="panel results-section hidden" id="scheduleSection"><h2 data-loan-i18n="scheduleTitle">جدول السداد الشهري (120 شهر)</h2><div id="scheduleTabs" class="button-group"><button type="button" class="secondary active" onclick="showSchedule('option1')" data-loan-i18n="option1">الخيار 1: دفعة كاش</button><button type="button" class="secondary" onclick="showSchedule('option2')" data-loan-i18n="option2">الخيار 2: قرض شخصي</button></div><div class="monthly-schedule"><table class="monthly-table" id="monthlyTable"><thead><tr><th data-loan-i18n="month">الشهر</th><th data-loan-i18n="monthlyPayment">القسط الشهري</th><th data-loan-i18n="principal">أصل القرض</th><th data-loan-i18n="interest">الفوائد</th><th data-loan-i18n="balance">الرصيد</th></tr></thead><tbody id="scheduleBody"></tbody></table></div><div id="scheduleSummary" class="summary-cards" style="margin-top:20px"></div></div>
 </div>
-<script src="/assets/js/pages/loan-calculator.js"></script>
-<script src="/assets/js/pages/loan-ai-recommendation.js"></script>
-<script src="/assets/js/platform.js"></script>
+<script defer src="/assets/js/pages/loan-calculator.js"></script>
+<script defer src="/assets/js/pages/loan-ai-recommendation.js"></script>
+<script defer src="/assets/js/platform.js"></script>
 </body>
 </html>

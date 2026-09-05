@@ -5,18 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>عجلة الأسماء — tools.oalfawzan.sa</title>
+<script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
   <meta name="theme-color" content="#090b10">
   <meta name="description" content="عجلة أسماء تفاعلية لاختيار اسم عشوائي بعدالة وسهولة.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/pages/wheel-of-names.css?v=20260829">
-  <link rel="stylesheet" href="/assets/css/platform.css">
+<link rel="stylesheet" href="/assets/css/platform.css">
+<link rel="stylesheet" href="/assets/css/home-parity.css">
+<link rel="stylesheet" href="/assets/css/design-system.css">
+<link rel="stylesheet" href="/assets/css/design-taste.css">
 </head>
-<body>
+<body class="tool-page">
   <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
   <div class="wrap">
-    <header>
-      <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
+    <header class="site-header tool-site-header">
+      <a href="/" class="brand" aria-label="tools.oalfawzan.sa home"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a>
       <div class="header-actions">
         <button class="lang-btn" id="langBtn" type="button" aria-label="English">EN</button>
         <button class="lang-btn" id="themeBtn" type="button" aria-label="تغيير المظهر">☀️</button>
@@ -91,7 +93,7 @@
     </section>
   </div>
   <div class="sr-only" id="liveResult" role="status" aria-live="assertive"></div>
-  <script src="/assets/js/pages/wheel-of-names.js?v=20260829"></script>
-  <script src="/assets/js/platform.js"></script>
+  <script defer src="/assets/js/pages/wheel-of-names.js?v=20260829"></script>
+  <script defer src="/assets/js/platform.js"></script>
 </body>
 </html>
