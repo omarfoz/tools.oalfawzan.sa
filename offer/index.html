@@ -11,13 +11,27 @@
 <script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
 <link rel="stylesheet" href="/assets/css/pages/offer.css">
 <link rel="stylesheet" href="/assets/css/offer-runtime.css">
+<style>
+/* Final Offer mobile touch-target override */
+@media (max-width:640px){
+  body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 112px 30px!important}
+  html[dir="rtl"] body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 112px 30px!important}
+  body.tool-page .main-grid button.toggle{width:48px!important;min-width:48px!important;max-width:48px!important;height:48px!important;min-height:48px!important;max-height:48px!important;background:transparent!important;border:0!important;border-radius:10px!important;position:relative!important}
+  body.tool-page .main-grid button.toggle::before{content:"";position:absolute;width:32px;height:18px;left:8px;top:15px;border-radius:999px;background:var(--border2);transition:background .2s}
+  body.tool-page .main-grid button.toggle.on::before{background:var(--current)}
+  body.tool-page .main-grid button.toggle.on-new::before{background:var(--new)}
+  body.tool-page .main-grid button.toggle::after{top:18px!important;left:11px!important;width:12px!important;height:12px!important}
+}
+@media (max-width:390px){body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 100px 26px!important}}
+</style>
+
 </head>
 <body class="tool-page">
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
 <div class="wrap" id="main-content" role="main">
 
   <header class="site-header tool-site-header">
-    <a href="/" class="brand"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a>
+    <a href="/" class="brand" aria-label="OF tools.oalfawzan.sa"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a>
     <div class="header-actions">
       <button type="button" class="lang-btn" id="langBtn" onclick="toggleLang()">عربي</button>
       <button type="button" class="lang-btn" id="themeBtn" onclick="toggleTheme()">☀️</button>
