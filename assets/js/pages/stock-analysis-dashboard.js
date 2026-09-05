@@ -3,6 +3,9 @@ const AI_ENDPOINT = 'https://tools.niug502.workers.dev';
 const FAVORITES_KEY = 'tadawul_favorites_v1';
 const TRENDING_TICKERS = ['2222','2010','1120','7010','1211','7202','1180','2380','4210','2290','2082','4002','4260','8010','1050','8310','1150','4321','1214','8012'];
 const YAHOO_BASE = 'https://query1.finance.yahoo.com';
+const CHART_LIB_URL = 'https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js';
+let chartLibraryPromise;
+function ensureChartLibrary(){if(window.LightweightCharts)return Promise.resolve(window.LightweightCharts);if(!chartLibraryPromise){chartLibraryPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=CHART_LIB_URL;s.async=true;s.onload=()=>window.LightweightCharts?resolve(window.LightweightCharts):reject(new Error('Chart library unavailable'));s.onerror=()=>reject(new Error('Chart library unavailable'));document.head.appendChild(s)})}return chartLibraryPromise}
 const YAHOO_PROXIES = [
   (url) => url,
   (url) => `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`,
@@ -233,10 +236,11 @@ function initChart(){
   });
 }
 
-function drawChart(payload){
+async function drawChart(payload){
   if(!payload?.candles?.length) return;
   chartDataCache = payload;
   if(!chartVisible) return;
+  await ensureChartLibrary();
   initChart();
 
   candleSeries.setData(payload.candles);
@@ -301,7 +305,7 @@ async function analyzeTicker(ticker){
     };
     lastMetrics = metrics;
     renderMetrics(cleanTicker, metrics);
-    drawChart({ candles, sma10, sma50, sma200, volume: volumeData });
+    await drawChart({ candles, sma10, sma50, sma200, volume: volumeData });
     document.getElementById('aiText').textContent = await getAiRecommendation(metrics);
   } catch {
     document.getElementById('aiText').textContent = t('failed');
@@ -433,5 +437,7 @@ applyTheme(currentTheme);
 applyLanguage(currentLang);
 setupChartVisibility();
 renderFavorites();
-renderTrending();
-analyzeTicker('7202');
+document.getElementById('trendingList').innerHTML = '<div class="muted">—</div>';
+let trendingLoaded = false;
+function loadTrendingOnDemand(){if(trendingLoaded)return;trendingLoaded=true;renderTrending()}
+window.addEventListener('scroll', loadTrendingOnDemand, {once:true,passive:true});

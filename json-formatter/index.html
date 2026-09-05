@@ -5,18 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>JSON Formatter — tools.oalfawzan.sa</title>
+<script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
 <meta name="theme-color" content="#0a0a0f">
 <meta name="description" content="منسق JSON سريع للنسخ والتحقق." />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/pages/json-formatter.css">
-<link rel="stylesheet" href="/assets/css/platform.css">
+<link rel="stylesheet" href="/assets/css/tool-runtime.css">
 </head>
-<body>
+<body class="tool-page">
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap">
-<header>
-  <a href="/" class="logo">tools.<span>oalfawzan.sa</span></a>
+<div class="wrap" id="main-content" role="main">
+<header class="site-header tool-site-header">
+  <a href="/" class="brand" aria-label="tools.oalfawzan.sa home"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a>
   <div class="header-actions">
     <button class="lang-btn" id="langBtn" type="button">EN</button>
     <button class="lang-btn" id="themeBtn" type="button">☀️</button>
@@ -41,7 +40,7 @@
 </section>
 <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
 </div>
-<script src="/assets/js/pages/json-formatter.js"></script>
-<script src="/assets/js/platform.js"></script>
+<script defer src="/assets/js/pages/json-formatter.js"></script>
+<script defer src="/assets/js/platform.js"></script>
 </body>
 </html>

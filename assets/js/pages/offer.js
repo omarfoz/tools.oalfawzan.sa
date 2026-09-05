@@ -1290,7 +1290,24 @@ document.addEventListener('keydown', e => {
 init();
 
 // ── Export to Excel ───────────────────────────────────────────────
-function exportExcel() {
+let xlsxLibraryPromise;
+function ensureXlsxLibrary() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  if (!xlsxLibraryPromise) {
+    xlsxLibraryPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      script.async = true;
+      script.onload = () => resolve(window.XLSX);
+      script.onerror = () => reject(new Error('Failed to load Excel export library'));
+      document.head.appendChild(script);
+    });
+  }
+  return xlsxLibraryPromise;
+}
+async function exportExcel() {
+  try { await ensureXlsxLibrary(); }
+  catch (_) { alert(currentLang === 'ar' ? 'تعذر تحميل مكتبة تصدير Excel.' : 'Could not load the Excel export library.'); return; }
   const wb = XLSX.utils.book_new();
   const coA = state.coA || 'Current Company';
   const coB = state.coB || 'New Company';

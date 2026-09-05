@@ -2,80 +2,28 @@
   'use strict';
   const API = {};
   const THEME_KEY='tools-theme', LANG_KEY='tools-language', LEGACY_THEME='tools_theme', LEGACY_LANG='tools_lang', OFFER_LANG='offer_lang';
-  const ICONS={sun:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg>',moon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/></svg>'};
+  const ICONS={sun:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg>',moon:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/></svg>'};
   const ready=fn=>document.readyState==='loading'?document.addEventListener('DOMContentLoaded',fn,{once:true}):fn();
   const validTheme=v=>v==='light'||v==='dark';
   const validLang=v=>v==='ar'||v==='en';
-  API.getTheme=()=>{const primary=localStorage.getItem(THEME_KEY),legacy=localStorage.getItem(LEGACY_THEME);const value=validTheme(primary)?primary:(validTheme(legacy)?legacy:null);return value||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')};
-  API.getLanguage=()=>{const primary=localStorage.getItem(LANG_KEY),legacy=localStorage.getItem(LEGACY_LANG),offer=localStorage.getItem(OFFER_LANG);const value=validLang(primary)?primary:(validLang(legacy)?legacy:(validLang(offer)?offer:null));return value||(document.documentElement.lang==='en'?'en':'ar')};
-  API.applyTheme=(theme,persist=true)=>{theme=validTheme(theme)?theme:'dark';document.documentElement.dataset.theme=theme;const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',theme==='light'?'#f8fafc':'#09090b');if(persist){localStorage.setItem(THEME_KEY,theme);localStorage.setItem(LEGACY_THEME,theme)}document.querySelectorAll('[data-platform-theme],#themeBtn').forEach(b=>{b.innerHTML=theme==='light'?ICONS.moon:ICONS.sun;b.setAttribute('aria-label',theme==='light'?'Dark mode':'Light mode');b.title=theme==='light'?'Dark mode':'Light mode'});window.dispatchEvent(new CustomEvent('tools:themechange',{detail:{theme}}));return theme};
-  API.applyLanguage=(lang,persist=true)=>{lang=validLang(lang)?lang:'ar';document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';if(persist){localStorage.setItem(LANG_KEY,lang);localStorage.setItem(LEGACY_LANG,lang);localStorage.setItem(OFFER_LANG,lang)}document.querySelectorAll('[data-platform-language],#langBtn').forEach(b=>{b.textContent=lang==='ar'?'EN':'ع';b.setAttribute('aria-label',lang==='ar'?'Switch to English':'التبديل إلى العربية');b.title=lang==='ar'?'English':'العربية'});window.dispatchEvent(new CustomEvent('tools:languagechange',{detail:{lang}}));return lang};
-  API.notify=(message,tone='info',timeout=2600)=>{if(!message)return;let region=document.querySelector('.platform-toast-region');if(!region){region=document.createElement('div');region.className='platform-toast-region';region.setAttribute('aria-live','polite');region.setAttribute('aria-atomic','true');document.body.append(region)}const toast=document.createElement('div');toast.className='platform-toast';toast.dataset.tone=tone;toast.setAttribute('role',tone==='error'?'alert':'status');toast.textContent=String(message);region.append(toast);setTimeout(()=>toast.remove(),timeout)};
-  API.setBusy=(element,busy=true)=>{if(!element)return;element.setAttribute('aria-busy',String(Boolean(busy)));if('disabled'in element)element.disabled=Boolean(busy)};
+  API.getTheme=()=>{const a=localStorage.getItem(THEME_KEY),b=localStorage.getItem(LEGACY_THEME);return validTheme(a)?a:(validTheme(b)?b:(matchMedia?.('(prefers-color-scheme: light)').matches?'light':'dark'))};
+  API.getLanguage=()=>{const a=localStorage.getItem(LANG_KEY),b=localStorage.getItem(LEGACY_LANG),c=localStorage.getItem(OFFER_LANG);return validLang(a)?a:(validLang(b)?b:(validLang(c)?c:(document.documentElement.lang==='en'?'en':'ar')))};
+  API.applyTheme=(theme,persist=true)=>{theme=validTheme(theme)?theme:'dark';document.documentElement.dataset.theme=theme;const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=theme==='light'?'#f8fafc':'#09090b';if(persist){localStorage.setItem(THEME_KEY,theme);localStorage.setItem(LEGACY_THEME,theme)}document.querySelectorAll('[data-platform-theme]').forEach(b=>{b.innerHTML=theme==='light'?ICONS.moon:ICONS.sun;b.setAttribute('aria-label',theme==='light'?'Dark mode':'Light mode')});window.dispatchEvent(new CustomEvent('tools:themechange',{detail:{theme}}));return theme};
+  API.applyLanguage=(lang,persist=true)=>{lang=validLang(lang)?lang:'ar';document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';if(persist){localStorage.setItem(LANG_KEY,lang);localStorage.setItem(LEGACY_LANG,lang);localStorage.setItem(OFFER_LANG,lang)}document.querySelectorAll('[data-platform-language]').forEach(b=>{b.textContent=lang==='ar'?'EN':'ع';b.setAttribute('aria-label',lang==='ar'?'Switch to English':'التبديل إلى العربية')});window.dispatchEvent(new CustomEvent('tools:languagechange',{detail:{lang}}));return lang};
+  API.notify=(message,tone='info',timeout=2400)=>{if(!message)return;let region=document.querySelector('.platform-toast-region');if(!region){region=document.createElement('div');region.className='platform-toast-region';region.setAttribute('aria-live','polite');document.body.append(region)}const toast=document.createElement('div');toast.className='platform-toast';toast.dataset.tone=tone;toast.textContent=String(message);region.append(toast);setTimeout(()=>toast.remove(),timeout)};
+  API.setBusy=(el,busy=true)=>{if(!el)return;el.setAttribute('aria-busy',String(Boolean(busy)));if('disabled' in el)el.disabled=Boolean(busy)};
   API.downloadText=(text,filename,type='text/plain;charset=utf-8')=>{const blob=new Blob([text],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)};
   API.copyText=async text=>{if(!navigator.clipboard?.writeText)throw new Error('Clipboard API unavailable');await navigator.clipboard.writeText(String(text??''));API.notify(document.documentElement.lang==='ar'?'تم النسخ':'Copied','success')};
-  const isHome=()=>{const path=location.pathname.replace(/\/+$/,'')||'/';return path==='/'||path==='/index.html'};
-  const brandMarkup=()=>'<span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>';
-  const appendStylesheet=(href,key)=>{if(document.querySelector(`link[data-${key}]`))return;const l=document.createElement('link');l.rel='stylesheet';l.href=href;l.dataset[key]='true';document.head.append(l)};
-  const appendScript=(src,key)=>{if(document.querySelector(`script[data-${key}]`))return;const s=document.createElement('script');s.src=src;s.defer=true;s.dataset[key]='true';document.head.append(s)};
-  const ensureStyles=()=>{if(!isHome())appendStylesheet('/assets/css/home-parity.css?v=20260823f','homeParity');if(location.pathname.includes('/offer'))appendStylesheet('/assets/css/offer-mobile.css?v=20260823f','offerMobile');appendStylesheet('/assets/css/design-system.css?v=20260823a','designSystem');appendStylesheet('/assets/css/design-taste.css?v=20260826scrollcraft','designTaste')};
-  const ensureEmojiSvgScript=()=>{if(document.querySelector('script[data-emoji-svg]'))return;const s=document.createElement('script');s.src='/assets/js/emoji-svg.js?v=20260823f';s.defer=true;s.dataset.emojiSvg='true';document.head.append(s)};
-  const ensurePageScripts=()=>{if(location.pathname.includes('/offer'))appendScript('/assets/js/pages/offer-riyal.js?v=20260823a','offerRiyal')};
-  const normalizeToolChrome=()=>{if(isHome())return;document.body.classList.add('tool-page');const shell=document.querySelector('.wrap,.container,.app,body > div');if(!shell)return;let header=shell.querySelector(':scope > header')||document.querySelector('header');if(!header){header=document.createElement('header');shell.prepend(header)}header.classList.add('site-header','tool-site-header');const legacyTitle=header.querySelector(':scope > h1');if(legacyTitle){const hero=document.createElement('section');hero.className='tool-hero';const subtitle=header.querySelector(':scope > .subtitle,:scope > p');hero.append(legacyTitle);if(subtitle)hero.append(subtitle);header.after(hero)}let brand=header.querySelector('.brand');if(!brand){const old=header.querySelector('.logo');if(old){brand=old;brand.className='brand';brand.href='/';brand.innerHTML=brandMarkup()}else{brand=document.createElement('a');brand.className='brand';brand.href='/';brand.innerHTML=brandMarkup();header.prepend(brand)}}else if(!brand.querySelector('.brand-mark')){brand.innerHTML=brandMarkup();brand.href='/'}brand.setAttribute('aria-label','tools.oalfawzan.sa home');let actions=header.querySelector('.header-actions,.top-actions');if(!actions){actions=document.createElement('div');header.append(actions)}actions.classList.add('header-actions','platform-header-actions');let lang=actions.querySelector('#langBtn,[data-platform-language]'),langExisting=Boolean(lang);if(!lang){lang=document.createElement('button');lang.type='button';lang.className='icon-btn platform-control';lang.dataset.platformLanguage='';actions.append(lang)}else{lang.dataset.platformLanguage='';lang.classList.add('icon-btn','platform-control')}let theme=actions.querySelector('#themeBtn,[data-platform-theme]'),themeExisting=Boolean(theme);if(!theme){theme=document.createElement('button');theme.type='button';theme.className='icon-btn platform-control';theme.dataset.platformTheme='';actions.append(theme)}else{theme.dataset.platformTheme='';theme.classList.add('icon-btn','platform-control')}if(langExisting){lang.addEventListener('click',()=>queueMicrotask(()=>API.applyLanguage(document.documentElement.lang==='en'?'en':'ar')))}else{lang.addEventListener('click',()=>API.applyLanguage(document.documentElement.lang==='ar'?'en':'ar'))}if(themeExisting){theme.addEventListener('click',()=>queueMicrotask(()=>API.applyTheme(document.documentElement.dataset.theme==='light'?'light':'dark')))}else{theme.addEventListener('click',()=>API.applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light'))}};
   window.ToolsPlatform=API;
-  const initialTheme=API.getTheme(),initialLang=API.getLanguage();localStorage.setItem(THEME_KEY,initialTheme);localStorage.setItem(LEGACY_THEME,initialTheme);localStorage.setItem(LANG_KEY,initialLang);localStorage.setItem(LEGACY_LANG,initialLang);localStorage.setItem(OFFER_LANG,initialLang);API.applyTheme(initialTheme,false);API.applyLanguage(initialLang,false);ensureStyles();ensureEmojiSvgScript();ensurePageScripts();
-  ready(()=>{normalizeToolChrome();API.applyTheme(API.getTheme(),false);API.applyLanguage(API.getLanguage(),false);if(!document.querySelector('.skip-link')){const skip=document.createElement('a');skip.className='skip-link';skip.href='#main-content';skip.textContent=document.documentElement.lang==='ar'?'تجاوز إلى المحتوى':'Skip to content';document.body.prepend(skip)}let main=document.querySelector('main,[role="main"]');if(!main){main=document.querySelector('.wrap,.container,.app,body > div');if(main){main.id||='main-content';main.setAttribute('role','main')}}else main.id||='main-content';document.querySelectorAll('a[target="_blank"]').forEach(a=>{const rel=new Set((a.getAttribute('rel')||'').split(/\s+/).filter(Boolean));rel.add('noopener');rel.add('noreferrer');a.setAttribute('rel',[...rel].join(' '))});document.querySelectorAll('button:not([type])').forEach(b=>b.type='button');document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.matches('[type="hidden"],[type="submit"],[type="button"],[type="reset"]')||el.labels?.length||el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return;const hint=el.getAttribute('placeholder')||el.getAttribute('name')||el.id;if(hint)el.setAttribute('aria-label',hint)});document.querySelectorAll('table').forEach(t=>{const p=t.parentElement;if(p&&!p.classList.contains('platform-table-scroll'))p.classList.add('platform-table-scroll')})});
-})();
-
-/* Scrollcraft-inspired interaction layer for every tool page.
-   It never generates application UI or changes calculation logic; it only
-   publishes scroll/pointer state and progressively reveals existing surfaces. */
-(() => {
-  'use strict';
-  const ready=fn=>document.readyState==='loading'?document.addEventListener('DOMContentLoaded',fn,{once:true}):fn();
-  const reduce=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  const isHome=()=>{const p=location.pathname.replace(/\/+$/,'')||'/';return p==='/'||p==='/index.html'};
+  API.applyTheme(API.getTheme(),false);
   ready(()=>{
-    if(isHome()) return;
-    document.documentElement.classList.add('sc-tools-enabled');
-    const shell=document.querySelector('#main-content,.wrap,.container,.app,main,[role="main"]');
-    if(!shell) return;
-
-    let progress=document.querySelector('.sc-tool-progress');
-    if(!progress){progress=document.createElement('div');progress.className='sc-tool-progress';progress.setAttribute('aria-hidden','true');progress.innerHTML='<span></span>';document.body.prepend(progress)}
-    const progressFill=progress.firstElementChild;
-
-    const hero=shell.querySelector(':scope > .hero,:scope > .tool-hero,.hero,.tool-hero');
-    if(hero) hero.classList.add('sc-tool-hero');
-
-    const candidates=[...shell.querySelectorAll('section,article,.panel,.card,.editor-card,.preview-card,.calculator-card,.summary-card,.metric-card,.result-card,.workspace,.mode-tabs,.filters,.tabs,.stock-card,.chart-card')]
-      .filter(el=>!el.closest('.sc-no-reveal')&&!el.matches('.site-header,.tool-site-header,.sc-tool-hero')&&!el.closest('.sc-tool-hero'));
-    candidates.forEach((el,i)=>{el.classList.add('sc-reveal-surface');el.style.setProperty('--sc-order',String(i%6))});
-
-    const io='IntersectionObserver' in window&&!reduce()?new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('sc-in');io.unobserve(entry.target)}}),{rootMargin:'0px 0px -7% 0px',threshold:.07}):null;
-    candidates.forEach(el=>{if(io)io.observe(el);else el.classList.add('sc-in')});
-
-    const interactive=[...shell.querySelectorAll('.panel,.card,.editor-card,.preview-card,.calculator-card,.summary-card,.metric-card,.result-card,.workspace')];
-    if(!reduce()&&window.matchMedia?.('(hover:hover) and (pointer:fine)').matches){
-      interactive.forEach(el=>{
-        el.classList.add('sc-pointer-surface');
-        el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();el.style.setProperty('--sc-mx',`${((e.clientX-r.left)/r.width)*100}%`);el.style.setProperty('--sc-my',`${((e.clientY-r.top)/r.height)*100}%`)});
-        el.addEventListener('pointerleave',()=>{el.style.removeProperty('--sc-mx');el.style.removeProperty('--sc-my')});
-      });
-    }
-
-    let ticking=false;
-    const paint=()=>{
-      ticking=false;
-      const doc=document.documentElement,max=Math.max(1,doc.scrollHeight-innerHeight),p=Math.min(1,Math.max(0,scrollY/max));
-      progressFill.style.transform=`scaleX(${p})`;
-      doc.style.setProperty('--sc-page-p',p.toFixed(4));
-      if(hero&&!reduce()){
-        const r=hero.getBoundingClientRect(),hp=Math.min(1,Math.max(0,-r.top/Math.max(1,r.height)));
-        hero.style.setProperty('--sc-hero-p',hp.toFixed(4));
-      }
-    };
-    const onScroll=()=>{if(!ticking){ticking=true;requestAnimationFrame(paint)}};
-    addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll,{passive:true});paint();
+    const langButtons=[...document.querySelectorAll('[data-platform-language]')];
+    const themeButtons=[...document.querySelectorAll('[data-platform-theme]')];
+    if(langButtons.length) API.applyLanguage(API.getLanguage(),false);
+    themeButtons.forEach(b=>b.addEventListener('click',()=>API.applyTheme(document.documentElement.dataset.theme==='light'?'dark':'light')));
+    langButtons.forEach(b=>b.addEventListener('click',()=>API.applyLanguage(document.documentElement.lang==='ar'?'en':'ar')));
+    document.querySelectorAll('a[target="_blank"]').forEach(a=>{const rel=new Set((a.rel||'').split(/\s+/).filter(Boolean));rel.add('noopener');rel.add('noreferrer');a.rel=[...rel].join(' ')});
+    document.querySelectorAll('button:not([type])').forEach(b=>b.type='button');
+    document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.matches('[type="hidden"],[type="submit"],[type="button"],[type="reset"]')||el.labels?.length||el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return;const hint=el.getAttribute('placeholder')||el.getAttribute('name')||el.id;if(hint)el.setAttribute('aria-label',hint)});
   });
 })();
