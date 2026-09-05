@@ -182,7 +182,7 @@ function renderFields(side) {
     if (!deductions.length) {
       const addDedBtn = document.createElement('div');
       addDedBtn.style.cssText = 'padding:6px 16px 10px;border-top:1px dashed var(--border);margin-top:4px';
-      addDedBtn.innerHTML = `<button type="button" class="add-field-btn" style="font-size:.65rem;opacity:.5" onclick="openAddDeduction('${side}')">${t('add_deduction')}</button>`;
+      addDedBtn.innerHTML = `<button type="button" class="add-field-btn" style="font-size:.65rem" onclick="openAddDeduction('${side}')">${t('add_deduction')}</button>`;
       con.appendChild(addDedBtn);
     }
     if (deductions.length) {
@@ -190,7 +190,7 @@ function renderFields(side) {
       dedHdr.style.cssText = 'padding:8px 16px 4px;border-top:1px dashed rgba(192,57,43,.2);margin-top:4px;display:flex;align-items:center;justify-content:space-between';
       dedHdr.innerHTML = `
         <div class="section-label" style="color:var(--danger);opacity:.7;margin-bottom:0">${t('deductions_section')}</div>
-        <button type="button" class="add-field-btn" style="border-color:rgba(192,57,43,.3);color:var(--danger);opacity:.8" onclick="openAddDeduction('${side}')">${t('add_deduction')}</button>
+        <button type="button" class="add-field-btn" style="border-color:rgba(255,107,107,.55);color:var(--danger);font-weight:700" onclick="openAddDeduction('${side}')">${t('add_deduction')}</button>
       `;
       con.appendChild(dedHdr);
       deductions.forEach(f => con.appendChild(makeRow(f, side)));
@@ -249,14 +249,20 @@ function makeRow(f, side) {
   const display = val;
   const isReadonly = f.isPct;
   const toggleClass = f.enabled ? (side === 'A' ? 'on' : 'on-new') : '';
+  const fieldAccessibleName = tFieldName(f);
+  const toggleLabel = currentLang === 'ar'
+    ? `${f.enabled ? 'تعطيل' : 'تفعيل'} ${fieldAccessibleName}`
+    : `${f.enabled ? 'Disable' : 'Enable'} ${fieldAccessibleName}`;
+  const nameInputLabel = currentLang === 'ar' ? `اسم الحقل: ${fieldAccessibleName}` : `Field name: ${fieldAccessibleName}`;
+  const amountInputLabel = currentLang === 'ar' ? `قيمة ${fieldAccessibleName}` : `${fieldAccessibleName} amount`;
   const row = document.createElement('div');
   row.className = 'field-row' + (f.enabled ? '' : ' disabled');
   row.dataset.id = f.id;
 
   row.innerHTML = `
-    <button type="button" class="toggle ${toggleClass}" onclick="toggleField('${side}','${f.id}')"></button>
+    <button type="button" class="toggle ${toggleClass}" onclick="toggleField('${side}','${f.id}')" aria-label="${esc(toggleLabel)}" aria-pressed="${f.enabled ? 'true' : 'false'}"></button>
     <div class="field-name">
-      <input class="field-name-input" value="${esc(tFieldName(f))}"
+      <input class="field-name-input" value="${esc(tFieldName(f))}" aria-label="${esc(nameInputLabel)}"
         onchange="renameField('${side}','${f.id}',this.value)"
         ${!f.enabled ? 'disabled' : ''}>
     </div>
@@ -265,7 +271,7 @@ function makeRow(f, side) {
     <div class="field-amount">
       ${f.isMonths
         ? `<div style="display:flex;align-items:center;gap:4px">
-            <input class="amount-input" type="number" step="0.5" min="0"
+            <input class="amount-input" type="number" step="0.5" min="0" aria-label="${esc(amountInputLabel)}"
               value="${(f.pct/100).toFixed(2).replace(/\.?0+$/, '')}"
               style="width:60px;text-align:center"
               onchange="updateMultiplier('${side}','${f.id}',this.value)"
@@ -273,7 +279,7 @@ function makeRow(f, side) {
             <span style="font-size:.72rem;color:var(--muted);font-weight:500">× basic</span>
            </div>`
         : `<input class="amount-input ${isReadonly ? 'readonly' : ''} ${f.isDeduction ? 'is-deduction' : ''}"
-            type="number" value="${display.toFixed(0)}"
+            type="number" value="${display.toFixed(0)}" aria-label="${esc(amountInputLabel)}"
             ${isReadonly ? 'readonly' : ''}
             onchange="updateFieldValue('${side}','${f.id}',this.value)"
             ${!f.enabled ? 'disabled' : ''}>`
