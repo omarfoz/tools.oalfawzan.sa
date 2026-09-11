@@ -9,6 +9,13 @@
     themeLink.href = '/assets/css/oalfawzan-theme.css?v=20260911b';
     document.head.append(themeLink);
   }
+  if (!document.getElementById('mobile-enhancements')) {
+    const mobileLink = document.createElement('link');
+    mobileLink.id = 'mobile-enhancements';
+    mobileLink.rel = 'stylesheet';
+    mobileLink.href = '/assets/css/mobile-enhancements.css?v=20260911';
+    document.head.append(mobileLink);
+  }
 
   const API = {};
   const THEME_KEY='tools-theme', LANG_KEY='tools-language', LEGACY_THEME='tools_theme', LEGACY_LANG='tools_lang', OFFER_LANG='offer_lang';
@@ -35,5 +42,29 @@
     document.querySelectorAll('a[target="_blank"]').forEach(a=>{const rel=new Set((a.rel||'').split(/\s+/).filter(Boolean));rel.add('noopener');rel.add('noreferrer');a.rel=[...rel].join(' ')});
     document.querySelectorAll('button:not([type])').forEach(b=>b.type='button');
     document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.matches('[type="hidden"],[type="submit"],[type="button"],[type="reset"]')||el.labels?.length||el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return;const hint=el.getAttribute('placeholder')||el.getAttribute('name')||el.id;if(hint)el.setAttribute('aria-label',hint)});
+
+    /* Offer mobile header: preserve Save, but place it inside the existing overflow menu. */
+    const saveBtn=document.getElementById('saveBtn');
+    const headerMenu=document.getElementById('headerMenu');
+    const menuWrap=headerMenu?.closest('.menu-wrap');
+    if(saveBtn&&headerMenu&&menuWrap&&saveBtn.parentElement){
+      const originalParent=saveBtn.parentElement;
+      const originalNext=saveBtn.nextElementSibling;
+      const mobileQuery=matchMedia('(max-width: 700px)');
+      const syncOfferHeader=()=>{
+        if(mobileQuery.matches){
+          if(saveBtn.parentElement!==headerMenu){
+            saveBtn.classList.add('mobile-menu-save');
+            headerMenu.prepend(saveBtn);
+          }
+        }else if(saveBtn.parentElement===headerMenu){
+          saveBtn.classList.remove('mobile-menu-save');
+          const anchor=originalNext&&originalNext.parentElement===originalParent?originalNext:menuWrap;
+          originalParent.insertBefore(saveBtn,anchor);
+        }
+      };
+      syncOfferHeader();
+      mobileQuery.addEventListener?.('change',syncOfferHeader);
+    }
   });
 })();
