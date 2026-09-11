@@ -358,7 +358,8 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
 .tool-card:hover { transform: translateY(-3px) !important; border-color: rgba(255,255,255,.24) !important; }
 .tool-card .category { color: var(--site-text-faint) !important; font-size: .72rem !important; font-weight: 600 !important; letter-spacing: .12em !important; }
 .tool-card .tool-glyph { color: var(--site-text-muted) !important; }
-.tool-card .tool-icon { width: 42px !important; height: 42px !important; margin-top: 24px !important; border: 1px solid var(--site-glass-border) !important; border-radius: 14px !important; background: rgba(255,255,255,.035) !important; color: var(--site-accent) !important; }
+.tool-card .tool-icon { display: grid; place-items: center; flex-shrink: 0; width: 42px !important; height: 42px !important; margin-top: 24px !important; border: 1px solid var(--site-glass-border) !important; border-radius: 14px !important; background: rgba(255,255,255,.035) !important; color: var(--site-accent) !important; }
+.tool-card .tool-icon > svg { display: block; }
 .tool-card h3 { margin: 16px 0 8px !important; color: var(--site-text) !important; font-size: 1.05rem !important; font-weight: 600 !important; line-height: 1.35 !important; letter-spacing: -.015em !important; }
 .tool-card p { margin: 0 0 18px !important; color: var(--site-text-muted) !important; font-size: .88rem !important; line-height: 1.65 !important; }
 .tool-card .launch { margin-top: auto !important; color: var(--site-accent) !important; font-size: .82rem !important; font-weight: 500 !important; }

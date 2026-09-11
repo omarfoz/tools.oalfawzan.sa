@@ -1,5 +1,30 @@
 
 const $ = id => document.getElementById(id);
+const OFFER_ICONS = {
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/>',
+  moon: '<path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/>',
+  flag: '<path d="M5 21V4m0 1c5-3 8 3 14 0v10c-6 3-9-3-14 0"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>',
+  check: '<path d="m5 12 4 4L19 6"/>',
+  close: '<path d="m6 6 12 12M18 6 6 18"/>'
+};
+function offerIcon(name) {
+  return `<svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${OFFER_ICONS[name]}</svg>`;
+}
+function setOfferIconLabel(element, name, label) {
+  element.innerHTML = offerIcon(name);
+  const text = document.createElement('span');
+  text.textContent = label;
+  element.append(text);
+}
+function updateThemeIcon() {
+  const button = $('themeBtn');
+  if (!button) return;
+  button.innerHTML = offerIcon(currentTheme === 'light' ? 'moon' : 'sun');
+  button.setAttribute('aria-label', currentLang === 'ar'
+    ? (currentTheme === 'light' ? 'تفعيل المظهر الداكن' : 'تفعيل المظهر الفاتح')
+    : (currentTheme === 'light' ? 'Dark mode' : 'Light mode'));
+}
 const deepClone = o => JSON.parse(JSON.stringify(o));
 
 // ── Field / Factor name translation map ──────────────────────────
@@ -288,7 +313,7 @@ function makeRow(f, side) {
     <button type="button" class="type-btn ${f.isDeduction ? 'deduction' : ''}"
       title="${f.isDeduction ? t('deduction_toggle') : t('addition_toggle')}"
       onclick="toggleDeduction('${side}','${f.id}')">${f.isDeduction ? '−' : '+'}</button>
-    <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="Remove field">✕</button>
+    <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="Remove field">${offerIcon('close')}</button>
   `;
 
   // Double-click to edit in popup
@@ -844,7 +869,7 @@ const STRINGS = {
     tool_tag:'// TOOL_01', hero_h1_line1:'Job Offer', hero_h1_line2:'Comparator',
     hero_p:'Fully customizable. Rename any field, toggle it on/off, add your own, set a field as % of another. Auto-saves to your browser.',
     current_company:'Current Company', new_company:'New Company',
-    nationality:'Nationality', saudi:'🇸🇦 Saudi', non_saudi:'🌍 Non-Saudi',
+    nationality:'Nationality', saudi:'Saudi', non_saudi:'Non-Saudi',
     current:'Current', new_offer:'New Offer',
     add_field:'+ Add Field', add_deduction:'+ Add Deduction',
     qualitative_factors:'// Qualitative Factors',
@@ -865,11 +890,11 @@ const STRINGS = {
     deductions_section:'Deductions', gross_monthly:'GROSS MONTHLY SALARY',
     net_monthly_salary:'NET MONTHLY SALARY', qualitative_score:'QUALITATIVE SCORE',
     reset_btn:'↺ Reset', save_btn:'Save', portfolio_btn:'← Portfolio',
-    reset_confirm:'Reset everything to defaults?', saved_txt:'✓ Saved',
+    reset_confirm:'Reset everything to defaults?', saved_txt:'Saved',
     gosi_note_saudi:'',
     gosi_note_non:'Non-Saudi: no GOSI deduction from employee salary',
     deduction_toggle:'Deduction — click to toggle', addition_toggle:'Addition — click to mark as deduction',
-    weight_lbl:'WEIGHT %', remove_factor:'✕ Remove',
+    weight_lbl:'WEIGHT %', remove_factor:'Remove',
     ai_unavailable:'AI unavailable. The breakdown above tells the full story.',
     breakdown_rows: {
       gross:'GROSS MONTHLY SALARY', gosi:'GOSI / DEDUCTIONS', net:'NET MONTHLY SALARY',
@@ -921,7 +946,7 @@ const STRINGS = {
     tool_tag:'// الأداة_01', hero_h1_line1:'مقارنة', hero_h1_line2:'العروض الوظيفية',
     hero_p:'قابل للتخصيص الكامل. عدّل أي حقل، فعّله أو أوقفه، أضف حقولك الخاصة، احسب كنسبة من حقل آخر. يحفظ تلقائياً في متصفحك.',
     current_company:'الشركة الحالية', new_company:'العرض الجديد',
-    nationality:'الجنسية', saudi:'🇸🇦 سعودي', non_saudi:'🌍 غير سعودي',
+    nationality:'الجنسية', saudi:'سعودي', non_saudi:'غير سعودي',
     current:'الحالي', new_offer:'العرض الجديد',
     add_field:'+ إضافة حقل', add_deduction:'+ إضافة خصم',
     qualitative_factors:'// العوامل النوعية',
@@ -941,11 +966,11 @@ const STRINGS = {
     deductions_section:'الاستقطاعات', gross_monthly:'إجمالي الراتب الشهري',
     net_monthly_salary:'صافي الراتب الشهري', qualitative_score:'النتيجة النوعية',
     reset_btn:'↺ إعادة تعيين', save_btn:'حفظ', portfolio_btn:'← المعرض',
-    reset_confirm:'إعادة تعيين كل شيء إلى الإعدادات الافتراضية؟', saved_txt:'✓ تم الحفظ',
+    reset_confirm:'إعادة تعيين كل شيء إلى الإعدادات الافتراضية؟', saved_txt:'تم الحفظ',
     gosi_note_saudi:'',
     gosi_note_non:'غير سعودي: لا يوجد اشتراك تأمينات على الموظف',
     deduction_toggle:'خصم — انقر للتبديل', addition_toggle:'إضافة — انقر للتعيين كخصم',
-    weight_lbl:'الوزن %', remove_factor:'✕ حذف',
+    weight_lbl:'الوزن %', remove_factor:'حذف',
     ai_unavailable:'الذكاء الاصطناعي غير متاح. التفاصيل أعلاه تكفي.',
     breakdown_rows: {
       gross:'إجمالي الراتب الشهري', gosi:'التأمينات / الاستقطاعات', net:'صافي الراتب الشهري',
@@ -1029,7 +1054,7 @@ function applyLang(lang) {
     btn.classList.toggle('ar-active', isAr);
   }
   const themeBtn = $('themeBtn');
-  if (themeBtn) themeBtn.textContent = currentTheme === 'light' ? '🌙' : '☀️';
+  updateThemeIcon();
 
   // Header buttons
   const btnReset = $('btnReset');
@@ -1042,8 +1067,8 @@ function applyLang(lang) {
   // Nationality buttons
   ['A','B'].forEach(s => {
     const sa = $('nat'+s+'_saudi'), ns = $('nat'+s+'_nonsaudi');
-    if (sa) sa.textContent = t('saudi');
-    if (ns) ns.textContent = t('non_saudi');
+    if (sa) setOfferIconLabel(sa, 'flag', t('saudi'));
+    if (ns) setOfferIconLabel(ns, 'globe', t('non_saudi'));
   });
 
   // Nationality notes (re-apply based on current nat)
@@ -1076,7 +1101,7 @@ function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', currentTheme);
   localStorage.setItem('tools_theme', currentTheme);
   const themeBtn = $('themeBtn');
-  if (themeBtn) themeBtn.textContent = currentTheme === 'light' ? '🌙' : '☀️';
+  updateThemeIcon();
 }
 function toggleTheme() {
   applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
@@ -1085,7 +1110,7 @@ function toggleTheme() {
 function saveData() {
   autosave();
   const btn = $('saveBtn');
-  btn.textContent = t('saved_txt');
+  setOfferIconLabel(btn, 'check', t('saved_txt'));
   btn.classList.add('btn-saved');
   setTimeout(() => { btn.textContent = t('save_btn'); btn.classList.remove('btn-saved'); }, 1800);
 }
@@ -1206,7 +1231,7 @@ function makeFactorRow(f) {
         <input type="number" class="factor-weight-input" value="${f.weight}" min="0" max="100"
           onchange="updateFactor('${f.id}','weight',+this.value)">
       </div>
-      <button type="button" class="factor-del-btn hide-mobile" onclick="deleteFactor('${f.id}')">✕</button>
+      <button type="button" class="factor-del-btn hide-mobile" onclick="deleteFactor('${f.id}')">${offerIcon('close')}</button>
     </div>
   `;
   return row;
