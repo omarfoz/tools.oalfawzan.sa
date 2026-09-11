@@ -8,8 +8,8 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
   <link rel="stylesheet" href="/assets/css/platform.css">
-  <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911b">
-  <script defer src="/assets/js/pages/home.js"></script>
+  <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911c">
+  <script defer src="/assets/js/pages/home.js?v=20260911c"></script>
   <title>أدوات عمر الفوزان | tools.oalfawzan.sa</title>
 </head>
 <body>
@@ -60,11 +60,11 @@
     </div>
 
     <div class="filters" aria-label="Tool categories">
-      <button class="filter" data-category="all" data-i18n="all" aria-pressed="true">الكل</button>
-      <button class="filter" data-category="career" data-i18n="career" aria-pressed="false">العمل والمال</button>
-      <button class="filter" data-category="developer" data-i18n="developer" aria-pressed="false">للمطورين</button>
-      <button class="filter" data-category="productivity" data-i18n="productivity" aria-pressed="false">الإنتاجية</button>
-      <button class="filter" data-category="market" data-i18n="market" aria-pressed="false">الأسواق</button>
+      <button class="filter" type="button" data-category="all" data-i18n="all" aria-pressed="true">الكل</button>
+      <button class="filter" type="button" data-category="career" data-i18n="career" aria-pressed="false">العمل والمال</button>
+      <button class="filter" type="button" data-category="developer" data-i18n="developer" aria-pressed="false">للمطورين</button>
+      <button class="filter" type="button" data-category="productivity" data-i18n="productivity" aria-pressed="false">الإنتاجية</button>
+      <button class="filter" type="button" data-category="market" data-i18n="market" aria-pressed="false">الأسواق</button>
     </div>
 
     <div class="tools-grid" id="toolsGrid">
@@ -109,7 +109,7 @@
       </a>
     </div>
 
-    <div class="empty-tools" id="emptyTools" role="status">لا توجد أدوات مطابقة للبحث.</div>
+    <div class="empty-tools" id="emptyTools" role="status" hidden>لا توجد أدوات مطابقة للبحث.</div>
   </section>
 
   <footer class="site-footer">

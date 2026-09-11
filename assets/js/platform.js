@@ -6,7 +6,7 @@
     const themeLink = document.createElement('link');
     themeLink.id = 'oalfawzan-theme';
     themeLink.rel = 'stylesheet';
-    themeLink.href = '/assets/css/oalfawzan-theme.css?v=20260911b';
+    themeLink.href = '/assets/css/oalfawzan-theme.css?v=20260911c';
     document.head.append(themeLink);
   }
   if (!document.getElementById('mobile-enhancements')) {

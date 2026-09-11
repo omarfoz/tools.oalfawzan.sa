@@ -25,16 +25,19 @@ jobs:
           node-version: '22'
       - name: Run repository audit
         run: python scripts/repo_audit.py
-      - name: Syntax-check inline JavaScript
+      - name: Syntax-check inline and external JavaScript
         shell: bash
         run: |
           set -euo pipefail
-          shopt -s nullglob
+          test -d .audit-js
           failed=0
-          for f in audit-js/*.js; do
+          checked=0
+          while IFS= read -r -d '' f; do
             echo "Checking $f"
             if ! node --check "$f"; then failed=1; fi
-          done
+            checked=$((checked + 1))
+          done < <(find .audit-js assets/js -type f -name '*.js' -print0)
+          test "$checked" -gt 0
           exit "$failed"
       - name: Validate internal absolute tool links
         shell: bash

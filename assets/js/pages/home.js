@@ -39,7 +39,7 @@
   function applyTheme(theme,persist=true){theme=validTheme(theme)?theme:'dark';document.documentElement.dataset.theme=theme;const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=theme==='light'?'#dce8f5':'#010204';if(persist){localStorage.setItem(THEME_KEY,theme);localStorage.setItem(LEGACY_THEME,theme)}themeBtn.innerHTML=theme==='light'?ICONS.moon:ICONS.sun;themeBtn.setAttribute('aria-label',theme==='light'?'Dark mode':'Light mode');themeBtn.title=theme==='light'?'Dark mode':'Light mode'}
   function getLang(){const saved=localStorage.getItem(LANG_KEY)||localStorage.getItem(LEGACY_LANG);return validLang(saved)?saved:'ar'}
 
-  function applyFilter(){const q=search.value.trim().toLocaleLowerCase();let shown=0;cards.forEach(card=>{const visible=(category==='all'||card.dataset.category===category)&&(!q||card.textContent.toLocaleLowerCase().includes(q));card.hidden=!visible;if(visible)shown++});empty.style.display=shown?'none':'block'}
+  function applyFilter(){const q=search.value.trim().toLocaleLowerCase();let shown=0;cards.forEach(card=>{const visible=(category==='all'||card.dataset.category===category)&&(!q||card.textContent.toLocaleLowerCase().includes(q));card.hidden=!visible;if(visible)shown++});empty.hidden=shown>0}
   function setLang(lang,persist=true){
     lang=validLang(lang)?lang:'ar';
     const s=DATA[lang];
@@ -67,4 +67,5 @@
 
   applyTheme(getTheme(),false);
   setLang(getLang(),false);
+  applyFilter();
 })();
