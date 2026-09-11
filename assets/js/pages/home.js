@@ -4,6 +4,14 @@
   const ICONS={sun:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg>',moon:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/></svg>'};
   const DATA={ar:{title:'أدوات عمر الفوزان | tools.oalfawzan.sa',eyebrow:'TOOLS.OALFAWZAN.SA',h1a:'أدوات عملية،',h1b:'بدون تعقيد.',desc:'مجموعة أدوات مركّزة تساعدك على المقارنة والحساب والتحليل وإنجاز المهام اليومية مباشرة من المتصفح.',manifestoKicker:'الفكرة بسيطة',manifestoTitle:'افتح الأداة. أنجز المهمة. وارجع لشيء أهم.',manifestoDesc:'لا حسابات، لا تتبع، ولا خطوات زائدة. كل أداة مصممة لتؤدي وظيفة واضحة داخل المتصفح.',directory:'دليل الأدوات',sub:'اختر الأداة المناسبة أو ابحث بالاسم.',searchLabel:'البحث في الأدوات',search:'ابحث عن أداة…',all:'الكل',career:'العمل والمال',developer:'للمطورين',productivity:'الإنتاجية',market:'الأسواق',launch:'فتح الأداة',none:'لا توجد أدوات مطابقة للبحث.',profile:'الملف الشخصي',github:'GitHub'},en:{title:'Omar Alfawzan Tools | tools.oalfawzan.sa',eyebrow:'TOOLS.OALFAWZAN.SA',h1a:'Useful tools,',h1b:'without the overhead.',desc:'Focused browser utilities for comparing, calculating, analyzing, and getting everyday tasks done quickly.',manifestoKicker:'THE IDEA IS SIMPLE',manifestoTitle:'Open the tool. Finish the task. Get back to what matters.',manifestoDesc:'No accounts, no tracking, no unnecessary steps. Every tool is designed to do one clear job in your browser.',directory:'Tool directory',sub:'Choose a tool or search by name.',searchLabel:'Search tools',search:'Search tools…',all:'All',career:'Career & finance',developer:'Developer',productivity:'Productivity',market:'Markets',launch:'Open tool',none:'No tools match your search.',profile:'Portfolio',github:'GitHub'}};
 
+  if(!document.getElementById('mobile-enhancements')){
+    const link=document.createElement('link');
+    link.id='mobile-enhancements';
+    link.rel='stylesheet';
+    link.href='/assets/css/mobile-enhancements.css?v=20260911';
+    document.head.append(link);
+  }
+
   const cards=[...document.querySelectorAll('.tool-card')];
   const filters=[...document.querySelectorAll('.filter')];
   const search=document.getElementById('toolSearch');
@@ -12,6 +20,19 @@
   const langBtn=document.getElementById('langBtn');
   let category='all';
 
+  function prepareBilingualTitles(){
+    cards.forEach(card=>{
+      const title=card.querySelector('h3');
+      if(!title||title.querySelector('.tool-title-primary'))return;
+      const parts=title.textContent.split('·').map(part=>part.trim()).filter(Boolean);
+      if(parts.length<2)return;
+      const [ar,en]=parts;
+      title.classList.add('tool-title');
+      title.innerHTML=`<span class="tool-title-primary" data-ar="${ar}" data-en="${en}">${ar}</span><span class="tool-title-secondary" data-ar="${en}" data-en="${ar}" lang="en" dir="ltr">${en}</span>`;
+    });
+  }
+  prepareBilingualTitles();
+
   const validTheme=v=>v==='light'||v==='dark';
   const validLang=v=>v==='ar'||v==='en';
   function getTheme(){const saved=localStorage.getItem(THEME_KEY)||localStorage.getItem(LEGACY_THEME);return validTheme(saved)?saved:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark')}
@@ -19,7 +40,25 @@
   function getLang(){const saved=localStorage.getItem(LANG_KEY)||localStorage.getItem(LEGACY_LANG);return validLang(saved)?saved:'ar'}
 
   function applyFilter(){const q=search.value.trim().toLocaleLowerCase();let shown=0;cards.forEach(card=>{const visible=(category==='all'||card.dataset.category===category)&&(!q||card.textContent.toLocaleLowerCase().includes(q));card.hidden=!visible;if(visible)shown++});empty.style.display=shown?'none':'block'}
-  function setLang(lang,persist=true){lang=validLang(lang)?lang:'ar';const s=DATA[lang];document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';if(persist){localStorage.setItem(LANG_KEY,lang);localStorage.setItem(LEGACY_LANG,lang)}document.title=s.title;langBtn.textContent=lang==='ar'?'EN':'ع';langBtn.setAttribute('aria-label',lang==='ar'?'Switch to English':'التبديل إلى العربية');langBtn.title=lang==='ar'?'English':'العربية';document.getElementById('heroTitle').innerHTML=`<span>${s.h1a}</span><span>${s.h1b}</span>`;const map={eyebrow:'eyebrow',heroDesc:'desc',manifestoKicker:'manifestoKicker',manifestoTitle:'manifestoTitle',manifestoDesc:'manifestoDesc',directoryTitle:'directory',directorySub:'sub',searchLabel:'searchLabel',profileLink:'profile',githubLink:'github',emptyTools:'none'};Object.entries(map).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=s[key]});search.placeholder=s.search;filters.forEach(filter=>{filter.textContent=s[filter.dataset.i18n]});document.querySelectorAll('.launch').forEach(el=>{el.textContent=s.launch})}
+  function setLang(lang,persist=true){
+    lang=validLang(lang)?lang:'ar';
+    const s=DATA[lang];
+    document.documentElement.lang=lang;
+    document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+    if(persist){localStorage.setItem(LANG_KEY,lang);localStorage.setItem(LEGACY_LANG,lang)}
+    document.title=s.title;
+    langBtn.textContent=lang==='ar'?'EN':'ع';
+    langBtn.setAttribute('aria-label',lang==='ar'?'Switch to English':'التبديل إلى العربية');
+    langBtn.title=lang==='ar'?'English':'العربية';
+    document.getElementById('heroTitle').innerHTML=`<span>${s.h1a}</span><span>${s.h1b}</span>`;
+    const map={eyebrow:'eyebrow',heroDesc:'desc',manifestoKicker:'manifestoKicker',manifestoTitle:'manifestoTitle',manifestoDesc:'manifestoDesc',directoryTitle:'directory',directorySub:'sub',searchLabel:'searchLabel',profileLink:'profile',githubLink:'github',emptyTools:'none'};
+    Object.entries(map).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=s[key]});
+    search.placeholder=s.search;
+    filters.forEach(filter=>{filter.textContent=s[filter.dataset.i18n]});
+    document.querySelectorAll('.launch').forEach(el=>{el.textContent=s.launch});
+    document.querySelectorAll('.tool-title-primary,.tool-title-secondary').forEach(el=>{if(el.dataset[lang])el.textContent=el.dataset[lang]});
+    document.querySelectorAll('.tool-title-secondary').forEach(el=>{el.lang=lang==='ar'?'en':'ar';el.dir=lang==='ar'?'ltr':'rtl'});
+  }
 
   search.addEventListener('input',applyFilter,{passive:true});
   filters.forEach(filter=>filter.addEventListener('click',()=>{category=filter.dataset.category;filters.forEach(item=>item.setAttribute('aria-pressed',String(item===filter)));applyFilter()}));
