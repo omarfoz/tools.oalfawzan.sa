@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#010204">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>مقارن عروض العمل — tools.oalfawzan.sa</title>
@@ -11,6 +11,7 @@
 <script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
 <link rel="stylesheet" href="/assets/css/pages/offer.css">
 <link rel="stylesheet" href="/assets/css/offer-runtime.css">
+<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911b">
 <style>
 /* Final Offer mobile touch-target override */
 @media (max-width:640px){
@@ -45,24 +46,25 @@
       </div>
     </div>
   </header>
+  <a href="/" class="back-link" aria-label="Back to all tools">← tools.oalfawzan.sa</a>
 
   <div class="hero">
-    <div class="hero-tag"><span data-i18n="tool_tag">// TOOL_01</span></div>
-    <h1><span data-i18n="hero_h1_line1">Job Offer</span><br><em data-i18n="hero_h1_line2">Comparator</em></h1>
-    <p><span data-i18n="hero_p">Fully customizable. Rename any field, toggle it on/off, add your own, set a field as % of another. Auto-saves to your browser.</span></p>
+    <div class="hero-tag"><span data-i18n="tool_tag">// أداة مقارنة</span></div>
+    <h1><span data-i18n="hero_h1_line1">مقارن عروض</span><br><em data-i18n="hero_h1_line2">العمل</em></h1>
+    <p><span data-i18n="hero_p">قارن الراتب والمزايا والقيمة السنوية والعوامل المهنية، مع إمكانية تخصيص الحقول وحفظ بياناتك في المتصفح.</span></p>
   </div>
 
   <!-- Mode Switcher -->
   <div class="mode-switcher" role="group" aria-label="Comparison mode">
     <button type="button" class="mode-btn active-simple" id="modeSimpleBtn" onclick="setMode('simple')">
       <span class="mode-icon">⚡</span>
-      <span class="mode-label" data-i18n="mode_simple_label">Quick Compare</span>
-      <span class="mode-sub" data-i18n="mode_simple_sub">Job Seeker · Fast answer</span>
+      <span class="mode-label" data-i18n="mode_simple_label">مقارنة سريعة</span>
+      <span class="mode-sub" data-i18n="mode_simple_sub">للباحث عن عمل · نتيجة سريعة</span>
     </button>
     <button type="button" class="mode-btn" id="modeDetailedBtn" onclick="setMode('detailed')">
       <span class="mode-icon">📊</span>
-      <span class="mode-label" data-i18n="mode_detailed_label">Full Analysis</span>
-      <span class="mode-sub" data-i18n="mode_detailed_sub">HR / Finance · Every detail</span>
+      <span class="mode-label" data-i18n="mode_detailed_label">تحليل كامل</span>
+      <span class="mode-sub" data-i18n="mode_detailed_sub">الموارد البشرية / المالية · كل التفاصيل</span>
     </button>
   </div>
 

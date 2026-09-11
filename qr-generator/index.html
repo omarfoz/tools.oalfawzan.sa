@@ -6,17 +6,18 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>QR Generator — tools.oalfawzan.sa</title>
 <script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#010204">
 <meta name="description" content="مولد QR للنصوص والروابط وبطاقات vCard لجهات الاتصال.">
 <link rel="stylesheet" href="/assets/css/pages/qr-generator.css">
 <link rel="stylesheet" href="/assets/css/tool-runtime.css">
+<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911b">
 </head>
 <body class="tool-page">
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
 <div class="wrap" id="main-content" role="main">
   <header class="site-header tool-site-header"><a href="/" class="brand" aria-label="tools.oalfawzan.sa home"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a><div class="header-actions"><button class="icon-btn" id="langBtn" type="button">EN</button><button class="icon-btn" id="themeBtn" type="button" aria-label="تبديل المظهر">☀️</button></div></header>
   <a href="/" class="back-link" id="backLink">← الرجوع لكل الأدوات</a>
-  <section class="hero"><div class="hero-tag" id="tag">// أداة</div><h1 id="title">QR Code Generator</h1><p class="sub" id="desc">أنشئ رمز QR للرابط أو النص أو بطاقة vCard قابلة للحفظ كجهة اتصال.</p></section>
+  <section class="hero"><div class="hero-tag" id="tag">// أداة</div><h1 id="title">مولد QR</h1><p class="sub" id="desc">أنشئ رمز QR للرابط أو النص أو بطاقة vCard قابلة للحفظ كجهة اتصال.</p></section>
   <div class="mode-tabs" role="tablist" aria-label="QR type"><button class="mode-tab active" id="textTab" type="button" role="tab" aria-selected="true" data-mode="text">نص / رابط</button><button class="mode-tab" id="contactTab" type="button" role="tab" aria-selected="false" data-mode="contact">vCard</button></div>
   <section class="workspace"><div class="editor-card"><div id="textMode" class="mode-panel"><label class="field-label" id="textLabel" for="qrText">النص أو الرابط</label><textarea id="qrText" placeholder="https://tools.oalfawzan.sa" aria-label="Text or URL to encode"></textarea><div class="helper" id="helper">يدعم الروابط والنصوص العادية.</div></div>
   <div id="contactMode" class="mode-panel" hidden><div class="contact-intro" id="contactIntro">أنشئ بطاقة vCard قياسية. عند مسح الرمز يمكن للهاتف عرض جهة الاتصال وحفظها مباشرة.</div><div class="contact-grid">

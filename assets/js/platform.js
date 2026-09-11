@@ -1,12 +1,12 @@
 (() => {
   'use strict';
 
-  /* Load the shared oalfawzan.sa visual layer last without changing tool logic. */
+  /* Fallback only: current tool pages load the shared theme directly in <head>. */
   if (!document.getElementById('oalfawzan-theme')) {
     const themeLink = document.createElement('link');
     themeLink.id = 'oalfawzan-theme';
     themeLink.rel = 'stylesheet';
-    themeLink.href = '/assets/css/oalfawzan-theme.css?v=20260911';
+    themeLink.href = '/assets/css/oalfawzan-theme.css?v=20260911b';
     document.head.append(themeLink);
   }
 

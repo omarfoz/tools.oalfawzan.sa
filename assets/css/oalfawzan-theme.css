@@ -608,3 +608,199 @@ html[data-theme="light"] .tool-page .popup-btn.confirm { background: #0062cc !im
 @media (prefers-reduced-motion:reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Post-validation refinements */
+@media (min-width:701px) {
+  .tools-grid > .tool-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1 !important;
+    min-height: 190px !important;
+    display: grid !important;
+    grid-template-columns: 64px minmax(0,1fr) auto !important;
+    grid-template-rows: auto auto 1fr !important;
+    grid-template-areas:
+      "top top launch"
+      "icon title launch"
+      "icon desc launch" !important;
+    column-gap: 18px !important;
+    row-gap: 2px !important;
+    align-items: center !important;
+    padding: 26px 30px !important;
+  }
+  .tools-grid > .tool-card:last-child:nth-child(odd) .tool-top { grid-area: top !important; }
+  .tools-grid > .tool-card:last-child:nth-child(odd) .tool-icon { grid-area: icon !important; width: 52px !important; height: 52px !important; margin: 0 !important; }
+  .tools-grid > .tool-card:last-child:nth-child(odd) h3 { grid-area: title !important; margin: 0 0 3px !important; font-size: 1.12rem !important; }
+  .tools-grid > .tool-card:last-child:nth-child(odd) p { grid-area: desc !important; max-width: 62ch !important; margin: 0 !important; }
+  .tools-grid > .tool-card:last-child:nth-child(odd) .launch { grid-area: launch !important; align-self: center !important; margin: 0 !important; white-space: nowrap; }
+}
+
+/* Stock Analysis uses the same open hero hierarchy as the other tools. */
+.tool-page .stock-hero-card {
+  max-width: 760px !important;
+  margin: 0 auto 30px !important;
+  padding: 6px 0 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+.tool-page .stock-hero-card .pill {
+  display: inline-flex !important;
+  margin: 0 auto 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--site-text-faint) !important;
+  font-size: .72rem !important;
+  font-weight: 600 !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+}
+.tool-page .stock-hero-card h1 {
+  margin: 0 0 12px !important;
+  color: var(--site-text) !important;
+  font-size: clamp(2.20rem,5vw,2.85rem) !important;
+  font-weight: 700 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -.035em !important;
+}
+.tool-page .stock-hero-card > p {
+  max-width: 650px !important;
+  margin: 0 auto !important;
+  color: var(--site-text-muted) !important;
+  font-size: .92rem !important;
+  line-height: 1.7 !important;
+}
+.tool-page .stock-hero-card .search {
+  width: min(760px,100%) !important;
+  margin: 22px auto 0 !important;
+  padding: 10px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto auto !important;
+  gap: 8px !important;
+  align-items: center !important;
+  background: linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),rgba(255,255,255,.025) !important;
+  border: 1px solid var(--site-glass-border) !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08),0 8px 24px rgba(0,0,0,.10) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+  backdrop-filter: blur(16px) saturate(150%) !important;
+}
+html[data-theme="light"] .tool-page .stock-hero-card .search {
+  background: rgba(255,255,255,.50) !important;
+  border-color: rgba(255,255,255,.82) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.98),0 8px 24px rgba(46,65,90,.08) !important;
+}
+.tool-page .stock-hero-card .search input { min-width: 0 !important; }
+.tool-page .stock-hero-card .search button { min-height: 44px !important; padding-inline: 15px !important; border-radius: 14px !important; }
+.tool-page .stock-hero-card + .card { padding: 16px !important; }
+.tool-page .stock-hero-card + .card .chart-wrap { min-height: 310px; }
+.tool-page .two-col .card.grid {
+  background: rgba(255,255,255,.018) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+.tool-page .two-col .card.grid .kpi {
+  background: rgba(255,255,255,.025) !important;
+  border-color: rgba(255,255,255,.09) !important;
+}
+
+/* Nested controls should feel lighter than their parent glass surface. */
+.tool-page .mode-switcher,
+.tool-page .nat-unified {
+  background: rgba(255,255,255,.018) !important;
+  border-color: rgba(255,255,255,.09) !important;
+  border-radius: 20px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+}
+.tool-page .mode-switcher .mode-btn,
+.tool-page .nat-unified .nat-btn,
+.tool-page .panel-tabs .tab {
+  box-shadow: none !important;
+}
+.tool-page .mode-switcher .mode-btn:not(.active):not(.active-simple),
+.tool-page .nat-unified .nat-btn:not(.active),
+.tool-page .panel-tabs .tab:not(.is-active) {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+.tool-page .mode-switcher .mode-btn.active,
+.tool-page .mode-switcher .mode-btn.active-simple,
+.tool-page .nat-unified .nat-btn.active,
+.tool-page .panel-tabs .tab.is-active {
+  color: var(--site-text) !important;
+  background: rgba(0,122,255,.14) !important;
+  border-color: rgba(0,122,255,.30) !important;
+}
+html[data-theme="light"] .tool-page .mode-switcher,
+html[data-theme="light"] .tool-page .nat-unified {
+  background: rgba(255,255,255,.28) !important;
+  border-color: rgba(255,255,255,.68) !important;
+}
+html[data-theme="light"] .tool-page .mode-switcher .mode-btn.active,
+html[data-theme="light"] .tool-page .mode-switcher .mode-btn.active-simple,
+html[data-theme="light"] .tool-page .nat-unified .nat-btn.active,
+html[data-theme="light"] .tool-page .panel-tabs .tab.is-active {
+  color: #0f172a !important;
+  background: rgba(0,98,204,.10) !important;
+  border-color: rgba(0,98,204,.24) !important;
+}
+.tool-page .simple-result .winner-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* QR preview is intentionally quieter than the editing surface. */
+.tool-page .preview-card {
+  background: linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.004)),rgba(255,255,255,.016) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.10),0 6px 20px rgba(0,0,0,.08) !important;
+}
+html[data-theme="light"] .tool-page .preview-card {
+  background: rgba(255,255,255,.38) !important;
+}
+.tool-page .qr-box { padding: 18px !important; }
+
+/* Wheel stays playful, but its saturation now sits inside the portfolio palette. */
+.tool-page #wheelCanvas {
+  filter: saturate(.76) contrast(.98) !important;
+}
+html[data-theme="light"] .tool-page #wheelCanvas { filter: saturate(.72) contrast(.97) !important; }
+.tool-page .spin-center {
+  box-shadow: 0 10px 30px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.16) !important;
+}
+
+/* Small rhythm improvements across dense tools. */
+.tool-page .card + .card,
+.tool-page .panel + .panel { margin-top: 0; }
+.tool-page .two-col { gap: 18px !important; }
+.tool-page .workspace { gap: 18px !important; }
+.tool-page .main-grid { gap: 18px !important; }
+.tool-page .factors-card { margin-top: 16px !important; }
+.tool-page .tool-breadcrumb + .stock-hero-card { margin-top: -4px !important; }
+
+@media (max-width:700px) {
+  .tools-grid > .tool-card:last-child:nth-child(odd) {
+    display: flex !important;
+    min-height: 205px !important;
+    padding: 22px !important;
+  }
+  .tools-grid > .tool-card:last-child:nth-child(odd) .tool-icon { width: 42px !important; height: 42px !important; margin-top: 24px !important; }
+  .tools-grid > .tool-card:last-child:nth-child(odd) h3 { margin: 16px 0 8px !important; font-size: 1.05rem !important; }
+  .tools-grid > .tool-card:last-child:nth-child(odd) p { margin: 0 0 18px !important; }
+  .tools-grid > .tool-card:last-child:nth-child(odd) .launch { margin-top: auto !important; }
+  .tool-page .stock-hero-card { margin-bottom: 24px !important; }
+  .tool-page .stock-hero-card .search {
+    grid-template-columns: 1fr 1fr !important;
+    padding: 9px !important;
+  }
+  .tool-page .stock-hero-card .search input { grid-column: 1 / -1 !important; }
+  .tool-page .stock-hero-card .search button { width: 100% !important; }
+  .tool-page .stock-hero-card + .card .chart-wrap { min-height: 250px; }
+  .tool-page .mode-switcher,
+  .tool-page .nat-unified { padding: 14px !important; }
+}

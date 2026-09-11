@@ -26,9 +26,11 @@ The tools site intentionally shares the visual language of `oalfawzan.sa`.
 
 - `assets/css/oalfawzan-theme.css` is the final shared visual layer.
 - It mirrors the portfolio's system font stack, blue accent, liquid-glass material, rounded navigation, spacing, light/dark theme behavior, and mobile blur optimization.
+- Every current tool loads the shared theme directly in `<head>` after its runtime CSS. This prevents a late visual restyle on slower devices.
+- `assets/js/platform.js` keeps a fallback theme loader for future or legacy pages that do not yet include the stylesheet directly.
 - Tool-specific CSS remains responsible for each tool's functional layout and specialized components.
-- `assets/js/platform.js` loads the shared visual layer on tool pages so new and existing tools keep the same visual identity without duplicating theme CSS.
-- The background artwork is shared from `https://oalfawzan.sa/image-1600.webp` to keep both sites visually synchronized.
+- The shared theme also contains the validated cross-tool refinements for homepage card balance, Stock Analysis hierarchy, nested glass surfaces, QR preview emphasis, and Wheel visual saturation.
+- The background artwork is shared from `https://oalfawzan.sa/image-1600.webp` so both sites retain the same visual backdrop.
 
 When adding a new tool, preserve this separation: tool CSS controls structure and behavior; the shared visual layer controls brand appearance.
 
@@ -58,9 +60,10 @@ For a new tool:
 
 1. Create `/<tool-name>/index.html`.
 2. Add page-specific assets under `assets/css/pages` or `assets/js/pages` when needed.
-3. Load `/assets/js/platform.js` on the page so the shared visual system is applied.
-4. Add the tool card to the root `index.html`.
-5. Verify internal links, accessibility, mobile behavior, theme switching, and JavaScript syntax before merging.
+3. Load the tool-specific CSS, runtime CSS, then `/assets/css/oalfawzan-theme.css` in that order.
+4. Load `/assets/js/platform.js` for shared theme, language, notification, clipboard, and accessibility helpers.
+5. Add the tool card to the root `index.html`.
+6. Verify internal links, accessibility, mobile behavior, theme switching, first-paint styling, and JavaScript syntax before merging.
 
 ## Quality goals
 
@@ -68,6 +71,7 @@ For a new tool:
 - Keyboard-visible focus and browser zoom support.
 - Clear labels and status feedback for interactive controls.
 - Consistent liquid-glass design across the homepage and all tools.
+- Shared navigation and hero hierarchy across tools.
 - No secrets or credentials in client-side code.
 - Third-party dependencies kept explicit and limited.
 - No orphaned pages or unused tool-specific assets.
