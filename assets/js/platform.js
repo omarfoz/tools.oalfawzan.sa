@@ -16,6 +16,13 @@
     mobileLink.href = '/assets/css/mobile-enhancements.css?v=20260911';
     document.head.append(mobileLink);
   }
+  if (!document.getElementById('tool-parity')) {
+    const parityLink = document.createElement('link');
+    parityLink.id = 'tool-parity';
+    parityLink.rel = 'stylesheet';
+    parityLink.href = '/assets/css/tool-parity.css?v=20260912a';
+    document.head.append(parityLink);
+  }
 
   const API = {};
   const THEME_KEY='tools-theme', LANG_KEY='tools-language', LEGACY_THEME='tools_theme', LEGACY_LANG='tools_lang', OFFER_LANG='offer_lang';
