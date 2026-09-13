@@ -1,5 +1,18 @@
 /* Page-level parity refinements loaded after the homepage-derived shared theme. */
 
+/* The legacy tool runtime assigns a solid background to `.tool-page` (the body).
+   Reassert the homepage scene here so every tool uses the same glass backdrop. */
+body.tool-page {
+  background:
+    linear-gradient(rgba(13,22,45,.84), rgba(1,2,4,.94)),
+    url('https://oalfawzan.sa/image-1600.webp') center / cover fixed !important;
+  background-color: var(--site-bg) !important;
+}
+html[data-theme="light"] body.tool-page {
+  background: url('https://oalfawzan.sa/image-1600.webp') center / cover fixed !important;
+  background-color: var(--site-bg) !important;
+}
+
 /* Wheel of Names: use the same centered hero hierarchy as the other tools. */
 .tool-page .tool-heading {
   display: block !important;
