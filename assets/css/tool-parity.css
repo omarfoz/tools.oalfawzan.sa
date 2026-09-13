@@ -180,3 +180,39 @@ html[data-theme="light"] .tool-page .mode-tabs .mode-tab.active {
     overflow-x: auto !important;
   }
 }
+
+/* Keep the Offer Comparator's own actions, but give its compact header the
+   exact homepage glass shell instead of turning it into a second row. */
+@media (max-width:600px) {
+  body.tool-page:has(#saveBtn) header.site-header {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto !important;
+    min-height: 60px !important;
+    padding: 7px 14px !important;
+    width: calc(100% + 24px) !important;
+    margin: 16px -12px 38px !important;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.004) 58%),
+      var(--site-glass-fill) !important;
+    border: 1px solid var(--site-glass-border) !important;
+    border-radius: 26px !important;
+    box-shadow: inset 0 1px 0 var(--site-glass-highlight), 0 8px 26px var(--site-glass-shadow) !important;
+    -webkit-backdrop-filter: blur(var(--site-glass-blur)) saturate(var(--site-glass-saturation)) !important;
+    backdrop-filter: blur(var(--site-glass-blur)) saturate(var(--site-glass-saturation)) !important;
+  }
+  body.tool-page:has(#saveBtn) header.site-header .brand {
+    justify-self: auto !important;
+  }
+  body.tool-page:has(#saveBtn) header.site-header .header-actions {
+    width: auto !important;
+    max-width: none !important;
+    justify-content: flex-end !important;
+    overflow: visible !important;
+  }
+  body.tool-page:has(#saveBtn) header.site-header button {
+    min-width: 34px !important;
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 7px 10px !important;
+  }
+}
