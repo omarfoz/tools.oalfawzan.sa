@@ -200,6 +200,7 @@ function addChartSeries(type, options){
 function initChart(){
   const container = document.getElementById('priceChart');
   if(!container || chartApi) return;
+  const compactChart = window.matchMedia('(max-width: 600px)').matches;
 
   chartApi = LightweightCharts.createChart(container, {
     width: container.clientWidth,
@@ -207,8 +208,8 @@ function initChart(){
     layout: { background: { color: '#0b0f14' }, textColor: '#aaa' },
     grid: { vertLines: { color: 'rgba(255,255,255,0.05)' }, horzLines: { color: 'rgba(255,255,255,0.05)' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: 'rgba(255,255,255,0.12)' },
-    timeScale: { borderColor: 'rgba(255,255,255,0.12)', rightOffset: 8, barSpacing: 8, fixLeftEdge: false },
+    rightPriceScale: { borderColor: 'rgba(255,255,255,0.12)', minimumWidth: compactChart ? 48 : 0 },
+    timeScale: { borderColor: 'rgba(255,255,255,0.12)', rightOffset: compactChart ? 2 : 8, barSpacing: compactChart ? 6 : 8, fixLeftEdge: false },
     localization: { locale: currentLang === 'ar' ? 'ar-SA' : 'en-US' },
     handleScale: { axisPressedMouseMove: true, mouseWheel: true, pinch: true },
     handleScroll: { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: true, kineticScroll: { touch: true, mouse: true } }
@@ -231,6 +232,10 @@ function initChart(){
 
   const tooltip = document.getElementById('chartTooltip');
   chartApi.subscribeCrosshairMove((param) => {
+    if(compactChart){
+      tooltip.style.display = 'none';
+      return;
+    }
     if(!param.point || !param.time || !param.seriesData.size){
       tooltip.style.display = 'none';
       return;
