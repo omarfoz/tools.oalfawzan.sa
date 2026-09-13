@@ -47,6 +47,16 @@ const I18N = {
 
 let currentLang = localStorage.getItem('tools_lang') || 'ar';
 let currentTheme = localStorage.getItem('tools_theme') || 'dark';
+const themeIcons = {
+  sun: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>'
+};
+
+function updateThemeIcon() {
+  const button = document.getElementById('themeBtn');
+  button.innerHTML = currentTheme === 'light' ? themeIcons.moon : themeIcons.sun;
+  button.setAttribute('aria-label', currentTheme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+}
 let currentTicker = '';
 let chartApi;
 let candleSeries;
@@ -82,7 +92,7 @@ function applyTheme(theme){
   currentTheme = theme === 'light' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', currentTheme);
   localStorage.setItem('tools_theme', currentTheme);
-  document.getElementById('themeBtn').textContent = currentTheme === 'light' ? t('themeDark') : t('themeLight');
+  updateThemeIcon();
   if(chartDataCache) drawChart(chartDataCache);
 }
 
@@ -109,7 +119,7 @@ function applyLanguage(lang){
   document.getElementById('kpiVolumeLabel').textContent = s.volume;
   document.getElementById('kpiTickerLabel').textContent = s.ticker;
   document.getElementById('langBtn').textContent = s.langBtn;
-  document.getElementById('themeBtn').textContent = currentTheme === 'light' ? s.themeDark : s.themeLight;
+  updateThemeIcon();
   if(!lastMetrics) document.getElementById('aiText').textContent = s.aiInitial;
   localStorage.setItem('tools_lang', currentLang);
 }
