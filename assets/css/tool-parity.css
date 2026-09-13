@@ -164,6 +164,33 @@ html[data-theme="light"] .tool-page .mode-tabs .mode-tab.active {
   .tool-page .quick-actions { margin-top: 14px !important; }
 }
 
+/* Offer Comparator: make the busy action header read as a deliberate mobile
+   toolbar instead of compressing the brand and four controls into one row. */
+@media (max-width:600px) {
+  body.tool-page:has(#saveBtn) header.site-header {
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    gap: 10px !important;
+    padding: 12px !important;
+    margin-bottom: 22px !important;
+  }
+  body.tool-page:has(#saveBtn) header.site-header .brand {
+    justify-self: center !important;
+  }
+  body.tool-page:has(#saveBtn) header.site-header .header-actions {
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+    overflow: visible !important;
+  }
+  body.tool-page:has(#saveBtn) .back-link {
+    margin-bottom: 14px !important;
+  }
+  body.tool-page:has(#saveBtn) .hero {
+    margin-bottom: 22px !important;
+  }
+}
+
 @media (max-width:390px) {
   /* Offer has four header actions. Put them on a second row instead of crowding the brand. */
   .tool-page header.site-header:has(.header-actions > :nth-child(3)) {
