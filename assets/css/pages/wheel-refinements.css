@@ -1,0 +1,28 @@
+/* Small interaction refinements for the Wheel of Names. */
+.wheel-hit-area {
+  touch-action: manipulation;
+}
+
+.spin-button svg {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 620px) {
+  .pointer { right: 50%; }
+}
+
+/* A top pointer feels anchored to the wheel and reads consistently in RTL/LTR. */
+.pointer {
+  top: 18px;
+  right: 50%;
+  transform: translateX(50%);
+  border-top: 30px solid #fff;
+  border-right: 17px solid transparent;
+  border-bottom: 0;
+  border-left: 17px solid transparent;
+}
+
+.pointer::after {
+  left: -6px;
+  top: -25px;
+}
