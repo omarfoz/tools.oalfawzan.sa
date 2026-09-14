@@ -98,7 +98,9 @@ function convertTime(){
     const utcMs=zonedToUtcMs(tzDate.value,tzTime.value,fromZone.value);
     const target=formatInZone(utcMs,toZone.value,currentLang);
     const zoneName=toZone.options[toZone.selectedIndex]?.textContent||toZone.value;
-    setResult('tzResult',STRINGS[currentLang].tzResult.replace('{date}',`${tzDate.value} ${tzTime.value}`).replace('{to}',zoneName).replace('{time}',target));
+    const locale=currentLang==='ar'?'ar-SA':'en-GB';
+    const prettyDate=new Intl.DateTimeFormat(locale,{day:'numeric',month:'long',year:'numeric'}).format(new Date(`${tzDate.value}T00:00:00`));
+    setResult('tzResult',STRINGS[currentLang].tzResult.replace('{date}',`${prettyDate} (${tzTime.value})`).replace('{to}',zoneName).replace('{time}',target));
   }catch(e){setResult('tzResult',STRINGS[currentLang].badInput,true)}
 }
 
@@ -154,14 +156,18 @@ function convertH2G(){
   const y=+document.getElementById('hYear').value,m=+document.getElementById('hMonth').value,d=+document.getElementById('hDay').value;
   if(!y||m<1||m>12||d<1||d>30){setResult('h2gResult',STRINGS[currentLang].badInput,true);return;}
   const g=jdToGregorian(islamicToJD(y,m,d));
-  setResult('h2gResult',STRINGS[currentLang].h2gResult.replace('{date}',`${g.year}-${pad(g.month)}-${pad(g.day)}`));
+  const locale=currentLang==='ar'?'ar-SA':'en-GB';
+  const dateStr=new Intl.DateTimeFormat(locale,{day:'numeric',month:'long',year:'numeric'}).format(new Date(Date.UTC(g.year,g.month-1,g.day)));
+  setResult('h2gResult',STRINGS[currentLang].h2gResult.replace('{date}',`${dateStr} (${g.year}-${pad(g.month)}-${pad(g.day)})`));
 }
 function convertG2H(){
   const gd=document.getElementById('gDate').value;
   if(!gd){setResult('g2hResult',STRINGS[currentLang].badInput,true);return;}
   const [y,m,d]=gd.split('-').map(Number);
   const h=jdToIslamic(gregorianToJD(y,m,d)-0.5);
-  setResult('g2hResult',STRINGS[currentLang].g2hResult.replace('{date}',`${h.year}-${pad(h.month)}-${pad(h.day)}`));
+  const locale=currentLang==='ar'?'ar-SA':'en-GB';
+  const gregStr=new Intl.DateTimeFormat(locale,{day:'numeric',month:'long',year:'numeric'}).format(new Date(Date.UTC(y,m-1,d)));
+  setResult('g2hResult',STRINGS[currentLang].g2hResult.replace('{date}',`${gregStr} — ${h.year}-${pad(h.month)}-${pad(h.day)} Hijri`));
 }
 
 function applyLang(lang){

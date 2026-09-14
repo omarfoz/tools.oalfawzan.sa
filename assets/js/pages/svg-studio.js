@@ -46,12 +46,20 @@
       errAiParse: 'تعذر استخراج SVG من رد الذكاء الاصطناعي.',
       errAi: 'تعذر الاتصال بخدمة الذكاء الاصطناعي. أعد المحاولة.',
       errPng: 'تعذر تصدير PNG.', errRead: 'تعذر قراءة الملف.',
+      errCopy: 'تعذر النسخ إلى الحافظة. انسخ الكود يدويًا من المحرر.',
       aiWorking: 'جارٍ التوليد…', aiDone: 'تم توليد الرسمة وعرضها في المحرر والمعاينة.',
       aiModifying: 'جارٍ التعديل…', aiModDone: 'تم تحديث الرسمة بالتعديلات المطلوبة.',
       errAiEmpty: 'يرجى كتابة وصف للرسمة أولًا.',
       errModifyEmpty: 'اكتب تعليمات التعديل أولًا.',
       errNoSvgToModify: 'لا توجد رسمة لتعديلها — ولّد SVG أولًا أو ضع كودك في المحرر.',
-      statsNone: '—'
+      statsNone: '—',
+      zoomFit: 'ملاءمة',
+      canvasLabel: 'لوحة معاينة SVG — الأسهم للتحريك، وزرا + و− للتكبير',
+      bgSwitcherLabel: 'خلفية المعاينة',
+      bgChecker: 'خلفية رقعة الشطرنج', bgWhite: 'خلفية بيضاء', bgBlack: 'خلفية سوداء', bgTransparent: 'خلفية شفافة',
+      bgCheckerTitle: 'رقعة الشطرنج', bgWhiteTitle: 'أبيض', bgBlackTitle: 'أسود', bgTransparentTitle: 'شفاف',
+      sourceLabel: 'كود SVG المصدر',
+      uploadLabel: 'رفع ملف SVG'
     },
     en: {
       lang: 'en', dir: 'ltr',
@@ -94,12 +102,20 @@
       errAiParse: 'Could not extract SVG from the AI response.',
       errAi: 'Could not reach the AI service. Try again.',
       errPng: 'PNG export failed.', errRead: 'Could not read the file.',
+      errCopy: 'Could not copy to the clipboard. Copy the code manually from the editor.',
       aiWorking: 'Generating…', aiDone: 'SVG generated and loaded into the editor and preview.',
       aiModifying: 'Modifying…', aiModDone: 'SVG updated with your changes.',
       errAiEmpty: 'Describe the SVG you want first.',
       errModifyEmpty: 'Write your modification instructions first.',
       errNoSvgToModify: 'No SVG to modify — generate one first or put your code in the editor.',
-      statsNone: '—'
+      statsNone: '—',
+      zoomFit: 'Fit',
+      canvasLabel: 'SVG preview canvas — arrow keys pan, plus and minus zoom',
+      bgSwitcherLabel: 'Preview background',
+      bgChecker: 'Checkerboard background', bgWhite: 'White background', bgBlack: 'Black background', bgTransparent: 'Transparent background',
+      bgCheckerTitle: 'Checkerboard', bgWhiteTitle: 'White', bgBlackTitle: 'Black', bgTransparentTitle: 'Transparent',
+      sourceLabel: 'SVG source code',
+      uploadLabel: 'Upload SVG file'
     }
   };
 
@@ -231,8 +247,8 @@
   /* ── Stats + preview render ────────────────────────────────────────── */
   function formatBytes(n) {
     if (n < 1024) return n + ' B';
-    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
-    return (n / 1024 / 1024).toFixed(2) + ' MB';
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + '\u00A0KB';
+    return (n / 1024 / 1024).toFixed(2) + '\u00A0MB';
   }
 
   function clearStats() {
@@ -295,7 +311,7 @@
     live.style.height = 'auto';
     live.style.maxHeight = '100%';
     live.style.transform = '';
-    zoomHud.textContent = 'Fit';
+    zoomHud.textContent = t().zoomFit;
     zoomHud.hidden = svgHolder.hidden;
   }
 
@@ -328,6 +344,7 @@
     if (svgHolder.hidden) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     dragging = true; lastX = e.clientX; lastY = e.clientY;
+    canvasStage.classList.add('is-dragging');
     canvasStage.setPointerCapture(e.pointerId);
   });
   canvasStage.addEventListener('pointermove', e => {
@@ -337,8 +354,22 @@
     lastX = e.clientX; lastY = e.clientY;
     applyZoom();
   });
-  ['pointerup', 'pointercancel'].forEach(ev => canvasStage.addEventListener(ev, () => { dragging = false; }));
+  ['pointerup', 'pointercancel'].forEach(ev => canvasStage.addEventListener(ev, () => { dragging = false; canvasStage.classList.remove('is-dragging'); }));
   canvasStage.addEventListener('dblclick', fitToScreen);
+  /* Keyboard alternative for pan (arrow keys) when the stage is focused */
+  canvasStage.addEventListener('keydown', e => {
+    if (svgHolder.hidden) return;
+    const step = e.shiftKey ? 40 : 16;
+    if (e.key === 'ArrowLeft') { panX -= step; }
+    else if (e.key === 'ArrowRight') { panX += step; }
+    else if (e.key === 'ArrowUp') { panY -= step; }
+    else if (e.key === 'ArrowDown') { panY += step; }
+    else if (e.key === '+' || e.key === '=') { zoom *= 1.25; }
+    else if (e.key === '-' || e.key === '_') { zoom /= 1.25; }
+    else return;
+    e.preventDefault();
+    applyZoom();
+  });
 
   /* ── Background switcher ───────────────────────────────────────────── */
   $('bgSwitcher').addEventListener('click', e => {
@@ -564,7 +595,7 @@
   $('btnCopy').addEventListener('click', async () => {
     if (!svgSource.value.trim()) { setStatus(t().statusNoContent, true); return; }
     if (await copyTextRaw(svgSource.value)) setStatus(t().statusCopied);
-    else setStatus(t().errRead, true);
+    else setStatus(t().errCopy, true);
   });
   $('btnDownloadSvg').addEventListener('click', () => {
     if (!svgSource.value.trim()) { setStatus(t().statusNoContent, true); return; }
@@ -575,12 +606,14 @@
     if (!svgSource.value.trim()) { setStatus(t().statusNoContent, true); return; }
     const uri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgSource.value);
     if (await copyTextRaw(uri)) setStatus(t().statusCopied);
+    else setStatus(t().errCopy, true);
   });
   $('btnCopyBase64').addEventListener('click', async () => {
     if (!svgSource.value.trim()) { setStatus(t().statusNoContent, true); return; }
     try {
       const b64 = btoa(unescape(encodeURIComponent(svgSource.value)));
       if (await copyTextRaw(b64)) setStatus(t().statusCopied);
+      else setStatus(t().errCopy, true);
     } catch (_) { setStatus(t().errRead, true); }
   });
 
@@ -641,7 +674,6 @@
     svgSource.value = '';
     pushHistory('');
     refreshHighlight(); renderPreview();
-    stageEmpty.textContent = '';
     setStatus(t().statusCleared);
   });
 
@@ -703,7 +735,7 @@
       $('aiIterate').hidden = false;
       setAiStatus(t().aiDone);
     } catch (err) {
-      setAiStatus(err.message === 'extract' ? t().errAiParse : t().errSanitize, true);
+      setAiStatus(err.message === 'extract' ? t().errAiParse : t().errAi, true);
     } finally {
       aiBusy(false);
     }
@@ -754,6 +786,21 @@
     document.title = s.title;
     const meta = document.querySelector('meta[name="description"]');
     if (meta) meta.setAttribute('content', s.meta);
+    /* Accessible names follow the UI language */
+    $('canvasStage').setAttribute('aria-label', s.canvasLabel);
+    $('bgChecker').setAttribute('aria-label', s.bgChecker);
+    $('bgWhite').setAttribute('aria-label', s.bgWhite);
+    $('bgBlack').setAttribute('aria-label', s.bgBlack);
+    $('bgTransparent').setAttribute('aria-label', s.bgTransparent);
+    $('bgSwitcher').setAttribute('aria-label', s.bgSwitcherLabel);
+    $('svgSource').setAttribute('aria-label', s.sourceLabel);
+    $('aiPrompt').setAttribute('aria-label', s.aiPromptLabel);
+    $('aiModify').setAttribute('aria-label', s.lblModify);
+    $('fileInput').setAttribute('aria-label', s.uploadLabel);
+    $('bgChecker').setAttribute('title', s.bgCheckerTitle);
+    $('bgWhite').setAttribute('title', s.bgWhiteTitle);
+    $('bgBlack').setAttribute('title', s.bgBlackTitle);
+    $('bgTransparent').setAttribute('title', s.bgTransparentTitle);
     $('tag').textContent = s.tag;
     $('title').textContent = s.heading;
     $('desc').textContent = s.desc;

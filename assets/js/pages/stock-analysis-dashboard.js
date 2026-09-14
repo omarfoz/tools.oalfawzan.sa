@@ -73,6 +73,8 @@ let lastMetrics = null;
 
 function t(key){ return I18N[currentLang][key] || I18N.en[key] || key; }
 function fmt(v){ return Number.isFinite(v) ? Number(v).toFixed(2) : '—'; }
+/* Escape external API / user data before it enters innerHTML */
+function escHtml(v){ return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;'); }
 function getFavorites(){ try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); } catch { return []; } }
 function setFavorites(v){ localStorage.setItem(FAVORITES_KEY, JSON.stringify(v)); }
 function toChartDate(ts){ return new Date(ts * 1000).toISOString().slice(0,10); }
@@ -95,6 +97,8 @@ function applyTheme(theme){
   updateThemeIcon();
   if(chartDataCache) drawChart(chartDataCache);
 }
+// Keep a reference so theme-triggered redraws still have access to computed metrics
+let lastMetricsForChart = null;
 
 function applyLanguage(lang){
   currentLang = lang === 'en' ? 'en' : 'ar';
@@ -254,6 +258,7 @@ function initChart(){
 async function drawChart(payload){
   if(!payload?.candles?.length) return;
   chartDataCache = payload;
+  if(payload.metrics) lastMetricsForChart = payload.metrics;
   if(!chartVisible) return;
   await ensureChartLibrary();
   initChart();
@@ -265,8 +270,13 @@ async function drawChart(payload){
   volumeSeries.setData(payload.volume);
   if(supportLine) candleSeries.removePriceLine(supportLine);
   if(resistanceLine) candleSeries.removePriceLine(resistanceLine);
-  supportLine = candleSeries.createPriceLine({ price: 170.10, color: '#26a69a', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Support 170.10' });
-  resistanceLine = candleSeries.createPriceLine({ price: 340, color: '#ef5350', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: 'Resistance 340' });
+  // Use the computed support/resistance from the analyzed data instead of hardcoded values
+  const metrics = payload.metrics ?? lastMetricsForChart;
+  const support = metrics?.support ?? payload.candles[payload.candles.length - 1].close;
+  const resistance = metrics?.resistance ?? support;
+  const priceFmt = v => Number(v).toFixed(2);
+  supportLine = candleSeries.createPriceLine({ price: support, color: '#26a69a', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: `${t('support')} ${priceFmt(support)}` });
+  resistanceLine = candleSeries.createPriceLine({ price: resistance, color: '#ef5350', lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: `${t('resistance')} ${priceFmt(resistance)}` });
   chartApi.timeScale().fitContent();
 }
 
@@ -299,7 +309,13 @@ function renderMetrics(ticker, metrics){
 
 async function analyzeTicker(ticker){
   const cleanTicker = String(ticker || '').trim();
-  if(!/^\d{4}$/.test(cleanTicker)) return alert(t('invalidTicker'));
+  if(!/^\d{4}$/.test(cleanTicker)) { setInlineError(t('invalidTicker')); return; }
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const prevLabel = analyzeBtn.textContent;
+  analyzeBtn.disabled = true;
+  analyzeBtn.setAttribute('aria-busy','true');
+  analyzeBtn.textContent = t('analyzing');
+  setInlineError(null);
   document.getElementById('aiText').textContent = t('analyzing');
   currentTicker = cleanTicker;
   try {
@@ -320,15 +336,40 @@ async function analyzeTicker(ticker){
     };
     lastMetrics = metrics;
     renderMetrics(cleanTicker, metrics);
-    await drawChart({ candles, sma10, sma50, sma200, volume: volumeData });
+    await drawChart({ candles, sma10, sma50, sma200, volume: volumeData, metrics });
     document.getElementById('aiText').textContent = await getAiRecommendation(metrics);
   } catch {
     document.getElementById('aiText').textContent = t('failed');
+  } finally {
+    analyzeBtn.disabled = false;
+    analyzeBtn.removeAttribute('aria-busy');
+    analyzeBtn.textContent = prevLabel === t('analyzing') ? t('analyze') : prevLabel;
   }
 }
 
+/* Inline, dismissible-by-next-action validation message instead of alert() */
+function setInlineError(msg){
+  let el = document.getElementById('tickerError');
+  if(!msg){
+    if(el) el.hidden = true;
+    document.getElementById('tickerInput').removeAttribute('aria-invalid');
+    return;
+  }
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'tickerError';
+    el.className = 'ticker-error';
+    el.setAttribute('role','alert');
+    document.getElementById('tickerInput').insertAdjacentElement('afterend', el);
+  }
+  el.textContent = msg;
+  el.hidden = false;
+  document.getElementById('tickerInput').setAttribute('aria-invalid','true');
+  document.getElementById('tickerInput').focus();
+}
+
 function saveFavorite(){
-  if(!currentTicker) return alert(t('favoriteFirst'));
+  if(!currentTicker){ setInlineError(t('favoriteFirst')); return; }
   const favs = getFavorites();
   if(!favs.includes(currentTicker)) favs.unshift(currentTicker);
   setFavorites(favs.slice(0,20));
@@ -343,7 +384,7 @@ function renderFavorites(){
   favs.forEach(symbol => {
     const row = document.createElement('div');
     row.className = 'stock-item';
-    row.innerHTML = `<div><strong>${symbol}.SR</strong></div><div><button type="button" class="ghost" data-load="${symbol}">${t('load')}</button> <button type="button" class="ghost" data-del="${symbol}">${t('remove')}</button></div>`;
+    row.innerHTML = `<div><strong>${escHtml(symbol)}.SR</strong></div><div><button type="button" class="ghost" data-load="${escHtml(symbol)}">${t('load')}</button> <button type="button" class="ghost" data-del="${escHtml(symbol)}">${t('remove')}</button></div>`;
     list.appendChild(row);
   });
 }
@@ -396,7 +437,7 @@ async function renderTrending(){
       const row = document.createElement('div');
       const change = Number(q.changePercent || 0);
       row.className = 'stock-item';
-      row.innerHTML = `<div class="stock-item-main"><strong>${q.symbol}</strong><div class="muted">${q.name || ''}</div></div><div class="stock-item-side"><div style="text-align:right"><div>${fmt(q.price)}</div><div style="color:${change>=0?'var(--green)':'var(--danger)'}">${change.toFixed(2)}%</div></div><button type="button" class="ghost" data-load="${q.symbol.replace('.SR','')}">${t('analyze')}</button></div>`;
+      row.innerHTML = `<div class="stock-item-main"><strong>${escHtml(q.symbol)}</strong><div class="muted">${escHtml(q.name || '')}</div></div><div class="stock-item-side"><div style="text-align:right"><div>${fmt(q.price)}</div><div style="color:${change>=0?'var(--green)':'var(--danger)'}">${change.toFixed(2)}%</div></div><button type="button" class="ghost" data-load="${escHtml(q.symbol.replace('.SR',''))}">${t('analyze')}</button></div>`;
       list.appendChild(row);
     });
   } catch { list.innerHTML = `<div class="muted">${t('trendingFail')}</div>`; }

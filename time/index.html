@@ -8,7 +8,7 @@
 <script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
 <meta name="theme-color" content="#010204">
 <meta name="description" content="تحويل الوقت بين المناطق الزمنية، حساب الفترات بين الأوقات، وجمع الساعات بسرعة.">
-<link rel="stylesheet" href="/assets/css/pages/time.css">
+<link rel="stylesheet" href="/assets/css/pages/time.css?v=20260914b">
 <link rel="stylesheet" href="/assets/css/tool-runtime.css?v=20260911c">
 <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911c">
 <link rel="stylesheet" href="/assets/css/tool-parity.css?v=20260914a">
@@ -39,7 +39,7 @@
       <label><span id="toLabel">إلى منطقة</span><select id="toZone" aria-label="Destination time zone"></select></label>
     </div>
     <div class="actions"><button class="btn primary" id="convertTimeBtn" type="button">تحويل الوقت</button></div>
-    <div class="result" id="tzResult" data-empty="true"></div>
+    <div class="result" id="tzResult" aria-live="polite" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -49,7 +49,7 @@
       <label><span id="endLabel">إلى تاريخ</span><div class="picker-field" data-kind="date"><input type="date" id="endDate" aria-label="End date"><div class="picker-value" data-for="endDate"></div></div></label>
     </div>
     <div class="actions"><button class="btn primary" id="calcDaysBtn" type="button">احسب الفرق</button></div>
-    <div class="result" id="daysResult" data-empty="true"></div>
+    <div class="result" id="daysResult" aria-live="polite" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -59,7 +59,7 @@
       <label><span id="durationEndLabel">إلى وقت</span><div class="picker-field" data-kind="time"><input type="time" id="durationEnd" value="12:00" aria-label="End date and time"><div class="picker-value" data-for="durationEnd"></div></div></label>
     </div>
     <div class="actions"><button class="btn primary" id="durationBtn" type="button">احسب المدة</button></div>
-    <div class="result" id="durationResult" data-empty="true"></div>
+    <div class="result" id="durationResult" aria-live="polite" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -79,7 +79,7 @@
       </label>
     </div>
     <div class="actions"><button class="btn primary" id="addHoursBtn" type="button">احسب الوقت الجديد</button></div>
-    <div class="result" id="addHoursResult" data-empty="true"></div>
+    <div class="result" id="addHoursResult" aria-live="polite" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -90,7 +90,7 @@
       <label><span id="hdLabel">يوم هجري</span><input type="number" id="hDay" min="1" max="30" value="1" aria-label="Hijri day"></label>
     </div>
     <div class="actions"><button class="btn primary" id="h2gBtn" type="button">حوّل لميلادي</button></div>
-    <div class="result" id="h2gResult" data-empty="true"></div>
+    <div class="result" id="h2gResult" aria-live="polite" data-empty="true"></div>
   </article>
 
   <article class="panel">
@@ -99,12 +99,12 @@
       <label><span id="gDateLabel">التاريخ الميلادي</span><div class="picker-field" data-kind="date"><input type="date" id="gDate" aria-label="Gregorian date"><div class="picker-value" data-for="gDate"></div></div></label>
     </div>
     <div class="actions"><button class="btn primary" id="g2hBtn" type="button">حوّل لهجري</button></div>
-    <div class="result" id="g2hResult" data-empty="true"></div>
+    <div class="result" id="g2hResult" aria-live="polite" data-empty="true"></div>
   </article>
 </section>
 <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo" style="font-size:.72rem">Omar Alfawzan</a></footer>
 </div>
-<script defer src="/assets/js/pages/time.js?v=20260914a"></script>
+<script defer src="/assets/js/pages/time.js?v=20260914b"></script>
 <script defer src="/assets/js/platform.js"></script>
 </body>
 </html>

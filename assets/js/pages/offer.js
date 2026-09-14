@@ -142,8 +142,12 @@ function init() {
   $('noticeA').addEventListener('input', e => { state.noticeA = +e.target.value || null; autosave(); });
   $('noticeB').addEventListener('input', e => { state.noticeB = +e.target.value || null; autosave(); });
 
-  // Restore mode
-  try { const m = localStorage.getItem('offer_mode'); if (m === 'detailed') { setMode('detailed'); } else { setMode('simple'); } } catch { setMode('simple'); }
+  // Restore mode (URL ?mode= wins, then saved preference)
+  try {
+    const urlMode = new URL(location.href).searchParams.get('mode');
+    const m = (urlMode === 'simple' || urlMode === 'detailed') ? urlMode : localStorage.getItem('offer_mode');
+    if (m === 'detailed') { setMode('detailed'); } else { setMode('simple'); }
+  } catch { setMode('simple'); }
 }
 
 function updateVacDiff() {
@@ -159,6 +163,16 @@ function updateVacDiff() {
 // ── Mode (Simple / Detailed) ──────────────────────────────────────
 let currentMode = 'simple';
 
+/* Keep the mode in the URL (?mode=simple|detailed) so it is deep-linkable */
+function syncModeUrl(mode) {
+  try {
+    const url = new URL(location.href);
+    if (mode === 'simple') url.searchParams.delete('mode');
+    else url.searchParams.set('mode', mode);
+    history.replaceState(null, '', url);
+  } catch {}
+}
+
 function setMode(mode) {
   currentMode = mode;
   document.body.classList.remove('mode-simple', 'mode-detailed');
@@ -171,6 +185,7 @@ function setMode(mode) {
   if ($('totalsBar'))   $('totalsBar').style.display   = 'none';
   // persist
   try { localStorage.setItem('offer_mode', mode); } catch {}
+  syncModeUrl(mode);
   // update compare button label
   updateModeLabels();
 }
@@ -234,11 +249,11 @@ function renderFields(side) {
     summaryRow.innerHTML = `
       <div class="summary-gross">
         <span class="summary-label">${t('gross_monthly')}</span>
-        <span class="summary-value" style="color:${color}">SAR ${Math.round(grossVal).toLocaleString('en-SA')}</span>
+        <span class="summary-value" style="color:${color}">SAR ${fmtNum(grossVal)}</span>
       </div>
       <div class="summary-net">
         <span class="summary-label">${t('net_monthly_salary')}</span>
-        <span class="summary-value" style="color:${color}">SAR ${Math.round(netVal).toLocaleString('en-SA')}</span>
+        <span class="summary-value" style="color:${color}">SAR ${fmtNum(netVal)}</span>
       </div>
     `;
     con.appendChild(summaryRow);
@@ -312,8 +327,9 @@ function makeRow(f, side) {
     </div>
     <button type="button" class="type-btn ${f.isDeduction ? 'deduction' : ''}"
       title="${f.isDeduction ? t('deduction_toggle') : t('addition_toggle')}"
+      aria-label="${f.isDeduction ? t('deduction_toggle') : t('addition_toggle')}"
       onclick="toggleDeduction('${side}','${f.id}')">${f.isDeduction ? '−' : '+'}</button>
-    <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="Remove field">${offerIcon('close')}</button>
+    <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="${t('remove_field')}" aria-label="${t('remove_field')} — ${esc(fieldAccessibleName)}">${offerIcon('close')}</button>
   `;
 
   // Double-click to edit in popup
@@ -325,7 +341,35 @@ function makeRow(f, side) {
   return row;
 }
 
+/* Locale-aware number formatting: Arabic UI gets Arabic numerals via Intl */
+function fmtNum(n) {
+  try { return new Intl.NumberFormat(currentLang === 'ar' ? 'ar-SA' : 'en-US').format(Math.round(n)); }
+  catch { return String(Math.round(n)); }
+}
 function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+/* Inline status message (replaces alert()) — falls back to a temporary fixed toast */
+function setOfferStatus(msg, isError) {
+  if (window.ToolsPlatform && window.ToolsPlatform.notify) {
+    window.ToolsPlatform.notify(msg, isError ? 'error' : 'success');
+    return;
+  }
+  let el = document.getElementById('offerStatusToast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'offerStatusToast';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    el.style.cssText = 'position:fixed;inset-inline-end:16px;bottom:16px;z-index:99999;max-width:min(360px,calc(100vw - 32px));padding:12px 14px;border-radius:12px;border:1px solid var(--danger,#ef4444);background:var(--surface,#11151d);color:var(--danger,#ef4444);font-size:.82rem;font-weight:600;box-shadow:0 18px 50px rgba(0,0,0,.25)';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.borderColor = isError ? 'var(--danger,#ef4444)' : 'var(--success,#20d4a2)';
+  el.style.color = isError ? 'var(--danger,#ef4444)' : 'var(--success,#20d4a2)';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.textContent = ''; el.style.display = 'none'; }, 3200);
+  el.style.display = 'block';
+}
 
 // ── Value resolution ──────────────────────────────────────────────
 function resolveValue(f, fields) {
@@ -380,6 +424,7 @@ function openAddField(side) {
   populatePctRef2(side, null, null);
   if ($('pIsMonths')) $('pIsMonths').checked = false;
   togglePctMode();
+  popupOpener = document.activeElement;
   $('popupOverlay').classList.add('open');
   setTimeout(() => $('pName').focus(), 80);
 }
@@ -414,6 +459,7 @@ function openEditField(side, id) {
   populatePctRef2(side, f.pctRef2, id);
   if ($('pIsMonths')) $('pIsMonths').checked = !!(f.isMonths);
   togglePctMode();
+  popupOpener = document.activeElement;
   $('popupOverlay').classList.add('open');
 }
 
@@ -492,15 +538,32 @@ function confirmField() {
   closePopup();
 }
 
-function closePopup() { $('popupOverlay').classList.remove('open'); }
+/* Track the element that opened the popup so focus can be returned on close */
+let popupOpener = null;
+function closePopup() {
+  $('popupOverlay').classList.remove('open');
+  if (popupOpener && document.contains(popupOpener)) { try { popupOpener.focus(); } catch {} }
+  popupOpener = null;
+}
 $('popupOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closePopup(); });
+/* Focus trap: keep Tab cycling inside the modal while it is open */
+$('popupOverlay').addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  const popup = $('popupOverlay').querySelector('.popup');
+  const focusables = popup ? [...popup.querySelectorAll('button,input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(el => !el.disabled && el.offsetParent !== null) : [];
+  if (!focusables.length) return;
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
 
 // ── Calculate ─────────────────────────────────────────────────────
 function liveUpdate() {
   try {
     const a = computeSide('A');
     const b = computeSide('B');
-    const fmtK = n => 'SAR ' + Math.round(n).toLocaleString('en-SA');
+    const fmtK = n => 'SAR ' + fmtNum(n);
     // Detailed mode: update overall card
     if ($('oYearA') && currentMode === 'detailed') {
       $('oYearA').textContent  = fmtK(a.yearBenefits);
@@ -582,7 +645,7 @@ function calculate() {
   const pg = a.gross   ? (b.gross   - a.gross)   / a.gross   : 0;
   const pn = a.net     ? (b.net     - a.net)     / a.net     : 0;
   const py = a.yearly  ? (b.yearly  - a.yearly)  / a.yearly  : 0;
-  const fmtK = n => 'SAR ' + Math.round(n).toLocaleString('en-SA');
+  const fmtK = n => 'SAR ' + fmtNum(n);
 
   // ── SIMPLE MODE ──────────────────────────────────────────────────
   if (currentMode === 'simple') {
@@ -692,7 +755,7 @@ function calculate() {
   $('oMonthBadge').outerHTML = badgeHtml(poYear).replace('class="total-badge"', 'id="oMonthBadge" class="total-badge"');
 
 
-  const fmt = n => Math.round(n).toLocaleString('en-SA');
+  const fmt = n => fmtNum(n);
   const pf  = p => (p >= 0 ? '+' : '') + (p * 100).toFixed(1) + '%';
   const bdg = p => p > 0.005 ? `<span class="badge badge-up">${pf(p)}</span>` : p < -0.005 ? `<span class="badge badge-dn">${pf(p)}</span>` : `<span class="badge badge-eq">≈</span>`;
 
@@ -715,9 +778,9 @@ function calculate() {
 
   $('breakdownRows').innerHTML =
     `<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;margin-bottom:14px;padding:0 4px">
-      <span style="font-size:.72rem;color:var(--current);font-weight:700">${coA}</span>
+      <span style="font-size:.72rem;color:var(--current);font-weight:700">${esc(coA)}</span>
       <span></span>
-      <span style="font-size:.72rem;color:var(--new);font-weight:700;text-align:right">${coB}</span>
+      <span style="font-size:.72rem;color:var(--new);font-weight:700;text-align:right">${esc(coB)}</span>
     </div>` +
     rows.map(r => {
       const p = r.a ? (r.b - r.a) / Math.abs(r.a) : 0;
@@ -745,7 +808,7 @@ async function getAI(a, b, pg, pn, py) {
   $('aiText').innerHTML =
     '<div class="dot-pulse"><span></span><span></span><span></span></div>';
 
-  const fmt = n => Math.round(n).toLocaleString('en-SA');
+  const fmt = n => fmtNum(n);
   const coA = state.coA || t('current_company');
   const coB = state.coB || t('new_company');
 
@@ -895,6 +958,8 @@ const STRINGS = {
     gosi_note_non:'Non-Saudi: no GOSI deduction from employee salary',
     deduction_toggle:'Deduction — click to toggle', addition_toggle:'Addition — click to mark as deduction',
     weight_lbl:'WEIGHT %', remove_factor:'Remove',
+    remove_field:'Remove field', more_options:'More options', reset_aria:'Reset all fields to defaults',
+    export_fail:'Could not load the Excel export library. Check your connection and try again.',
     ai_unavailable:'AI unavailable. The breakdown above tells the full story.',
     breakdown_rows: {
       gross:'GROSS MONTHLY SALARY', gosi:'GOSI / DEDUCTIONS', net:'NET MONTHLY SALARY',
@@ -971,6 +1036,8 @@ const STRINGS = {
     gosi_note_non:'غير سعودي: لا يوجد اشتراك تأمينات على الموظف',
     deduction_toggle:'خصم — انقر للتبديل', addition_toggle:'إضافة — انقر للتعيين كخصم',
     weight_lbl:'الوزن %', remove_factor:'حذف',
+    remove_field:'حذف الحقل', more_options:'خيارات إضافية', reset_aria:'إعادة تعيين كل الحقول إلى الوضع الافتراضي',
+    export_fail:'تعذر تحميل مكتبة تصدير Excel. تحقق من الاتصال وحاول مجددًا.',
     ai_unavailable:'الذكاء الاصطناعي غير متاح. التفاصيل أعلاه تكفي.',
     breakdown_rows: {
       gross:'إجمالي الراتب الشهري', gosi:'التأمينات / الاستقطاعات', net:'صافي الراتب الشهري',
@@ -1034,6 +1101,11 @@ function applyLang(lang) {
   const isAr = lang === 'ar';
   document.documentElement.setAttribute('dir', isAr ? 'rtl' : 'ltr');
   document.documentElement.setAttribute('lang', isAr ? 'ar' : 'en');
+
+  // Accessible names follow the UI language
+  const menuBtnEl = $('menuBtn'), btnResetEl = $('btnReset');
+  if (menuBtnEl) menuBtnEl.setAttribute('aria-label', t('more_options'));
+  if (btnResetEl) btnResetEl.setAttribute('aria-label', t('reset_aria'));
 
   // Static data-i18n elements
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1206,7 +1278,7 @@ function makeFactorRow(f) {
     <div class="factor-sliders-row">
       <div class="factor-slider-wrap">
         <div class="factor-slider-label">
-          <span style="color:var(--current)">${state.coA||t('current')}</span>
+          <span style="color:var(--current)">${esc(state.coA||t('current'))}</span>
           <span style="color:var(--current);font-weight:700" id="sa_${f.id}">${f.scoreA}/10</span>
         </div>
         <input type="range" min="1" max="10" value="${f.scoreA}"
@@ -1216,7 +1288,7 @@ function makeFactorRow(f) {
       </div>
       <div class="factor-slider-wrap">
         <div class="factor-slider-label">
-          <span style="color:var(--new)">${state.coB||t('new_offer')}</span>
+          <span style="color:var(--new)">${esc(state.coB||t('new_offer'))}</span>
           <span style="color:var(--new);font-weight:700" id="sb_${f.id}">${f.scoreB}/10</span>
         </div>
         <input type="range" min="1" max="10" value="${f.scoreB}"
@@ -1231,7 +1303,7 @@ function makeFactorRow(f) {
         <input type="number" class="factor-weight-input" value="${f.weight}" min="0" max="100"
           onchange="updateFactor('${f.id}','weight',+this.value)">
       </div>
-      <button type="button" class="factor-del-btn hide-mobile" onclick="deleteFactor('${f.id}')">${offerIcon('close')}</button>
+      <button type="button" class="factor-del-btn hide-mobile" onclick="deleteFactor('${f.id}')" title="${t('remove_factor')}" aria-label="${t('remove_factor')} — ${esc(tFactorName(f))}">${offerIcon('close')}</button>
     </div>
   `;
   return row;
@@ -1278,12 +1350,17 @@ function updateFactorScore() {
 // ── Header menu ──────────────────────────────────────────────────
 function toggleMenu() {
   const m = $('headerMenu');
-  if (m) m.classList.toggle('open');
+  const btn = $('menuBtn');
+  if (!m) return;
+  const opening = !m.classList.contains('open');
+  m.classList.toggle('open');
+  if (btn) btn.setAttribute('aria-expanded', String(opening));
 }
 document.addEventListener('click', e => {
   const m = $('headerMenu'), btn = $('menuBtn');
   if (m && m.classList.contains('open') && !m.contains(e.target) && e.target !== btn) {
     m.classList.remove('open');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
   }
 });
 
@@ -1293,15 +1370,17 @@ function switchCard(side) {
     const card = $('card'+s);
     const tab  = $('tab'+s);
     if (!card || !tab) return;
-    if (s === side) {
+    const active = s === side;
+    if (active) {
       card.classList.add('active-card');
       tab.className = 'card-tab active-tab-' + s.toLowerCase();
-      tab.textContent = s === 'A' ? (state.coA || t('current')) : (state.coB || t('new_offer'));
+      tab.setAttribute('aria-selected', 'true');
     } else {
       card.classList.remove('active-card');
       tab.className = 'card-tab';
-      tab.textContent = s === 'A' ? (state.coA || t('current')) : (state.coB || t('new_offer'));
+      tab.setAttribute('aria-selected', 'false');
     }
+    tab.textContent = s === 'A' ? (state.coA || t('current')) : (state.coB || t('new_offer'));
   });
 }
 function updateTabLabels() {
@@ -1315,7 +1394,15 @@ document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
     if (!$('popupOverlay').classList.contains('open')) calculate();
   }
-  if (e.key === 'Escape') closePopup();
+  if (e.key === 'Escape') {
+    closePopup();
+    const m = $('headerMenu');
+    if (m && m.classList.contains('open')) {
+      m.classList.remove('open');
+      const btn = $('menuBtn');
+      if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.focus(); }
+    }
+  }
 });
 
 init();
@@ -1338,7 +1425,7 @@ function ensureXlsxLibrary() {
 }
 async function exportExcel() {
   try { await ensureXlsxLibrary(); }
-  catch (_) { alert(currentLang === 'ar' ? 'تعذر تحميل مكتبة تصدير Excel.' : 'Could not load the Excel export library.'); return; }
+  catch (_) { setOfferStatus(t('export_fail'), true); return; }
   const wb = XLSX.utils.book_new();
   const coA = state.coA || 'Current Company';
   const coB = state.coB || 'New Company';

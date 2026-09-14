@@ -8,9 +8,9 @@
 <script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
 <meta name="theme-color" content="#010204">
 <meta name="description" content="اعرض وحرّر وحسّن وولّد صور SVG بالذكاء الاصطناعي مباشرة من المتصفح.">
-<link rel="stylesheet" href="/assets/css/pages/svg-studio.css?v=20260914a">
+<link rel="stylesheet" href="/assets/css/pages/svg-studio.css?v=20260914b">
 <link rel="stylesheet" href="/assets/css/tool-runtime.css?v=20260911c">
-<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911c">
+<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260914b">
 <link rel="stylesheet" href="/assets/css/tool-parity.css?v=20260914a">
 </head>
 <body class="tool-page">
@@ -64,13 +64,13 @@
       <div class="preview-head">
         <span id="previewTitle">المعاينة</span>
         <div class="bg-switcher" role="group" id="bgSwitcher" aria-label="Preview background">
-          <button class="bg-btn bg-checker" id="bgChecker" type="button" data-bg="checker" aria-pressed="true" title="Checkerboard"></button>
-          <button class="bg-btn bg-white" id="bgWhite" type="button" data-bg="white" aria-pressed="false" title="White"></button>
-          <button class="bg-btn bg-black" id="bgBlack" type="button" data-bg="black" aria-pressed="false" title="Black"></button>
-          <button class="bg-btn bg-transparent" id="bgTransparent" type="button" data-bg="transparent" aria-pressed="false" title="Transparent"></button>
+          <button class="bg-btn bg-checker" id="bgChecker" type="button" data-bg="checker" aria-pressed="true" title="Checkerboard" aria-label="Checkerboard background"></button>
+          <button class="bg-btn bg-white" id="bgWhite" type="button" data-bg="white" aria-pressed="false" title="White" aria-label="White background"></button>
+          <button class="bg-btn bg-black" id="bgBlack" type="button" data-bg="black" aria-pressed="false" title="Black" aria-label="Black background"></button>
+          <button class="bg-btn bg-transparent" id="bgTransparent" type="button" data-bg="transparent" aria-pressed="false" title="Transparent" aria-label="Transparent background"></button>
         </div>
       </div>
-      <div class="canvas-stage stage-checker" id="canvasStage" dir="ltr" aria-label="SVG preview canvas">
+      <div class="canvas-stage stage-checker" id="canvasStage" dir="ltr" tabindex="0" role="img" aria-label="SVG preview canvas — arrow keys pan, plus and minus zoom">
       <div class="svg-holder" id="svgHolder" hidden></div>
       <div class="stage-empty" id="stageEmpty"><span id="dropHint">أفلت ملف SVG هنا أو الصق الكود في المحرر</span><span class="stage-error" id="stageError" hidden></span></div>
       <div class="zoom-hud" id="zoomHud" hidden>100%</div>
@@ -125,5 +125,5 @@
 
   <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa">Omar Alfawzan</a></footer>
 </div>
-<script defer src="/assets/js/pages/svg-studio.js?v=20260914a"></script><script defer src="/assets/js/platform.js"></script>
+<script defer src="/assets/js/pages/svg-studio.js?v=20260914b"></script><script defer src="/assets/js/platform.js"></script>
 </body></html>

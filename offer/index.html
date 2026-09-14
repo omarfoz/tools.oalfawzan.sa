@@ -9,7 +9,7 @@
 <meta name="description" content="قارن بين عرضي عمل من حيث الراتب الصافي والبدلات والمزايا السنوية والتأمينات والعوامل المهنية لاتخاذ قرار أوضح.">
 <link rel="canonical" href="https://tools.oalfawzan.sa/offer/">
 <script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
-<link rel="stylesheet" href="/assets/css/pages/offer.css">
+<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20260914b">
 <link rel="stylesheet" href="/assets/css/offer-runtime.css?v=20260911c">
 <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911e">
 <link rel="stylesheet" href="/assets/css/tool-parity.css?v=20260914a">
@@ -50,9 +50,9 @@
       <button type="button" class="lang-btn" id="themeBtn" aria-label="Toggle theme" onclick="toggleTheme()"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg></button>
       <button type="button" class="btn-ghost" id="saveBtn" onclick="saveData()">Save</button>
       <div class="menu-wrap">
-        <button type="button" class="btn-ghost" onclick="toggleMenu()" id="menuBtn">⋯</button>
+        <button type="button" class="btn-ghost" onclick="toggleMenu()" id="menuBtn" aria-label="More options" aria-haspopup="true" aria-expanded="false">⋯</button>
         <div class="dropdown" id="headerMenu">
-          <button type="button" onclick="resetAll();toggleMenu()" id="btnReset">↺ Reset</button>
+          <button type="button" onclick="resetAll();toggleMenu()" id="btnReset" aria-label="Reset all fields to defaults">↺ Reset</button>
           <a href="https://oalfawzan.sa" id="btnPortfolio">← Portfolio</a>
         </div>
       </div>
@@ -105,9 +105,9 @@
   </div>
 
   <!-- Mobile card tab switcher -->
-  <div class="card-tabs">
-    <button type="button" class="card-tab active-tab-a" id="tabA" onclick="switchCard('A')"><span data-i18n="current">Current</span></button>
-    <button type="button" class="card-tab" id="tabB" onclick="switchCard('B')"><span data-i18n="new_offer">New Offer</span></button>
+  <div class="card-tabs" role="tablist" aria-label="Offer cards">
+    <button type="button" class="card-tab active-tab-a" id="tabA" role="tab" aria-selected="true" aria-controls="cardA" onclick="switchCard('A')"><span data-i18n="current">Current</span></button>
+    <button type="button" class="card-tab" id="tabB" role="tab" aria-selected="false" aria-controls="cardB" onclick="switchCard('B')"><span data-i18n="new_offer">New Offer</span></button>
   </div>
 
   <div class="main-grid">
@@ -324,25 +324,25 @@
 
 <!-- Popup -->
 <div class="popup-overlay" id="popupOverlay">
-  <div class="popup">
+  <div class="popup" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
     <div class="popup-title" id="popupTitle"><span data-i18n="add_field_title">Add Field</span></div>
     <div class="popup-field">
-      <label class="popup-label"><span data-i18n="field_name_lbl">FIELD NAME</span></label>
+      <label class="popup-label" for="pName"><span data-i18n="field_name_lbl">FIELD NAME</span></label>
       <input class="popup-input" id="pName" placeholder="e.g. Housing Allowance" aria-label="Custom benefit name">
     </div>
     <div class="popup-field" id="pValueWrap">
-      <label class="popup-label">AMOUNT (SAR / month)</label>
+      <label class="popup-label" for="pValue">AMOUNT (SAR / month)</label>
       <input class="popup-input" id="pValue" type="number" placeholder="0" aria-label="Custom benefit value">
     </div>
     <div class="popup-field" id="pPctWrap" style="display:none">
-      <label class="popup-label" id="pPctLabel"><span data-i18n="pct_lbl">% OF FIELD</span></label>
+      <label class="popup-label" id="pPctLabel" for="pPct"><span data-i18n="pct_lbl">% OF FIELD</span></label>
       <div class="pct-row">
         <input class="popup-input" id="pPct" type="number" placeholder="25" aria-label="Custom benefit percentage">
         <span id="pPctUnit">% of</span>
         <select id="pPctRef" aria-label="Percentage reference"></select>
       </div>
       <div style="margin-top:8px">
-        <label class="popup-label" style="margin-bottom:4px;display:flex;align-items:center;gap:8px">
+        <label class="popup-label" style="margin-bottom:4px;display:flex;align-items:center;gap:8px" for="pHasRef2">
           <input type="checkbox" class="popup-check" id="pHasRef2" onchange="toggleRef2()" aria-label="Enable second reference">
           <span data-i18n="ref2_hint">Add a second field (e.g. GOSI = Basic + Housing)</span>
         </label>
@@ -378,7 +378,7 @@
   </div>
 </div>
 
-<script defer src="/assets/js/pages/offer.js?v=20260914a"></script>
+<script defer src="/assets/js/pages/offer.js?v=20260914b"></script>
 <script defer src="/assets/js/platform.js"></script>
 <script defer src="/assets/js/pages/offer-riyal.js?v=20260823a"></script>
 </body>
