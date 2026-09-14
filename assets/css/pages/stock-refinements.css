@@ -24,6 +24,16 @@ html[data-theme="light"] .tool-page .stock-hero-card .muted {
   border-collapse: separate !important;
   border-spacing: 0 !important;
 }
+#priceChart tr,
+#priceChart tr:hover {
+  background: transparent !important;
+}
+#priceChart td,
+#priceChart th {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
 #priceChart canvas {
   max-width: none !important;
 }
