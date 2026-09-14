@@ -162,8 +162,7 @@ body:not(:has(.home)) .factor-slider::-moz-range-thumb{
   }
   body.tool-page header.site-header .header-actions,
   body:not(:has(.home)) header .header-actions{width:auto!important;gap:5px!important;justify-content:flex-end!important;flex-wrap:nowrap!important}
-  body.tool-page header.site-header button,
-  body:not(:has(.home)) header button{min-width:40px!important;height:40px!important;min-height:40px!important;padding-inline:10px!important}
+
 
   /* Hero should not consume half the first screen. */
   body.tool-page .hero,

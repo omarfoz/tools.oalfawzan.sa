@@ -13,14 +13,14 @@
     const mobileLink = document.createElement('link');
     mobileLink.id = 'mobile-enhancements';
     mobileLink.rel = 'stylesheet';
-    mobileLink.href = '/assets/css/mobile-enhancements.css?v=20260911';
+    mobileLink.href = '/assets/css/mobile-enhancements.css?v=20260914a';
     document.head.append(mobileLink);
   }
   if (!document.getElementById('tool-parity')) {
     const parityLink = document.createElement('link');
     parityLink.id = 'tool-parity';
     parityLink.rel = 'stylesheet';
-    parityLink.href = '/assets/css/tool-parity.css?v=20260912a';
+    parityLink.href = '/assets/css/tool-parity.css?v=20260914a';
     document.head.append(parityLink);
   }
 

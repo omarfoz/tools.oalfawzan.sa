@@ -157,6 +157,50 @@ html[lang="en"] .tool-card .tool-title-secondary { direction: rtl; text-align: l
     justify-content: flex-start !important;
     text-align: right !important;
   }
+
+  /* Header parity: every page matches the homepage's finger-sized controls. */
+  .site-header .header-actions .icon-btn,
+  .site-header .header-actions .lang-btn,
+  .site-header .header-actions .platform-control,
+  body.tool-page header.site-header .header-actions button,
+  body.tool-page header.site-header .header-actions a:not(.brand) {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    padding: 8px 11px !important;
+  }
+  body.tool-page header.site-header .menu-wrap .btn-ghost,
+  body.tool-page header.site-header .menu-wrap button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+  }
+  body.tool-page header.site-header .header-actions .menu-wrap {
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+  body.tool-page header.site-header .header-actions .menu-wrap > button {
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Very narrow phones: reclaim space so the brand text never clips
+     next to three 44px controls. */
+  .site-header,
+  .tool-page header.site-header {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
+  .site-header .header-actions,
+  .tool-page header.site-header .header-actions {
+    gap: 6px !important;
+  }
+  .site-header .brand,
+  .tool-page header.site-header .brand {
+    font-size: .88rem !important;
+  }
 }
 
 @media (max-width: 390px) {

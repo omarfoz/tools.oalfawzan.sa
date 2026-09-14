@@ -16,3 +16,14 @@ html[data-theme="light"] .tool-page .stock-hero-card .muted {
     background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,255,255,.76)) !important;
   }
 }
+
+/* The shared runtime CSS (table{width:100%}) breaks lightweight-charts' internal
+   layout table, shrinking the price chart pane. Restore the library's own sizing. */
+#priceChart table {
+  width: auto !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+#priceChart canvas {
+  max-width: none !important;
+}

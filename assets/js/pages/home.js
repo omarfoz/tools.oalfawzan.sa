@@ -8,7 +8,7 @@
     const link=document.createElement('link');
     link.id='mobile-enhancements';
     link.rel='stylesheet';
-    link.href='/assets/css/mobile-enhancements.css?v=20260911';
+    link.href='/assets/css/mobile-enhancements.css?v=20260914a';
     document.head.append(link);
   }
 
