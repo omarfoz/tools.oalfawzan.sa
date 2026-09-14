@@ -11,6 +11,7 @@ A focused collection of browser-first utilities deployed as a static GitHub Page
 3. **Wheel of Names** (`/wheel-of-names/`): random selection from a list of names.
 4. **QR Generator** (`/qr-generator/`): create downloadable QR codes from text, URLs, and vCards.
 5. **Saudi Stock Analysis** (`/stock-analysis-dashboard/`): technical indicators, favorites, market data, and a simplified analysis summary.
+6. **SVG Studio** (`/svg-studio/`): view, edit, optimize, and AI-generate SVG graphics entirely in the browser.
 
 ## Architecture
 
@@ -44,6 +45,7 @@ When adding a new tool, preserve this separation: tool CSS controls structure an
 ├── wheel-of-names/
 ├── qr-generator/
 ├── stock-analysis-dashboard/
+├── svg-studio/
 ├── assets/
 │   ├── css/
 │   │   └── oalfawzan-theme.css
