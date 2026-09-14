@@ -8,7 +8,8 @@
 <script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
   <meta name="theme-color" content="#010204">
   <meta name="description" content="لوحة تحليل الأسهم السعودية مع RSI وMA50 وMA200 وحجم التداول والمفضلة وتوصية ذكية مبسطة.">
-  <link rel="stylesheet" href="/assets/css/pages/stock-analysis-dashboard.css?v=20260913chart">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="stylesheet" href="/assets/css/pages/stock-analysis-dashboard.css?v=20260914b">
   <link rel="stylesheet" href="/assets/css/pages/stock-refinements.css?v=20260914b">
 <link rel="stylesheet" href="/assets/css/tool-runtime.css?v=20260911c">
 <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911c">
@@ -37,7 +38,7 @@
     <h1 id="pageTitle">لوحة تحليل الأسهم</h1>
     <p id="pageDesc" class="muted">ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة وتوصية ذكاء اصطناعي مبسطة.</p>
     <div class="search">
-      <input id="tickerInput" inputmode="numeric" placeholder="أدخل رمز تداول (مثال: 7202)" aria-label="Saudi stock ticker">
+      <input id="tickerInput" inputmode="numeric" autocomplete="off" placeholder="أدخل رمز تداول (مثال: 7202)" aria-label="Saudi stock ticker">
       <button type="button" id="analyzeBtn" class="primary">تحليل</button>
       <button type="button" id="saveFavBtn" class="ghost">حفظ بالمفضلة</button>
     </div>
@@ -86,7 +87,7 @@
   </footer>
 </div>
 
-<script defer src="/assets/js/pages/stock-analysis-dashboard.js?v=20260914a"></script>
+<script defer src="/assets/js/pages/stock-analysis-dashboard.js?v=20260914b"></script>
 <script defer src="/assets/js/platform.js"></script>
 </body>
 </html>

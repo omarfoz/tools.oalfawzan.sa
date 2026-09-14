@@ -440,7 +440,8 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
 .tool-page .fee-section,
 .tool-page .option-content,
 .tool-page .mode-switcher,
-.tool-page .nat-unified { padding: 22px !important; }
+.tool-page .nat-unified,
+.tool-page .ai-card { padding: 22px !important; }
 .tool-page .grid { gap: 18px !important; }
 .tool-page .panel h2,
 .tool-page .card h2,
@@ -585,7 +586,8 @@ html[data-theme="light"] .tool-page .popup-btn.confirm { background: #0062cc !im
   .tool-page .fee-section,
   .tool-page .option-content,
   .tool-page .mode-switcher,
-  .tool-page .nat-unified { padding: 20px !important; }
+  .tool-page .nat-unified,
+  .tool-page .ai-card { padding: 20px !important; }
   .site-header,
   .manifesto,
   .tool-card,
