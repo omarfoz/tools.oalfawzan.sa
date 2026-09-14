@@ -201,3 +201,12 @@ body:not(:has(.home)) .factor-slider::-moz-range-thumb{
   body.tool-page .company-names,
   body:not(:has(.home)) .company-names{grid-template-columns:1fr!important}
 }
+
+/* HR context panel: stack its three inline-grid columns on small phones
+   so vacation/notice inputs stay wide enough to use. */
+@media(max-width:480px){
+  body.tool-page #hrContextCard > div[style*="grid-template-columns"],
+  body:not(:has(.home)) #hrContextCard > div[style*="grid-template-columns"]{grid-template-columns:minmax(0,1fr)!important}
+  body.tool-page #hrContextCard .section-label,
+  body:not(:has(.home)) #hrContextCard .section-label{font-size:.68rem!important;margin-bottom:4px!important}
+}

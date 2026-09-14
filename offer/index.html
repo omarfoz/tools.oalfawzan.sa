@@ -24,7 +24,18 @@
   body.tool-page .main-grid button.toggle.on-new::before{background:var(--new)}
   body.tool-page .main-grid button.toggle::after{top:18px!important;left:11px!important;width:12px!important;height:12px!important}
 }
-@media (max-width:390px){body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 100px 26px!important}}
+@media (max-width:390px){
+  body.tool-page .main-grid .field-row{grid-template-columns:44px minmax(0,1fr) 96px 26px!important}
+  html[dir="rtl"] body.tool-page .main-grid .field-row{grid-template-columns:44px minmax(0,1fr) 96px 26px!important}
+}
+/* Very narrow phones: stack name above amount so both stay usable. */
+@media (max-width:360px){
+  body.tool-page .main-grid .field-row,
+  html[dir="rtl"] body.tool-page .main-grid .field-row{
+    grid-template-columns:44px minmax(0,1fr) minmax(84px,1fr) 26px!important;
+    grid-template-areas:"toggle name name name" "toggle amount amount type"!important;
+  }
+}
 </style>
 
 </head>
