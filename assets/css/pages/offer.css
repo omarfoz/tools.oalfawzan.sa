@@ -1,5 +1,56 @@
-@import url('/assets/css/pages/offer-base.css?v=20260914b');
-@import url('/assets/css/offer-mobile.css?v=20260911c');
+@import url('/assets/css/pages/offer-base.css?v=20260915a');
+@import url('/assets/css/offer-mobile.css?v=20260915a');
+
+/* Formerly inline styles from offer/index.html */
+.factors-hint {
+  font-family: var(--mono, var(--sans, sans-serif));
+  font-size: .65rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.fscore-badge {
+  font-family: var(--mono, var(--sans, sans-serif));
+  font-size: .65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+.hr-context-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.hr-context-grid .section-label { margin-bottom: 6px; }
+.hr-pair-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.amount-input.hr-current { text-align: center; border-top: 2px solid var(--current); }
+.amount-input.hr-new { text-align: center; border-top: 2px solid var(--new); }
+.hr-vac-diff { display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; }
+.hr-vac-val { font-size: .85rem; font-weight: 700; color: var(--muted); }
+.overall-divider { height: 1px; background: var(--border); margin: 14px 0; }
+.sm-arrow { color: var(--muted); font-size: .75rem; }
+.pct-ref2-wrap { margin-top: 8px; }
+.pct-ref2-label { margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.pct-ref2-wrap > div { margin-top: 8px; }
+.pct-ref2-prefix { font-family: var(--mono, var(--sans, sans-serif)); font-size: .75rem; color: var(--muted); white-space: nowrap; }
+.pct-ref2-select { flex: 1; background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: var(--mono, var(--sans, sans-serif)); font-size: .82rem; outline: none; }
+html[data-theme="light"] .pct-ref2-select { background: rgba(255,255,255,.5); }
+@media (max-width: 640px) {
+  .hr-context-grid { grid-template-columns: 1fr; }
+}
+
+/* Very narrow phones: stack name above amount so both stay usable. */
+@media (max-width: 360px) {
+  body .main-grid .field-row,
+  html[dir="rtl"] body .main-grid .field-row {
+    grid-template-columns: 44px minmax(0, 1fr) minmax(84px, 1fr) 26px !important;
+    grid-template-areas: "toggle name name name" "toggle amount amount type" !important;
+  }
+}
 
 /* Mobile compensation editor v2: compact, touch-friendly, numbers-first. */
 @media (max-width: 640px) {

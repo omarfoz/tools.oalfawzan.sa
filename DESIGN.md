@@ -4,30 +4,29 @@
 
 # 02 Colors
 
-Use the existing semantic tokens from `assets/css/design-system.css`; do not introduce page-specific brand palettes.
+Use the existing semantic tokens from the shared layers (`assets/css/platform.css` and `assets/css/oalfawzan-theme.css`); do not introduce page-specific brand palettes.
 
-- Background: `--color-bg-primary`
-- Surface: `--color-bg-surface`
-- Subtle surface: `--color-bg-subtle`
-- Default border: `--color-border-default`
-- Strong border: `--color-border-strong`
-- Primary text: `--color-text-primary`
-- Secondary text: `--color-text-secondary`
-- Muted text: `--color-text-muted`
-- Brand/action: `--color-brand-primary`
-- Status colors: success, warning, error, and info semantic tokens
+- Background: `--site-bg` (`--ds-bg`)
+- Glass surface: `--site-glass-fill` (`--ds-surface`)
+- Strong glass surface: `--site-glass-fill-strong` (`--ds-surface-2`)
+- Default border: `--site-glass-border` (`--ds-border`)
+- Strong border: `--ds-border-strong`
+- Primary text: `--site-text` (`--ds-text`)
+- Muted text: `--site-text-muted` (`--ds-muted`)
+- Brand/action: `--site-accent` (`#007aff` dark, `#0062cc` light)
+- Status colors: success, warning, and danger semantic tokens
 
-Use one accent for actions and selection. Avoid gradients, decorative glows, or extra palette families unless color carries domain meaning in a chart or data visualization.
+Use one accent for actions and selection. The site's liquid-glass backdrop and panel gradients are defined once in the shared theme; do not reintroduce them per page.
 
 # 03 Typography
 
 Primary family: **IBM Plex Sans Arabic** for Arabic and **IBM Plex Sans** for English/UI Latin text.
 
-Use the shared type scale and weights from `design-system.css`. Headings should be strong but not theatrical. Body text should stay readable at approximately 1.6–1.75 line-height. Labels and metadata should be compact and explicit. Do not add novelty serif/display fonts.
+Use the shared type scale from the theme layers. Headings should be strong but not theatrical. Body text should stay readable at approximately 1.6-1.75 line-height. Labels and metadata should be compact and explicit. Do not add novelty serif/display fonts.
 
 # 04 Elevation
 
-Flat by default. Group content with spacing, borders, and subtle surface contrast before using elevation. Standard cards and panels have no shadow. Shadows are reserved for truly floating UI such as temporary toasts, dialogs, menus, or overlays. Nested cards should be visually quieter than their parent and should not create repeated box-within-box chrome.
+The site uses one shared glass material: tinted fill, 1px glass border, a subtle inner highlight, soft shadow, and backdrop blur. It is defined once in `oalfawzan-theme.css` and applied to panels, cards, and the header. Do not invent per-page surface treatments or add extra shadows on top of the shared material. Nested surfaces (result boxes, KPI tiles, tab strips) are visually quieter than their parent, per the theme. Shadows beyond the shared material are reserved for truly floating UI such as toasts, dialogs, menus, or overlays.
 
 # 05 Components
 
@@ -38,7 +37,7 @@ Flat by default. Group content with spacing, borders, and subtle surface contras
 - **Cards/Panels:** use only when grouping is meaningful. Prefer sections and whitespace over additional containers.
 - **Tool directory cards:** concise category, icon, title, description, and one clear launch affordance.
 - **Tables/Data:** prioritize alignment, sticky headers when useful, restrained row hover, and horizontal scroll wrappers on narrow screens.
-- **Motion:** 100–200ms for controls and state changes. No blanket reveal-on-scroll, parallax, or pointer-follow effects. Respect `prefers-reduced-motion`.
+- **Motion:** 100-200ms for controls and state changes. No blanket reveal-on-scroll, parallax, or pointer-follow effects. Respect `prefers-reduced-motion`.
 
 # 06 Do's and Don'ts
 

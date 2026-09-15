@@ -1,0 +1,10 @@
+# QA artifacts (screenshots, test drivers, parity reports)
+.qa/
+
+# Generated audit output
+audit-report.json
+.audit-js/
+
+# OS/editor noise
+Thumbs.db
+.DS_Store

@@ -26,6 +26,8 @@ Repository guidance for AI coding agents working on `tools.oalfawzan.sa`.
 │   └── index.html
 ├── stock-analysis-dashboard/
 │   └── index.html
+├── svg-studio/
+│   └── index.html
 ├── assets/
 └── 404.html
 ```
@@ -45,11 +47,17 @@ Generates QR codes from text or URLs and supports downloading the result.
 ### Saudi Stock Analysis (`/stock-analysis-dashboard/`)
 Provides Saudi-market analysis features, indicators, favorites, and market-data views.
 
+### SVG Studio (`/svg-studio/`)
+View, edit, optimize, and AI-generate SVG images directly in the browser.
+
 ## Architecture
 
 - Keep the site static and framework-free unless a change explicitly requires otherwise.
 - Shared platform assets belong under `assets/css` and `assets/js`.
 - Page-specific assets belong under `assets/css/pages` and `assets/js/pages`.
+- Every page loads the same two shared CSS layers in this order: page CSS, `assets/css/platform.css`, `assets/css/oalfawzan-theme.css` (the single design authority). Do not create additional shared/runtime/parity CSS layers.
+- Every page includes `assets/js/theme-init.js` before its stylesheets and loads `assets/js/platform.js`.
+- Every page uses identical header, footer, hero, and back-link markup (see any existing tool page).
 - Keep tool URLs stable unless the task explicitly removes or renames a tool.
 - Prefer progressive enhancement and browser-native APIs.
 - Treat external market or analysis services as optional dependencies and handle failures clearly.

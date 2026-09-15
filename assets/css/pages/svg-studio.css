@@ -1,4 +1,4 @@
-/* SVG Studio — page layout. Shared brand look comes from tool-runtime + oalfawzan-theme + tool-parity
+/* SVG Studio - page layout. Shared brand look comes from platform.css + oalfawzan-theme.css
    (cards, buttons, inputs, hero, header and footer inherit the site's liquid-glass system). */
 
 .svg-workspace{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:18px;align-items:start}

@@ -4,96 +4,96 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>عجلة الأسماء — tools.oalfawzan.sa</title>
-<script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
+  <title>عجلة الأسماء - tools.oalfawzan.sa</title>
+<script src="/assets/js/theme-init.js"></script>
   <meta name="theme-color" content="#010204">
   <meta name="description" content="عجلة أسماء تفاعلية لاختيار اسم عشوائي بعدالة وسهولة.">
-  <link rel="stylesheet" href="/assets/css/pages/wheel-of-names.css?v=20260914b">
-  <link rel="stylesheet" href="/assets/css/pages/wheel-refinements.css?v=20260913a">
-<link rel="stylesheet" href="/assets/css/tool-runtime.css?v=20260911c">
-<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911c">
-<link rel="stylesheet" href="/assets/css/tool-parity.css?v=20260914a">
+  <link rel="stylesheet" href="/assets/css/pages/wheel-of-names.css?v=20260915a">
+  <link rel="stylesheet" href="/assets/css/pages/wheel-refinements.css?v=20260915a">
+  <link rel="stylesheet" href="/assets/css/platform.css?v=20260915a">
+  <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260915a">
 </head>
 <body class="tool-page">
   <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-  <div class="wrap">
-    <header class="site-header tool-site-header">
+  <div class="wrap" id="main-content" role="main">
+    <header class="site-header">
       <a href="/" class="brand" aria-label="tools.oalfawzan.sa home"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a>
       <div class="header-actions">
-        <button class="lang-btn" id="langBtn" type="button" aria-label="English">EN</button>
-        <button class="lang-btn" id="themeBtn" type="button" aria-label="تغيير المظهر"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+        <button class="icon-btn" id="langBtn" type="button" aria-label="English">EN</button>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="تغيير المظهر"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg></button>
       </div>
     </header>
-    <a href="/" class="back-link" id="backLink">← كل الأدوات</a>
-    <main id="main-content">
-      <div class="tool-heading">
-        <div>
-          <div class="hero-tag" id="tag">// اختيار عشوائي</div>
-          <h1 id="title">عجلة الأسماء</h1>
-          <p class="sub" id="desc">أضف الأسماء، اضغط العجلة، ودع الحظ يختار.</p>
-        </div>
-        <div class="quick-actions" aria-label="أدوات العجلة">
-          <button class="icon-action" id="soundBtn" type="button" aria-pressed="true" title="الصوت" aria-label="الصوت"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/></svg><span id="soundLabel">الصوت</span></button>
-          <button class="icon-action" id="fullscreenBtn" type="button" title="ملء الشاشة" aria-label="ملء الشاشة"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"/></svg><span id="fullscreenLabel">ملء الشاشة</span></button>
-        </div>
+    <a href="/" class="back-link"><span class="back-icon" aria-hidden="true">←</span><span id="backLink">← كل الأدوات</span></a>
+    <section class="tool-heading">
+      <div>
+        <div class="hero-tag" id="tag">// اختيار عشوائي</div>
+        <h1 id="title">عجلة الأسماء</h1>
+        <p class="sub" id="desc">أضف الأسماء، اضغط العجلة، ودع الحظ يختار.</p>
       </div>
-      <section class="wheel-app" aria-label="عجلة الأسماء">
-        <div class="wheel-column">
-          <div class="wheel-stage" id="wheelStage">
-            <div class="pointer" aria-hidden="true"></div>
-            <button class="wheel-hit-area" id="wheelHitArea" type="button" aria-label="لف العجلة">
-              <canvas id="wheelCanvas" width="720" height="720"></canvas>
-              <span class="spin-center" id="spinCenter"><strong id="spinCenterText">لف</strong><small id="spinHint">اضغط هنا</small></span>
-            </button>
-            <p class="wheel-empty" id="wheelEmpty" hidden>أضف اسمين على الأقل للبدء</p>
-          </div>
-          <button class="spin-button" id="spinBtn" type="button"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0 2.2 5.5"/><path d="M20 4v7h-7"/></svg><span id="spinButtonText">لف العجلة</span></button>
-          <p class="shortcut-hint" id="shortcutHint">اختصار: Ctrl + Enter</p>
+      <div class="quick-actions" aria-label="أدوات العجلة">
+        <button class="icon-action" id="soundBtn" type="button" aria-pressed="true" title="الصوت" aria-label="الصوت"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/></svg><span id="soundLabel">الصوت</span></button>
+        <button class="icon-action" id="fullscreenBtn" type="button" title="ملء الشاشة" aria-label="ملء الشاشة"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"/></svg><span id="fullscreenLabel">ملء الشاشة</span></button>
+      </div>
+    </section>
+    <section class="wheel-app" aria-label="عجلة الأسماء">
+      <div class="wheel-column">
+        <div class="wheel-stage" id="wheelStage">
+          <div class="pointer" aria-hidden="true"></div>
+          <button class="wheel-hit-area" id="wheelHitArea" type="button" aria-label="لف العجلة">
+            <canvas id="wheelCanvas" width="720" height="720"></canvas>
+            <span class="spin-center" id="spinCenter"><strong id="spinCenterText">لف</strong><small id="spinHint">اضغط هنا</small></span>
+          </button>
+          <p class="wheel-empty" id="wheelEmpty" hidden>أضف اسمين على الأقل للبدء</p>
         </div>
-        <aside class="control-panel">
-          <div class="panel-tabs" role="tablist" aria-label="لوحة العجلة">
-            <button class="tab is-active" id="entriesTab" role="tab" aria-selected="true" aria-controls="entriesPanel" type="button">الأسماء <span class="count-badge" id="namesCount">0</span></button>
-            <button class="tab" id="resultsTab" role="tab" aria-selected="false" aria-controls="resultsPanel" type="button">النتائج <span class="count-badge" id="resultsCount">0</span></button>
+        <button class="spin-button" id="spinBtn" type="button"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0 2.2 5.5"/><path d="M20 4v7h-7"/></svg><span id="spinButtonText">لف العجلة</span></button>
+        <p class="shortcut-hint" id="shortcutHint">اختصار: Ctrl + Enter</p>
+      </div>
+      <aside class="control-panel">
+        <div class="panel-tabs" role="tablist" aria-label="لوحة العجلة">
+          <button class="tab is-active" id="entriesTab" role="tab" aria-selected="true" aria-controls="entriesPanel" type="button">الأسماء <span class="count-badge" id="namesCount">0</span></button>
+          <button class="tab" id="resultsTab" role="tab" aria-selected="false" aria-controls="resultsPanel" type="button">النتائج <span class="count-badge" id="resultsCount">0</span></button>
+        </div>
+        <div class="tab-panel" id="entriesPanel" role="tabpanel" aria-labelledby="entriesTab">
+          <label class="sr-only" for="namesInput" id="namesLabel">الأسماء، اسم في كل سطر</label>
+          <textarea id="namesInput" spellcheck="false" placeholder="أحمد&#10;سارة&#10;ليلى" aria-describedby="inputHelp"></textarea>
+          <p class="input-help" id="inputHelp">اسم واحد في كل سطر • تُحفظ الأسماء تلقائيًا على جهازك</p>
+          <div class="entry-tools" aria-label="تنظيم الأسماء">
+            <button type="button" data-entry-action="shuffle" id="shuffleBtn">⇄ <span>خلط</span></button>
+            <button type="button" data-entry-action="sort" id="sortBtn">↓ <span>ترتيب</span></button>
+            <button type="button" data-entry-action="dedupe" id="dedupeBtn">≠ <span>حذف المكرر</span></button>
+            <button type="button" data-entry-action="clear" id="clearBtn" class="danger">× <span>مسح</span></button>
           </div>
-          <div class="tab-panel" id="entriesPanel" role="tabpanel" aria-labelledby="entriesTab">
-            <label class="sr-only" for="namesInput" id="namesLabel">الأسماء، اسم في كل سطر</label>
-            <textarea id="namesInput" spellcheck="false" placeholder="أحمد&#10;سارة&#10;ليلى" aria-describedby="inputHelp"></textarea>
-            <p class="input-help" id="inputHelp">اسم واحد في كل سطر • تُحفظ الأسماء تلقائيًا على جهازك</p>
-            <div class="entry-tools" aria-label="تنظيم الأسماء">
-              <button type="button" data-entry-action="shuffle" id="shuffleBtn">⇄ <span>خلط</span></button>
-              <button type="button" data-entry-action="sort" id="sortBtn">↓ <span>ترتيب</span></button>
-              <button type="button" data-entry-action="dedupe" id="dedupeBtn">≠ <span>حذف المكرر</span></button>
-              <button type="button" data-entry-action="clear" id="clearBtn" class="danger">× <span>مسح</span></button>
+          <details class="settings" id="settingsDetails">
+            <summary id="settingsSummary">إعدادات اللف</summary>
+            <div class="settings-grid">
+              <label for="durationSelect" id="durationLabel">مدة اللف</label>
+              <select id="durationSelect"><option value="3">3 ثوانٍ</option><option value="5" selected>5 ثوانٍ</option><option value="8">8 ثوانٍ</option><option value="12">12 ثانية</option></select>
+              <label class="switch-row" for="autoRemoveInput"><span id="autoRemoveLabel">حذف الفائز تلقائيًا</span><span class="switch"><input id="autoRemoveInput" type="checkbox"><span></span></span></label>
             </div>
-            <details class="settings" id="settingsDetails">
-              <summary id="settingsSummary">إعدادات اللف</summary>
-              <div class="settings-grid">
-                <label for="durationSelect" id="durationLabel">مدة اللف</label>
-                <select id="durationSelect"><option value="3">3 ثوانٍ</option><option value="5" selected>5 ثوانٍ</option><option value="8">8 ثوانٍ</option><option value="12">12 ثانية</option></select>
-                <label class="switch-row" for="autoRemoveInput"><span id="autoRemoveLabel">حذف الفائز تلقائيًا</span><span class="switch"><input id="autoRemoveInput" type="checkbox"><span></span></span></label>
-              </div>
-            </details>
-          </div>
-          <div class="tab-panel" id="resultsPanel" role="tabpanel" aria-labelledby="resultsTab" hidden>
-            <div class="history-empty" id="historyEmpty"><span aria-hidden="true">↻</span><strong id="historyEmptyTitle">لا توجد نتائج بعد</strong><p id="historyEmptyText">ستظهر الأسماء الفائزة هنا بعد كل لفة.</p></div>
-            <ol class="history-list" id="historyList"></ol>
-            <button class="clear-history" id="clearHistoryBtn" type="button">مسح سجل النتائج</button>
-          </div>
-        </aside>
-      </section>
-    </main>
-    <footer><span id="builtBy">من تطوير</span> <a href="https://oalfawzan.sa" class="logo">Omar Alfawzan</a></footer>
+          </details>
+        </div>
+        <div class="tab-panel" id="resultsPanel" role="tabpanel" aria-labelledby="resultsTab" hidden>
+          <div class="history-empty" id="historyEmpty"><span aria-hidden="true">↻</span><strong id="historyEmptyTitle">لا توجد نتائج بعد</strong><p id="historyEmptyText">ستظهر الأسماء الفائزة هنا بعد كل لفة.</p></div>
+          <ol class="history-list" id="historyList"></ol>
+          <button class="clear-history" id="clearHistoryBtn" type="button">مسح سجل النتائج</button>
+        </div>
+      </aside>
+    </section>
+    <footer class="site-footer">
+      <span>TOOLS.OALFAWZAN.SA / 2026</span>
+      <span>Built by <a href="https://oalfawzan.sa">Omar Alfawzan</a></span>
+    </footer>
   </div>
   <div class="winner-overlay" id="winnerOverlay" hidden>
     <canvas id="confettiCanvas" aria-hidden="true"></canvas>
     <section class="winner-card" role="dialog" aria-modal="true" aria-labelledby="winnerTitle" aria-describedby="winnerName">
       <button class="modal-close" id="closeWinnerBtn" type="button" aria-label="إغلاق">×</button>
-      <span class="winner-kicker" id="winnerKicker">والفائز هو</span><h2 id="winnerName">—</h2><p id="winnerTitle">تم الاختيار عشوائيًا</p>
+      <span class="winner-kicker" id="winnerKicker">والفائز هو</span><h2 id="winnerName">-</h2><p id="winnerTitle">تم الاختيار عشوائيًا</p>
       <div class="winner-actions"><button class="btn primary" id="removeWinnerBtn" type="button">حذف الاسم</button><button class="btn" id="closeWinnerAction" type="button">إغلاق</button></div>
     </section>
   </div>
   <div class="sr-only" id="liveResult" role="status" aria-live="assertive"></div>
-  <script defer src="/assets/js/pages/wheel-of-names.js?v=20260914b"></script>
-  <script defer src="/assets/js/platform.js"></script>
+  <script defer src="/assets/js/pages/wheel-of-names.js?v=20260915a"></script>
+  <script defer src="/assets/js/platform.js?v=20260915a"></script>
 </body>
 </html>
