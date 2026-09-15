@@ -153,7 +153,7 @@ function init() {
 function updateVacDiff() {
   const va = +$('vacA').value || 0, vb = +$('vacB').value || 0;
   const el = $('vacDiff');
-  if (!va && !vb) { el.textContent = '—'; el.style.color = 'var(--muted)'; return; }
+  if (!va && !vb) { el.textContent = '-'; el.style.color = 'var(--muted)'; return; }
   const diff = vb - va;
   if (diff > 0) { el.textContent = '+' + diff + ' days'; el.style.color = 'var(--current)'; }
   else if (diff < 0) { el.textContent = diff + ' days'; el.style.color = 'var(--danger)'; }
@@ -329,7 +329,7 @@ function makeRow(f, side) {
       title="${f.isDeduction ? t('deduction_toggle') : t('addition_toggle')}"
       aria-label="${f.isDeduction ? t('deduction_toggle') : t('addition_toggle')}"
       onclick="toggleDeduction('${side}','${f.id}')">${f.isDeduction ? '−' : '+'}</button>
-    <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="${t('remove_field')}" aria-label="${t('remove_field')} — ${esc(fieldAccessibleName)}">${offerIcon('close')}</button>
+    <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="${t('remove_field')}" aria-label="${t('remove_field')} - ${esc(fieldAccessibleName)}">${offerIcon('close')}</button>
   `;
 
   // Double-click to edit in popup
@@ -348,7 +348,7 @@ function fmtNum(n) {
 }
 function esc(s) { return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
-/* Inline status message (replaces alert()) — falls back to a temporary fixed toast */
+/* Inline status message (replaces alert()) - falls back to a temporary fixed toast */
 function setOfferStatus(msg, isError) {
   if (window.ToolsPlatform && window.ToolsPlatform.notify) {
     window.ToolsPlatform.notify(msg, isError ? 'error' : 'success');
@@ -478,7 +478,7 @@ function populatePctRef(side, selected, excludeId) {
 
 function populatePctRef2(side, selected, excludeId) {
   const sel = $('pPctRef2');
-  sel.innerHTML = '<option value="">— none —</option>';
+  sel.innerHTML = '<option value="">- none -</option>';
   state[side].forEach(f => {
     if (f.id === excludeId) return;
     const opt = document.createElement('option');
@@ -691,14 +691,14 @@ function calculate() {
     $('smYearA').textContent = fmtK(a.yearBenefits);
     $('smYearB').textContent = fmtK(b.yearBenefits);
     smBadge(py, $('smYearBadge'));
-    // vacation — always reset first
+    // vacation - always reset first
     $('smVacCell').style.display    = 'none';
     $('smNoticeCell').style.display = 'none';
     const va = state.vacA, vb = state.vacB;
     if (va || vb) {
       $('smVacCell').style.display = '';
-      $('smVacA').textContent = va ? va + ' d' : '—';
-      $('smVacB').textContent = vb ? vb + ' d' : '—';
+      $('smVacA').textContent = va ? va + ' d' : '-';
+      $('smVacB').textContent = vb ? vb + ' d' : '-';
       const vacDiff = (vb || 0) - (va || 0);
       const vacEl = $('smVacBadge');
       vacEl.textContent = vacDiff > 0 ? '+' + vacDiff + ' d' : vacDiff < 0 ? vacDiff + ' d' : '≈';
@@ -708,8 +708,8 @@ function calculate() {
     const na = state.noticeA, nb = state.noticeB;
     if (na || nb) {
       $('smNoticeCell').style.display = '';
-      $('smNoticeA').textContent = na ? na + ' mo' : '—';
-      $('smNoticeB').textContent = nb ? nb + ' mo' : '—';
+      $('smNoticeA').textContent = na ? na + ' mo' : '-';
+      $('smNoticeB').textContent = nb ? nb + ' mo' : '-';
     }
     $('simpleResult').style.display = 'block';
     $('simpleResult').classList.add('fadein');
@@ -839,7 +839,7 @@ async function getAI(a, b, pg, pn, py) {
     ).join('\n');
 
     qualSection =
-`\n\nQualitative Factors (weighted scores — ${coA}: ${scoreA.toFixed(1)}/10, ${coB}: ${scoreB.toFixed(1)}/10):
+`\n\nQualitative Factors (weighted scores - ${coA}: ${scoreA.toFixed(1)}/10, ${coB}: ${scoreB.toFixed(1)}/10):
 ${rows}`;
 
   }
@@ -863,7 +863,7 @@ Decision rules:
 6. Be direct, specific, and practical.
 7. End with a clear recommendation: choose ${coA}, choose ${coB}, or either is reasonable depending on priorities.
 
-Offer 1 — ${coA}
+Offer 1 - ${coA}
 - Gross monthly salary: SAR ${fmt(a.gross)}
 - Net monthly salary: SAR ${fmt(a.net)}
 - Total annual package: SAR ${fmt(a.yearBenefits)}
@@ -871,7 +871,7 @@ Offer 1 — ${coA}
 - Vacation days per year: ${state.vacA}` : ''}${state.noticeA ? `
 - Notice period: ${state.noticeA} month(s)` : ''}
 
-Offer 2 — ${coB}
+Offer 2 - ${coB}
 - Gross monthly salary: SAR ${fmt(b.gross)}
 - Net monthly salary: SAR ${fmt(b.net)}
 - Total annual package: SAR ${fmt(b.yearBenefits)}
@@ -892,7 +892,7 @@ ${qualSection}
 ${t('ai_lang_instruction')}
 ${t('ai_prompt_suffix')}
 
-Write 4–6 sentences in a confident advisory tone. No bullet points.`;
+Write 4-6 sentences in a confident advisory tone. No bullet points.`;
 
   try {
 
@@ -936,7 +936,7 @@ const STRINGS = {
     current:'Current', new_offer:'New Offer',
     add_field:'+ Add Field', add_deduction:'+ Add Deduction',
     qualitative_factors:'// Qualitative Factors',
-    factors_hint:'Rate each factor 1–10 · weight what matters most · used mainly when offers are close',
+    factors_hint:'Rate each factor 1-10 · weight what matters most · used mainly when offers are close',
     add_factor:'+ Add Factor', compare_btn:'Compare Offers',
     net_monthly:'NET MONTHLY', yearly_total:'YEARLY TOTAL', eff_monthly:'EFFECTIVE MONTHLY VALUE',
     overall_year:'TOTAL ANNUAL PACKAGE',
@@ -956,7 +956,7 @@ const STRINGS = {
     reset_confirm:'Reset everything to defaults?', saved_txt:'Saved',
     gosi_note_saudi:'',
     gosi_note_non:'Non-Saudi: no GOSI deduction from employee salary',
-    deduction_toggle:'Deduction — click to toggle', addition_toggle:'Addition — click to mark as deduction',
+    deduction_toggle:'Deduction - click to toggle', addition_toggle:'Addition - click to mark as deduction',
     weight_lbl:'WEIGHT %', remove_factor:'Remove',
     remove_field:'Remove field', more_options:'More options', reset_aria:'Reset all fields to defaults',
     export_fail:'Could not load the Excel export library. Check your connection and try again.',
@@ -1015,7 +1015,7 @@ const STRINGS = {
     current:'الحالي', new_offer:'العرض الجديد',
     add_field:'+ إضافة حقل', add_deduction:'+ إضافة خصم',
     qualitative_factors:'// العوامل النوعية',
-    factors_hint:'قيّم كل عامل من 1–10 · أعطِ وزناً لما يهمك أكثر · ويُستخدم غالباً عند تقارب العروض',
+    factors_hint:'قيّم كل عامل من 1-10 · أعطِ وزناً لما يهمك أكثر · ويُستخدم غالباً عند تقارب العروض',
     add_factor:'+ إضافة عامل', compare_btn:'قارن العروض',
     net_monthly:'صافي الشهري', yearly_total:'الإجمالي السنوي', eff_monthly:'القيمة الشهرية الفعلية',
     overall_year:'إجمالي الحزمة السنوية',
@@ -1034,7 +1034,7 @@ const STRINGS = {
     reset_confirm:'إعادة تعيين كل شيء إلى الإعدادات الافتراضية؟', saved_txt:'تم الحفظ',
     gosi_note_saudi:'',
     gosi_note_non:'غير سعودي: لا يوجد اشتراك تأمينات على الموظف',
-    deduction_toggle:'خصم — انقر للتبديل', addition_toggle:'إضافة — انقر للتعيين كخصم',
+    deduction_toggle:'خصم - انقر للتبديل', addition_toggle:'إضافة - انقر للتعيين كخصم',
     weight_lbl:'الوزن %', remove_factor:'حذف',
     remove_field:'حذف الحقل', more_options:'خيارات إضافية', reset_aria:'إعادة تعيين كل الحقول إلى الوضع الافتراضي',
     export_fail:'تعذر تحميل مكتبة تصدير Excel. تحقق من الاتصال وحاول مجددًا.',
@@ -1163,6 +1163,8 @@ function applyLang(lang) {
 
   // Persist lang
   localStorage.setItem('offer_lang', lang);
+  localStorage.setItem('tools-language', lang);
+  localStorage.setItem('tools_lang', lang);
 }
 
 function toggleLang() {
@@ -1171,8 +1173,8 @@ function toggleLang() {
 function applyTheme(theme) {
   currentTheme = theme === 'light' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('tools-theme', currentTheme);
   localStorage.setItem('tools_theme', currentTheme);
-  const themeBtn = $('themeBtn');
   updateThemeIcon();
 }
 function toggleTheme() {
@@ -1211,8 +1213,8 @@ function resetAll() {
   $('resultsWrap').style.display = 'none';
   $('simpleResult').style.display = 'none';
   $('totalsBar').style.display = 'none';
-  $('oYearA').textContent = '—'; $('oYearB').textContent = '—';
-  $('oMonthA').textContent = '—'; $('oMonthB').textContent = '—';
+  $('oYearA').textContent = '-'; $('oYearB').textContent = '-';
+  $('oMonthA').textContent = '-'; $('oMonthB').textContent = '-';
   $('oYearBadge').textContent = ''; $('oMonthBadge').textContent = '';
   updateVacDiff();
   closePopup();
@@ -1229,7 +1231,7 @@ function setNationality(side, nat) {
   // Update buttons
   $('nat' + side + '_saudi').classList.toggle('active', nat === 'saudi');
   $('nat' + side + '_nonsaudi').classList.toggle('active', nat === 'nonsaudi');
-  // Update GOSI pct — 0% for non-Saudi employees
+  // Update GOSI pct - 0% for non-Saudi employees
   const gosiId = side === 'A' ? 'a6' : 'b6';
   const gosi = state[side].find(x => x.id === gosiId);
   if (gosi) {
@@ -1303,7 +1305,7 @@ function makeFactorRow(f) {
         <input type="number" class="factor-weight-input" value="${f.weight}" min="0" max="100"
           onchange="updateFactor('${f.id}','weight',+this.value)">
       </div>
-      <button type="button" class="factor-del-btn hide-mobile" onclick="deleteFactor('${f.id}')" title="${t('remove_factor')}" aria-label="${t('remove_factor')} — ${esc(tFactorName(f))}">${offerIcon('close')}</button>
+      <button type="button" class="factor-del-btn hide-mobile" onclick="deleteFactor('${f.id}')" title="${t('remove_factor')}" aria-label="${t('remove_factor')} - ${esc(tFactorName(f))}">${offerIcon('close')}</button>
     </div>
   `;
   return row;
@@ -1380,13 +1382,18 @@ function switchCard(side) {
       tab.className = 'card-tab';
       tab.setAttribute('aria-selected', 'false');
     }
-    tab.textContent = s === 'A' ? (state.coA || t('current')) : (state.coB || t('new_offer'));
   });
+  updateTabLabels();
 }
 function updateTabLabels() {
   const tabA = $('tabA'), tabB = $('tabB');
-  if (tabA) tabA.textContent = state.coA || t('current');
-  if (tabB) tabB.textContent = state.coB || t('new_offer');
+  const setTab = (tab, value) => {
+    if (!tab) return;
+    const span = tab.querySelector('[data-i18n]');
+    if (span) span.textContent = value; else tab.textContent = value;
+  };
+  setTab(tabA, state.coA || t('current'));
+  setTab(tabB, state.coB || t('new_offer'));
 }
 
 // ── Keyboard ──────────────────────────────────────────────────────
@@ -1404,6 +1411,35 @@ document.addEventListener('keydown', e => {
     }
   }
 });
+
+// ── Static control bindings (replaces inline onclick handlers) ───
+$('langBtn').addEventListener('click', () => toggleLang());
+$('themeBtn').addEventListener('click', () => toggleTheme());
+$('saveBtn').addEventListener('click', () => saveData());
+$('menuBtn').addEventListener('click', () => toggleMenu());
+$('btnReset').addEventListener('click', () => { resetAll(); toggleMenu(); });
+$('modeSimpleBtn').addEventListener('click', () => setMode('simple'));
+$('modeDetailedBtn').addEventListener('click', () => setMode('detailed'));
+$('tabA').addEventListener('click', () => switchCard('A'));
+$('tabB').addEventListener('click', () => switchCard('B'));
+$('calcBtn').addEventListener('click', () => calculate());
+$('calcBtnSticky').addEventListener('click', () => calculate());
+$('exportBtn').addEventListener('click', () => exportExcel());
+$('exportBtnSticky').addEventListener('click', () => exportExcel());
+$('addFactorBtn').addEventListener('click', () => addFactor());
+document.querySelectorAll('.nat-btn[id^="natA_"],.nat-btn[id^="natB_"]').forEach(btn => {
+  const side = btn.id[3], nat = btn.id.slice(5);
+  btn.addEventListener('click', () => setNationality(side, nat));
+});
+document.querySelectorAll('.main-grid .add-field-btn').forEach(btn => {
+  const card = btn.closest('.card');
+  btn.addEventListener('click', () => openAddField(card && card.id === 'cardB' ? 'B' : 'A'));
+});
+$('popupCancelBtn').addEventListener('click', () => closePopup());
+$('popupConfirmBtn').addEventListener('click', () => confirmField());
+$('pIsPct').addEventListener('change', () => togglePctMode());
+$('pHasRef2').addEventListener('change', () => toggleRef2());
+$('pIsMonths').addEventListener('change', () => toggleMonthsMode());
 
 init();
 
@@ -1493,7 +1529,7 @@ async function exportExcel() {
   }
 
   // ════════════════════════════════════════════════════════════════
-  // SHEET 1 — SUMMARY
+  // SHEET 1 - SUMMARY
   // ════════════════════════════════════════════════════════════════
   const summaryData = [];
 
@@ -1553,7 +1589,7 @@ async function exportExcel() {
   XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
 
   // ════════════════════════════════════════════════════════════════
-  // SHEET 2 — FIELD BREAKDOWN
+  // SHEET 2 - FIELD BREAKDOWN
   // ════════════════════════════════════════════════════════════════
   const fieldsData = [];
   fieldsData.push([
@@ -1594,9 +1630,9 @@ async function exportExcel() {
     fieldsData.push([
       cell(name, { font: isDeduction ? { ...bodyFont, color:{ rgb:'C0392B' } } : bodyFont }),
       cell(isDeduction ? 'Deduction' : 'Monthly', { font: { ...bodyFont, color:{ rgb:'888880' } }, align: center }),
-      fa ? num(fmt(va)) : cell('—', { align: center }),
-      fb ? num(fmt(vb)) : cell('—', { align: center }),
-      diff !== 0 ? num(fmt(diff), diff > 0 ? { rgb:'E8F5F0' } : { rgb:'FEE9E7' }) : cell('—', { align: center })
+      fa ? num(fmt(va)) : cell('-', { align: center }),
+      fb ? num(fmt(vb)) : cell('-', { align: center }),
+      diff !== 0 ? num(fmt(diff), diff > 0 ? { rgb:'E8F5F0' } : { rgb:'FEE9E7' }) : cell('-', { align: center })
     ]);
   });
 
@@ -1620,9 +1656,9 @@ async function exportExcel() {
     fieldsData.push([
       cell(name),
       cell('Annual', { font: { ...bodyFont, color:{ rgb:'888880' } }, align: center }),
-      fa ? num(fmt(va)) : cell('—', { align: center }),
-      fb ? num(fmt(vb)) : cell('—', { align: center }),
-      diff !== 0 ? num(fmt(diff), diff > 0 ? { rgb:'E8F5F0' } : { rgb:'FEE9E7' }) : cell('—', { align: center })
+      fa ? num(fmt(va)) : cell('-', { align: center }),
+      fb ? num(fmt(vb)) : cell('-', { align: center }),
+      diff !== 0 ? num(fmt(diff), diff > 0 ? { rgb:'E8F5F0' } : { rgb:'FEE9E7' }) : cell('-', { align: center })
     ]);
   });
 
@@ -1632,7 +1668,7 @@ async function exportExcel() {
   XLSX.utils.book_append_sheet(wb, ws2, 'Field Breakdown');
 
   // ════════════════════════════════════════════════════════════════
-  // SHEET 3 — QUALITATIVE FACTORS
+  // SHEET 3 - QUALITATIVE FACTORS
   // ════════════════════════════════════════════════════════════════
   const factors = state.factors || [];
   if (factors.length) {

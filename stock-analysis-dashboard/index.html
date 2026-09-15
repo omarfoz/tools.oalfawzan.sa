@@ -4,90 +4,90 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>لوحة تحليل الأسهم — tools.oalfawzan.sa</title>
-<script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
+  <title>لوحة تحليل الأسهم - tools.oalfawzan.sa</title>
+<script src="/assets/js/theme-init.js"></script>
   <meta name="theme-color" content="#010204">
   <meta name="description" content="لوحة تحليل الأسهم السعودية مع RSI وMA50 وMA200 وحجم التداول والمفضلة وتوصية ذكية مبسطة.">
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
-<link rel="stylesheet" href="/assets/css/pages/stock-analysis-dashboard.css?v=20260914b">
-  <link rel="stylesheet" href="/assets/css/pages/stock-refinements.css?v=20260914b">
-<link rel="stylesheet" href="/assets/css/tool-runtime.css?v=20260911c">
-<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911c">
-<link rel="stylesheet" href="/assets/css/tool-parity.css?v=20260914a">
+  <link rel="stylesheet" href="/assets/css/pages/stock-analysis-dashboard.css?v=20260915a">
+  <link rel="stylesheet" href="/assets/css/pages/stock-refinements.css?v=20260915a">
+  <link rel="stylesheet" href="/assets/css/platform.css?v=20260915a">
+  <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260915a">
 </head>
 <body class="tool-page">
-<a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
-<div class="wrap" id="main-content" role="main">
-  <header class="site-header tool-site-header">
-    <a class="brand" href="/" aria-label="tools.oalfawzan.sa home">
-      <span class="brand-mark" aria-hidden="true">OF</span>
-      <span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>
-    </a>
-    <div class="header-actions">
-      <button class="icon-btn platform-control" id="langBtn" type="button" aria-label="Switch language">EN</button>
-      <button class="icon-btn platform-control" id="themeBtn" type="button" aria-label="Toggle theme"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg></button>
-    </div>
-  </header>
+  <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
+  <div class="wrap" id="main-content" role="main">
+    <header class="site-header">
+      <a href="/" class="brand" aria-label="tools.oalfawzan.sa home">
+        <span class="brand-mark" aria-hidden="true">OF</span>
+        <span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span>
+      </a>
+      <div class="header-actions">
+        <button class="icon-btn" id="langBtn" type="button" aria-label="Switch language">EN</button>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="تبديل المظهر"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+      </div>
+    </header>
 
-  <nav class="tool-breadcrumb" aria-label="Tool navigation">
-    <a href="/" id="backLink" class="tool-back-link"><span aria-hidden="true" class="back-icon">←</span><span class="back-label">الرجوع لكل الأدوات</span></a>
-  </nav>
+    <a href="/" class="back-link"><span class="back-icon" aria-hidden="true">←</span><span id="backLink">← الرجوع لكل الأدوات</span></a>
 
-  <div class="card stock-hero-card">
-    <div class="pill" id="badgeText">لوحة تداول</div>
-    <h1 id="pageTitle">لوحة تحليل الأسهم</h1>
-    <p id="pageDesc" class="muted">ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة وتوصية ذكاء اصطناعي مبسطة.</p>
-    <div class="search">
-      <input id="tickerInput" inputmode="numeric" autocomplete="off" placeholder="أدخل رمز تداول (مثال: 7202)" aria-label="Saudi stock ticker">
-      <button type="button" id="analyzeBtn" class="primary">تحليل</button>
-      <button type="button" id="saveFavBtn" class="ghost">حفظ بالمفضلة</button>
+    <section class="hero">
+      <div class="hero-tag" id="badgeText">لوحة تداول</div>
+      <h1 id="pageTitle">لوحة تحليل الأسهم</h1>
+      <p class="sub muted" id="pageDesc">ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة وتوصية ذكاء اصطناعي مبسطة.</p>
+    </section>
+
+    <div class="card stock-search-card">
+      <div class="search">
+        <input id="tickerInput" inputmode="numeric" autocomplete="off" placeholder="أدخل رمز تداول (مثال: 7202)" aria-label="Saudi stock ticker">
+        <button type="button" id="analyzeBtn" class="btn primary">تحليل</button>
+        <button type="button" id="saveFavBtn" class="btn">حفظ بالمفضلة</button>
+      </div>
     </div>
+
+    <div class="card">
+      <div class="chart-wrap" id="priceChartContainer">
+        <div id="priceChart"></div>
+        <div id="chartTooltip" class="chart-tooltip"></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="card grid">
+          <div class="kpi"><div class="l" id="kpiPriceLabel">السعر</div><div id="kpiPrice" class="v">-</div></div>
+          <div class="kpi"><div class="l">RSI (14)</div><div id="kpiRsi" class="v">-</div></div>
+          <div class="kpi"><div class="l">MA50</div><div id="kpiMa50" class="v">-</div></div>
+          <div class="kpi"><div class="l">MA200</div><div id="kpiMa200" class="v">-</div></div>
+          <div class="kpi"><div class="l" id="kpiSupportLabel">الدعم</div><div id="kpiSupport" class="v">-</div></div>
+          <div class="kpi"><div class="l" id="kpiResistanceLabel">المقاومة</div><div id="kpiResistance" class="v">-</div></div>
+          <div class="kpi"><div class="l" id="kpiVolumeLabel">اتجاه الحجم</div><div id="kpiVolume" class="v">-</div></div>
+          <div class="kpi"><div class="l" id="kpiTickerLabel">الرمز</div><div id="kpiTicker" class="v">-</div></div>
+        </div>
+        <div class="card">
+          <h3 id="aiTitle">توصية الذكاء الاصطناعي</h3>
+          <div id="aiText" aria-live="polite" class="ai-box">شغّل التحليل لإظهار التوصية.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h3 id="favTitle">الأسهم المفضلة</h3>
+          <div id="favoritesList" aria-live="polite" class="list"></div>
+        </div>
+        <div class="card">
+          <h3 id="trendingTitle">أكثر 20 سهماً سعودياً حركة</h3>
+          <div id="trendingList" aria-live="polite" class="list"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <span>TOOLS.OALFAWZAN.SA / 2026</span>
+      <span>Built by <a href="https://oalfawzan.sa">Omar Alfawzan</a></span>
+    </footer>
   </div>
 
-  <div class="card">
-    <div class="chart-wrap" id="priceChartContainer">
-      <div id="priceChart"></div>
-      <div id="chartTooltip" class="chart-tooltip"></div>
-    </div>
-  </div>
-
-  <div class="two-col">
-    <div>
-      <div class="card grid">
-        <div class="kpi"><div class="l" id="kpiPriceLabel">السعر</div><div id="kpiPrice" class="v">—</div></div>
-        <div class="kpi"><div class="l">RSI (14)</div><div id="kpiRsi" class="v">—</div></div>
-        <div class="kpi"><div class="l">MA50</div><div id="kpiMa50" class="v">—</div></div>
-        <div class="kpi"><div class="l">MA200</div><div id="kpiMa200" class="v">—</div></div>
-        <div class="kpi"><div class="l" id="kpiSupportLabel">الدعم</div><div id="kpiSupport" class="v">—</div></div>
-        <div class="kpi"><div class="l" id="kpiResistanceLabel">المقاومة</div><div id="kpiResistance" class="v">—</div></div>
-        <div class="kpi"><div class="l" id="kpiVolumeLabel">اتجاه الحجم</div><div id="kpiVolume" class="v">—</div></div>
-        <div class="kpi"><div class="l" id="kpiTickerLabel">الرمز</div><div id="kpiTicker" class="v">—</div></div>
-      </div>
-      <div class="card">
-        <h3 id="aiTitle" style="margin-top:0">توصية الذكاء الاصطناعي</h3>
-        <div id="aiText" aria-live="polite" class="ai-box">شغّل التحليل لإظهار التوصية.</div>
-      </div>
-    </div>
-
-    <div>
-      <div class="card">
-        <h3 id="favTitle" style="margin-top:0">الأسهم المفضلة</h3>
-        <div id="favoritesList" aria-live="polite" class="list"></div>
-      </div>
-      <div class="card">
-        <h3 id="trendingTitle" style="margin-top:0">أكثر 20 سهماً سعودياً حركة</h3>
-        <div id="trendingList" aria-live="polite" class="list"></div>
-      </div>
-    </div>
-  </div>
-
-  <footer class="site-footer">
-    <span>TOOLS.OALFAWZAN.SA / 2026</span>
-    <span>Built by <a href="https://oalfawzan.sa">Omar Alfawzan</a></span>
-  </footer>
-</div>
-
-<script defer src="/assets/js/pages/stock-analysis-dashboard.js?v=20260914b"></script>
-<script defer src="/assets/js/platform.js"></script>
+  <script defer src="/assets/js/pages/stock-analysis-dashboard.js?v=20260915a"></script>
+  <script defer src="/assets/js/platform.js?v=20260915a"></script>
 </body>
 </html>

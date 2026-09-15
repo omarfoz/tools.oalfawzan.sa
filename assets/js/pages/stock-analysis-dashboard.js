@@ -14,11 +14,11 @@ const YAHOO_PROXIES = [
 
 const I18N = {
   ar: {
-    lang: 'ar', dir: 'rtl', title: 'لوحة تحليل الأسهم — tools.oalfawzan.sa',
+    lang: 'ar', dir: 'rtl', title: 'لوحة تحليل الأسهم - tools.oalfawzan.sa',
     descMeta: 'لوحة تحليل الأسهم السعودية مع RSI وMA50 وMA200 وحجم التداول والمفضلة وتوصية ذكية مبسطة.',
     badge: 'لوحة تداول', pageTitle: 'لوحة تحليل الأسهم',
     pageDesc: 'ابحث برمز السهم (مثال: <b>7202</b>). مصدر البيانات: Yahoo Finance باستخدام <code>TICKER.SR</code>. تشمل RSI وMA50 وMA200 والدعم/المقاومة واتجاه الحجم والمفضلة وتوصية ذكاء اصطناعي مبسطة.',
-    back: '← الرجوع لكل الأدوات', tickerPlaceholder: 'أدخل رمز تداول (مثال: 7202)', analyze: 'تحليل', saveFavorite: 'حفظ بالمفضلة',
+    back: 'الرجوع لكل الأدوات', tickerPlaceholder: 'أدخل رمز تداول (مثال: 7202)', analyze: 'تحليل', saveFavorite: 'حفظ بالمفضلة',
     aiTitle: 'توصية الذكاء الاصطناعي', aiInitial: 'شغّل التحليل لإظهار التوصية.', favTitle: 'الأسهم المفضلة', trendingTitle: 'أكثر 20 سهماً سعودياً حركة',
     invalidTicker: 'من فضلك أدخل رمز تداول مكوّن من 4 أرقام (مثال: 7202).', analyzing: 'جارٍ التحليل...', failed: 'تعذر تحليل هذا السهم حالياً. حاول رمزاً آخر.', favoriteFirst: 'حلّل سهماً أولاً.',
     noFavorites: 'لا توجد أسهم مفضلة بعد.', loadingTrending: 'جارٍ تحميل الأسهم الأكثر حركة...', trendingFail: 'تعذر تحميل قائمة الأسهم الأكثر حركة حالياً.', trendingEmpty: 'لا توجد بيانات متاحة لقائمة الأسهم الأكثر حركة حالياً.',
@@ -29,11 +29,11 @@ const I18N = {
     aiPrompt: 'أنت مرشد استثماري مبسّط للمستخدم غير المتخصص. اكتب بالعربية الفصحى السهلة بلغة موزونة وواضحة، وتجنب المصطلحات المالية المعقدة. ممنوع كتابة كلمة RSI نهائياً. استخدم فقط عبارة "مؤشر الزخم" ثم وضّح معناها بلغة يومية مثل: يدل على ضعف الشراء، أو يدل على قوة الشراء، أو وضع متوازن. لا تستخدم markdown ولا رموز * أو - ولا أي قوائم. اكتب بالضبط 4 أسطر فقط وبالعناوين التالية حرفياً:\nالاتجاه: صاعد أو هابط أو جانبي + سبب قصير مفهوم لعامة الناس\nالمخاطرة: منخفضة أو متوسطة أو مرتفعة + سبب بسيط مرتبط بإمكانية تغير السعر\nالتوصية: شراء أو احتفاظ أو بيع + إجراء مباشر واضح لغير الماليين (مثل: اشترِ على دفعات صغيرة أو انتظر حتى يتضح الاتجاه)\nالشرح المبسط: جملتان قصيرتان جداً تشرحان القرار بعبارات يومية سهلة، بدون اختصارات وبدون أرقام تقنية.\nلا تضف أي مقدمات أو سطر خامس.'
   },
   en: {
-    lang: 'en', dir: 'ltr', title: 'Stock Analysis Dashboard — tools.oalfawzan.sa',
+    lang: 'en', dir: 'ltr', title: 'Stock Analysis Dashboard - tools.oalfawzan.sa',
     descMeta: 'Saudi stock dashboard with RSI, MA50, MA200, volume trend, favorites, and a simple AI recommendation.',
     badge: 'Tadawul Dashboard', pageTitle: 'Stock Analysis Dashboard',
     pageDesc: 'Search by ticker (example: <b>7202</b>). Data source: Yahoo Finance using <code>TICKER.SR</code>. Includes RSI, MA50, MA200, support/resistance, volume trend, favorites, and a simplified AI recommendation.',
-    back: '← Back to all tools', tickerPlaceholder: 'Enter Tadawul ticker (e.g. 7202)', analyze: 'Analyze', saveFavorite: 'Save Favorite',
+    back: 'Back to all tools', tickerPlaceholder: 'Enter Tadawul ticker (e.g. 7202)', analyze: 'Analyze', saveFavorite: 'Save Favorite',
     aiTitle: 'AI Recommendation', aiInitial: 'Run analysis to generate recommendation.', favTitle: 'Favorite Stocks', trendingTitle: 'Trending 20 Saudi Stocks',
     invalidTicker: 'Please enter a 4-digit Tadawul ticker (example: 7202).', analyzing: 'Analyzing...', failed: 'Could not analyze this stock now. Try another ticker.', favoriteFirst: 'Analyze a stock first.',
     noFavorites: 'No favorite stocks yet.', loadingTrending: 'Loading trending stocks...', trendingFail: 'Could not load trending list right now.', trendingEmpty: 'No data is currently available for the trending list.',
@@ -72,7 +72,7 @@ let chartObserver = null;
 let lastMetrics = null;
 
 function t(key){ return I18N[currentLang][key] || I18N.en[key] || key; }
-function fmt(v){ return Number.isFinite(v) ? Number(v).toFixed(2) : '—'; }
+function fmt(v){ return Number.isFinite(v) ? Number(v).toFixed(2) : '-'; }
 /* Escape external API / user data before it enters innerHTML */
 function escHtml(v){ return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;'); }
 function getFavorites(){ try { return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]'); } catch { return []; } }
@@ -190,7 +190,7 @@ function formatCrosshairDate(timeValue){
   if(timeValue && typeof timeValue === 'object' && 'year' in timeValue){
     return new Date(timeValue.year, timeValue.month - 1, timeValue.day).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
   }
-  return '—';
+  return '-';
 }
 
 function addChartSeries(type, options){
@@ -493,7 +493,7 @@ applyTheme(currentTheme);
 applyLanguage(currentLang);
 setupChartVisibility();
 renderFavorites();
-document.getElementById('trendingList').innerHTML = '<div class="muted">—</div>';
+document.getElementById('trendingList').innerHTML = '<div class="muted">-</div>';
 let trendingLoaded = false;
 function loadTrendingOnDemand(){if(trendingLoaded)return;trendingLoaded=true;renderTrending()}
 window.addEventListener('scroll', loadTrendingOnDemand, {once:true,passive:true});

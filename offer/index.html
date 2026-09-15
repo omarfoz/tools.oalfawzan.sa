@@ -5,60 +5,34 @@
 <meta name="theme-color" content="#010204">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<title>مقارن عروض العمل — tools.oalfawzan.sa</title>
+<title>مقارن عروض العمل - tools.oalfawzan.sa</title>
 <meta name="description" content="قارن بين عرضي عمل من حيث الراتب الصافي والبدلات والمزايا السنوية والتأمينات والعوامل المهنية لاتخاذ قرار أوضح.">
 <link rel="canonical" href="https://tools.oalfawzan.sa/offer/">
-<script>try{const t=localStorage.getItem('tools-theme')||localStorage.getItem('tools_theme');const l=localStorage.getItem('tools-language')||localStorage.getItem('tools_lang')||localStorage.getItem('offer_lang');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;if(l==='ar'||l==='en'){document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr'}}catch(e){}</script>
-<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20260914b">
-<link rel="stylesheet" href="/assets/css/offer-runtime.css?v=20260911c">
-<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260911e">
-<link rel="stylesheet" href="/assets/css/tool-parity.css?v=20260914a">
-<style>
-/* Final Offer mobile touch-target override */
-@media (max-width:640px){
-  body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 112px 30px!important}
-  html[dir="rtl"] body.tool-page .main-grid .field-row{grid-template-columns:48px minmax(0,1fr) 112px 30px!important}
-  body.tool-page .main-grid button.toggle{width:48px!important;min-width:48px!important;max-width:48px!important;height:48px!important;min-height:48px!important;max-height:48px!important;background:transparent!important;border:0!important;border-radius:10px!important;position:relative!important}
-  body.tool-page .main-grid button.toggle::before{content:"";position:absolute;width:32px;height:18px;left:8px;top:15px;border-radius:999px;background:var(--border2);transition:background .2s}
-  body.tool-page .main-grid button.toggle.on::before{background:var(--current)}
-  body.tool-page .main-grid button.toggle.on-new::before{background:var(--new)}
-  body.tool-page .main-grid button.toggle::after{top:18px!important;left:11px!important;width:12px!important;height:12px!important}
-}
-@media (max-width:390px){
-  body.tool-page .main-grid .field-row{grid-template-columns:44px minmax(0,1fr) 96px 26px!important}
-  html[dir="rtl"] body.tool-page .main-grid .field-row{grid-template-columns:44px minmax(0,1fr) 96px 26px!important}
-}
-/* Very narrow phones: stack name above amount so both stay usable. */
-@media (max-width:360px){
-  body.tool-page .main-grid .field-row,
-  html[dir="rtl"] body.tool-page .main-grid .field-row{
-    grid-template-columns:44px minmax(0,1fr) minmax(84px,1fr) 26px!important;
-    grid-template-areas:"toggle name name name" "toggle amount amount type"!important;
-  }
-}
-</style>
-
+<script src="/assets/js/theme-init.js"></script>
+<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20260915a">
+<link rel="stylesheet" href="/assets/css/platform.css?v=20260915a">
+<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20260915a">
 </head>
 <body class="tool-page">
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
 <div class="wrap" id="main-content" role="main">
 
-  <header class="site-header tool-site-header">
-    <a href="/" class="brand" aria-label="OF tools.oalfawzan.sa"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a>
+  <header class="site-header">
+    <a href="/" class="brand" aria-label="tools.oalfawzan.sa home"><span class="brand-mark" aria-hidden="true">OF</span><span class="brand-text"><strong>tools.</strong>oalfawzan.sa</span></a>
     <div class="header-actions">
-      <button type="button" class="lang-btn" id="langBtn" onclick="toggleLang()">عربي</button>
-      <button type="button" class="lang-btn" id="themeBtn" aria-label="Toggle theme" onclick="toggleTheme()"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg></button>
-      <button type="button" class="btn-ghost" id="saveBtn" onclick="saveData()">Save</button>
+      <button class="icon-btn" id="langBtn" type="button">EN</button>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="تبديل المظهر"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+      <button type="button" class="btn-ghost" id="saveBtn">Save</button>
       <div class="menu-wrap">
-        <button type="button" class="btn-ghost" onclick="toggleMenu()" id="menuBtn" aria-label="More options" aria-haspopup="true" aria-expanded="false">⋯</button>
+        <button type="button" class="btn-ghost" id="menuBtn" aria-label="More options" aria-haspopup="true" aria-expanded="false">⋯</button>
         <div class="dropdown" id="headerMenu">
-          <button type="button" onclick="resetAll();toggleMenu()" id="btnReset" aria-label="Reset all fields to defaults">↺ Reset</button>
+          <button type="button" id="btnReset" aria-label="Reset all fields to defaults">↺ Reset</button>
           <a href="https://oalfawzan.sa" id="btnPortfolio">← Portfolio</a>
         </div>
       </div>
     </div>
   </header>
-  <a href="/" class="back-link" aria-label="Back to all tools">← tools.oalfawzan.sa</a>
+  <a href="/" class="back-link" id="backLink">← tools.oalfawzan.sa</a>
 
   <div class="hero">
     <div class="hero-tag"><span data-i18n="tool_tag">// أداة مقارنة</span></div>
@@ -68,13 +42,13 @@
 
   <!-- Mode Switcher -->
   <div class="mode-switcher" role="group" aria-label="Comparison mode">
-    <button type="button" class="mode-btn active-simple" id="modeSimpleBtn" onclick="setMode('simple')">
-      <span class="mode-icon"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m13 2-8 11h6l-1 9 9-12h-6l1-8Z"/></svg></span>
+    <button type="button" class="mode-btn active-simple" id="modeSimpleBtn">
+      <span class="mode-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m13 2-8 11h6l-1 9 9-12h-6l1-8Z"/></svg></span>
       <span class="mode-label" data-i18n="mode_simple_label">مقارنة سريعة</span>
       <span class="mode-sub" data-i18n="mode_simple_sub">للباحث عن عمل · نتيجة سريعة</span>
     </button>
-    <button type="button" class="mode-btn" id="modeDetailedBtn" onclick="setMode('detailed')">
-      <span class="mode-icon"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
+    <button type="button" class="mode-btn" id="modeDetailedBtn">
+      <span class="mode-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
       <span class="mode-label" data-i18n="mode_detailed_label">تحليل كامل</span>
       <span class="mode-sub" data-i18n="mode_detailed_sub">الموارد البشرية / المالية · كل التفاصيل</span>
     </button>
@@ -88,8 +62,8 @@
     <div class="nat-col">
       <div class="nat-col-label current-col" id="natLabelA">Current</div>
       <div class="nat-toggle-wrap">
-        <button type="button" class="nat-btn active" id="natA_saudi" onclick="setNationality('A','saudi')"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 21V4m0 1c5-3 8 3 14 0v10c-6 3-9-3-14 0"/></svg> <span data-i18n="saudi_short">Saudi</span></button>
-        <button type="button" class="nat-btn" id="natA_nonsaudi" onclick="setNationality('A','nonsaudi')"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg> <span data-i18n="non_saudi_short">Non-Saudi</span></button>
+        <button type="button" class="nat-btn active" id="natA_saudi"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 21V4m0 1c5-3 8 3 14 0v10c-6 3-9-3-14 0"/></svg> <span data-i18n="saudi_short">Saudi</span></button>
+        <button type="button" class="nat-btn" id="natA_nonsaudi"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg> <span data-i18n="non_saudi_short">Non-Saudi</span></button>
       </div>
       <span class="nat-note" id="natNoteA">GOSI: 9.75% of (Basic + Housing), capped SAR 45,000</span>
     </div>
@@ -97,8 +71,8 @@
     <div class="nat-col">
       <div class="nat-col-label new-col" id="natLabelB">New Offer</div>
       <div class="nat-toggle-wrap">
-        <button type="button" class="nat-btn active" id="natB_saudi" onclick="setNationality('B','saudi')"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 21V4m0 1c5-3 8 3 14 0v10c-6 3-9-3-14 0"/></svg> <span data-i18n="saudi_short">Saudi</span></button>
-        <button type="button" class="nat-btn" id="natB_nonsaudi" onclick="setNationality('B','nonsaudi')"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg> <span data-i18n="non_saudi_short">Non-Saudi</span></button>
+        <button type="button" class="nat-btn active" id="natB_saudi"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 21V4m0 1c5-3 8 3 14 0v10c-6 3-9-3-14 0"/></svg> <span data-i18n="saudi_short">Saudi</span></button>
+        <button type="button" class="nat-btn" id="natB_nonsaudi"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg> <span data-i18n="non_saudi_short">Non-Saudi</span></button>
       </div>
       <span class="nat-note" id="natNoteB">GOSI: 9.75% of (Basic + Housing), capped SAR 45,000</span>
     </div>
@@ -106,22 +80,22 @@
 
   <!-- Mobile card tab switcher -->
   <div class="card-tabs" role="tablist" aria-label="Offer cards">
-    <button type="button" class="card-tab active-tab-a" id="tabA" role="tab" aria-selected="true" aria-controls="cardA" onclick="switchCard('A')"><span data-i18n="current">Current</span></button>
-    <button type="button" class="card-tab" id="tabB" role="tab" aria-selected="false" aria-controls="cardB" onclick="switchCard('B')"><span data-i18n="new_offer">New Offer</span></button>
+    <button type="button" class="card-tab active-tab-a" id="tabA" role="tab" aria-selected="true" aria-controls="cardA"><span data-i18n="current">Current</span></button>
+    <button type="button" class="card-tab" id="tabB" role="tab" aria-selected="false" aria-controls="cardB"><span data-i18n="new_offer">New Offer</span></button>
   </div>
 
   <div class="main-grid">
     <div class="card active-card" id="cardA">
       <div class="card-top">
         <div class="card-label" id="labelA">Current Company</div>
-        <button type="button" class="add-field-btn detailed-only" onclick="openAddField('A')"><span data-i18n="add_field">+ Add Field</span></button>
+        <button type="button" class="add-field-btn detailed-only"><span data-i18n="add_field">+ Add Field</span></button>
       </div>
       <div id="fieldsA"></div>
     </div>
     <div class="card" id="cardB">
       <div class="card-top">
         <div class="card-label" id="labelB">New Company</div>
-        <button type="button" class="add-field-btn detailed-only" onclick="openAddField('B')"><span data-i18n="add_field">+ Add Field</span></button>
+        <button type="button" class="add-field-btn detailed-only"><span data-i18n="add_field">+ Add Field</span></button>
       </div>
       <div id="fieldsB"></div>
     </div>
@@ -132,62 +106,54 @@
     <div class="factors-header">
       <div>
         <div class="factors-title"><span data-i18n="qualitative_factors">// Qualitative Factors</span></div>
-        <div style="font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-top:4px"><span data-i18n="factors_hint">Rate each factor 1–10 · set weight % · affects final score</span></div>
+        <div class="factors-hint"><span data-i18n="factors_hint">Rate each factor 1-10 · set weight % · affects final score</span></div>
       </div>
-      <button type="button" class="add-factor-btn" onclick="addFactor()"><span data-i18n="add_factor">+ Add Factor</span></button>
+      <button type="button" class="add-factor-btn" id="addFactorBtn"><span data-i18n="add_factor">+ Add Factor</span></button>
     </div>
     <div id="factorsContainer"></div>
-    <div class="factor-score-bar" id="factorScoreBar" style="display:none">
+    <div class="factor-score-bar" id="factorScoreBar" hidden>
       <span class="fscore-label" data-i18n="qualitative_score">QUALITATIVE SCORE</span>
-      <span class="fscore-val fa" id="fScoreA">—</span>
+      <span class="fscore-val fa" id="fScoreA">-</span>
       <span class="fscore-sep">vs</span>
-      <span class="fscore-val fb" id="fScoreB">—</span>
-      <span id="fScoreBadge" style="font-family:var(--mono);font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:4px"></span>
+      <span class="fscore-val fb" id="fScoreB">-</span>
+      <span id="fScoreBadge" class="fscore-badge"></span>
     </div>
   </div>
 
   <!-- HR Context Panel -->
-  <div class="factors-card detailed-only" id="hrContextCard" style="margin-bottom:10px">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+  <div class="factors-card detailed-only" id="hrContextCard">
+    <div class="hr-context-grid">
       <div>
-        <div class="section-label" style="margin-bottom:6px"><span data-i18n="vacation_lbl">Vacation Days / Year</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-          <input class="amount-input" id="vacA" type="number" min="0" max="365" placeholder="—"
-            style="text-align:center;border-top:2px solid var(--current)"
-            oninput="autosave()" aria-label="First offer vacation days">
-          <input class="amount-input" id="vacB" type="number" min="0" max="365" placeholder="—"
-            style="text-align:center;border-top:2px solid var(--new)"
-            oninput="autosave()" aria-label="Second offer vacation days">
+        <div class="section-label"><span data-i18n="vacation_lbl">Vacation Days / Year</span></div>
+        <div class="hr-pair-grid">
+          <input class="amount-input hr-current" id="vacA" type="number" min="0" max="365" placeholder="-" aria-label="First offer vacation days">
+          <input class="amount-input hr-new" id="vacB" type="number" min="0" max="365" placeholder="-" aria-label="Second offer vacation days">
         </div>
       </div>
       <div>
-        <div class="section-label" style="margin-bottom:6px"><span data-i18n="notice_lbl">Notice Period (months)</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-          <input class="amount-input" id="noticeA" type="number" min="0" max="24" placeholder="—"
-            style="text-align:center;border-top:2px solid var(--current)"
-            oninput="autosave()" aria-label="First offer notice period">
-          <input class="amount-input" id="noticeB" type="number" min="0" max="24" placeholder="—"
-            style="text-align:center;border-top:2px solid var(--new)"
-            oninput="autosave()" aria-label="Second offer notice period">
+        <div class="section-label"><span data-i18n="notice_lbl">Notice Period (months)</span></div>
+        <div class="hr-pair-grid">
+          <input class="amount-input hr-current" id="noticeA" type="number" min="0" max="24" placeholder="-" aria-label="First offer notice period">
+          <input class="amount-input hr-new" id="noticeB" type="number" min="0" max="24" placeholder="-" aria-label="Second offer notice period">
         </div>
       </div>
-      <div id="vacDiffWrap" style="display:flex;flex-direction:column;justify-content:flex-end;gap:4px">
-        <div class="section-label" style="margin-bottom:6px" data-i18n="vac_diff_lbl">VACATION DIFF</div>
-        <div id="vacDiff" style="font-size:.85rem;font-weight:700;color:var(--muted)">—</div>
+      <div id="vacDiffWrap" class="hr-vac-diff">
+        <div class="section-label" data-i18n="vac_diff_lbl">VACATION DIFF</div>
+        <div id="vacDiff" class="hr-vac-val">-</div>
       </div>
     </div>
   </div>
 
   <div class="action-row inline-compare">
-    <button type="button" class="calc-btn" onclick="calculate()"><span data-i18n="compare_btn">Compare Offers</span></button>
-    <button type="button" class="export-btn detailed-only" onclick="exportExcel()" id="exportBtn"><svg class="offer-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span data-i18n="export_btn">Export Excel</span></button>
+    <button type="button" class="calc-btn" id="calcBtn"><span data-i18n="compare_btn">Compare Offers</span></button>
+    <button type="button" class="export-btn detailed-only" id="exportBtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span data-i18n="export_btn">Export Excel</span></button>
   </div>
 
   <!-- Sticky compare for mobile -->
   <div class="sticky-compare">
     <div class="action-row">
-      <button type="button" class="calc-btn" onclick="calculate()"><span data-i18n="compare_btn">Compare Offers</span></button>
-      <button type="button" class="export-btn" onclick="exportExcel()"><svg class="offer-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span data-i18n="export_btn">Excel</span></button>
+      <button type="button" class="calc-btn" id="calcBtnSticky"><span data-i18n="compare_btn">Compare Offers</span></button>
+      <button type="button" class="export-btn" id="exportBtnSticky"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span data-i18n="export_btn">Excel</span></button>
     </div>
   </div>
 
@@ -195,43 +161,43 @@
   <div class="simple-result" id="simpleResult">
     <div class="winner-card" id="winnerCard">
       <div class="winner-label" id="winnerLabel">WINNER</div>
-      <div class="winner-name" id="winnerName">—</div>
+      <div class="winner-name" id="winnerName">-</div>
       <div class="winner-uplift" id="winnerUplift"></div>
-      <div class="winner-reason" id="winnerReason">—</div>
+      <div class="winner-reason" id="winnerReason">-</div>
       <div class="simple-metrics">
         <div class="sm-cell">
           <div class="sm-label" data-i18n="net_monthly">NET MONTHLY</div>
           <div class="sm-vals">
-            <span class="sm-val current-col" id="smNetA">—</span>
-            <span style="color:var(--muted);font-size:.75rem">→</span>
-            <span class="sm-val new-col" id="smNetB">—</span>
+            <span class="sm-val current-col" id="smNetA">-</span>
+            <span class="sm-arrow">→</span>
+            <span class="sm-val new-col" id="smNetB">-</span>
             <span class="sm-badge" id="smNetBadge"></span>
           </div>
         </div>
         <div class="sm-cell">
           <div class="sm-label" data-i18n="yearly_total">YEARLY TOTAL</div>
           <div class="sm-vals">
-            <span class="sm-val current-col" id="smYearA">—</span>
-            <span style="color:var(--muted);font-size:.75rem">→</span>
-            <span class="sm-val new-col" id="smYearB">—</span>
+            <span class="sm-val current-col" id="smYearA">-</span>
+            <span class="sm-arrow">→</span>
+            <span class="sm-val new-col" id="smYearB">-</span>
             <span class="sm-badge" id="smYearBadge"></span>
           </div>
         </div>
-        <div class="sm-cell" id="smVacCell" style="display:none">
+        <div class="sm-cell" id="smVacCell" hidden>
           <div class="sm-label" data-i18n="vacation_lbl">Vacation Days / Year</div>
           <div class="sm-vals">
-            <span class="sm-val current-col" id="smVacA">—</span>
-            <span style="color:var(--muted);font-size:.75rem">→</span>
-            <span class="sm-val new-col" id="smVacB">—</span>
+            <span class="sm-val current-col" id="smVacA">-</span>
+            <span class="sm-arrow">→</span>
+            <span class="sm-val new-col" id="smVacB">-</span>
             <span class="sm-badge" id="smVacBadge"></span>
           </div>
         </div>
-        <div class="sm-cell" id="smNoticeCell" style="display:none">
+        <div class="sm-cell" id="smNoticeCell" hidden>
           <div class="sm-label" data-i18n="notice_lbl">Notice Period (months)</div>
           <div class="sm-vals">
-            <span class="sm-val current-col" id="smNoticeA">—</span>
-            <span style="color:var(--muted);font-size:.75rem">→</span>
-            <span class="sm-val new-col" id="smNoticeB">—</span>
+            <span class="sm-val current-col" id="smNoticeA">-</span>
+            <span class="sm-arrow">→</span>
+            <span class="sm-val new-col" id="smNoticeB">-</span>
           </div>
         </div>
       </div>
@@ -239,14 +205,14 @@
   </div>
 
   <!-- Sticky totals bar -->
-  <div id="totalsBar" style="display:none" class="detailed-only">
+  <div id="totalsBar" hidden class="detailed-only">
     <div class="totals-bar">
       <div class="total-item">
         <div class="total-label"><span data-i18n="net_monthly">NET MONTHLY</span></div>
         <div class="total-vals">
-          <span class="total-val current-col" id="tNetA">—</span>
+          <span class="total-val current-col" id="tNetA">-</span>
           <span class="total-arrow">→</span>
-          <span class="total-val new-col" id="tNetB">—</span>
+          <span class="total-val new-col" id="tNetB">-</span>
           <span class="total-badge" id="tNetBadge"></span>
         </div>
       </div>
@@ -254,9 +220,9 @@
       <div class="total-item">
         <div class="total-label"><span data-i18n="yearly_total">YEARLY TOTAL</span></div>
         <div class="total-vals">
-          <span class="total-val current-col" id="tYearA">—</span>
+          <span class="total-val current-col" id="tYearA">-</span>
           <span class="total-arrow">→</span>
-          <span class="total-val new-col" id="tYearB">—</span>
+          <span class="total-val new-col" id="tYearB">-</span>
           <span class="total-badge" id="tYearBadge"></span>
         </div>
       </div>
@@ -264,9 +230,9 @@
       <div class="total-item">
         <div class="total-label"><span data-i18n="eff_monthly">EFF. MONTHLY</span></div>
         <div class="total-vals">
-          <span class="total-val current-col" id="tEffA">—</span>
+          <span class="total-val current-col" id="tEffA">-</span>
           <span class="total-arrow">→</span>
-          <span class="total-val new-col" id="tEffB">—</span>
+          <span class="total-val new-col" id="tEffB">-</span>
           <span class="total-badge" id="tEffBadge"></span>
         </div>
       </div>
@@ -279,19 +245,19 @@
       <div class="overall-row">
         <div class="overall-label"><span data-i18n="overall_year">OVERALL SALARY WITH BENEFITS / YEAR</span></div>
         <div class="overall-vals">
-          <span class="overall-val current-col" id="oYearA">—</span>
+          <span class="overall-val current-col" id="oYearA">-</span>
           <span class="overall-arrow">→</span>
-          <span class="overall-val new-col" id="oYearB">—</span>
+          <span class="overall-val new-col" id="oYearB">-</span>
           <span id="oYearBadge" class="total-badge"></span>
         </div>
       </div>
-      <div style="height:1px;background:var(--border);margin:14px 0"></div>
+      <div class="overall-divider"></div>
       <div class="overall-row">
         <div class="overall-label"><span data-i18n="overall_month">OVERALL SALARY WITH BENEFITS / MONTH</span></div>
         <div class="overall-vals">
-          <span class="overall-val current-col" id="oMonthA">—</span>
+          <span class="overall-val current-col" id="oMonthA">-</span>
           <span class="overall-arrow">→</span>
-          <span class="overall-val new-col" id="oMonthB">—</span>
+          <span class="overall-val new-col" id="oMonthB">-</span>
           <span id="oMonthBadge" class="total-badge"></span>
         </div>
       </div>
@@ -299,10 +265,10 @@
     </div>
   </div>
 
-  <div id="resultsWrap" style="display:none">
+  <div id="resultsWrap" hidden>
     <div class="audit-card">
       <div class="audit-title"><span data-i18n="decision_summary">// Decision Summary</span></div>
-      <div class="audit-text" id="decisionSummaryText">—</div>
+      <div class="audit-text" id="decisionSummaryText">-</div>
     </div>
     <div class="breakdown-card">
       <div class="breakdown-title"><span data-i18n="full_breakdown">// Full Breakdown</span></div>
@@ -310,15 +276,16 @@
     </div>
     <div class="ai-card">
       <div class="ai-header">
-        <div class="ai-icon"><svg class="offer-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z"/></svg></div>
+        <div class="ai-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3Z"/></svg></div>
         <div class="ai-title"><span data-i18n="ai_title">AI Recommendation</span></div>
       </div>
       <div id="aiText" aria-live="polite"><div class="dot-pulse"><span></span><span></span><span></span></div></div>
     </div>
   </div>
 
-  <footer>
-    <span data-i18n="built_by">Built by</span> <a href="https://oalfawzan.sa">Omar Alfawzan</a> · tools.oalfawzan.sa · <span data-i18n="figures_note">Figures are estimates</span>
+  <footer class="site-footer">
+    <span>TOOLS.OALFAWZAN.SA / 2026</span>
+    <span>Built by <a href="https://oalfawzan.sa">Omar Alfawzan</a> · <span data-i18n="figures_note">Figures are estimates</span></span>
   </footer>
 </div>
 
@@ -334,28 +301,28 @@
       <label class="popup-label" for="pValue">AMOUNT (SAR / month)</label>
       <input class="popup-input" id="pValue" type="number" placeholder="0" aria-label="Custom benefit value">
     </div>
-    <div class="popup-field" id="pPctWrap" style="display:none">
+    <div class="popup-field" id="pPctWrap" hidden>
       <label class="popup-label" id="pPctLabel" for="pPct"><span data-i18n="pct_lbl">% OF FIELD</span></label>
       <div class="pct-row">
         <input class="popup-input" id="pPct" type="number" placeholder="25" aria-label="Custom benefit percentage">
         <span id="pPctUnit">% of</span>
         <select id="pPctRef" aria-label="Percentage reference"></select>
       </div>
-      <div style="margin-top:8px">
-        <label class="popup-label" style="margin-bottom:4px;display:flex;align-items:center;gap:8px" for="pHasRef2">
-          <input type="checkbox" class="popup-check" id="pHasRef2" onchange="toggleRef2()" aria-label="Enable second reference">
+      <div class="pct-ref2-wrap">
+        <label class="popup-label pct-ref2-label" for="pHasRef2">
+          <input type="checkbox" class="popup-check" id="pHasRef2" aria-label="Enable second reference">
           <span data-i18n="ref2_hint">Add a second field (e.g. GOSI = Basic + Housing)</span>
         </label>
-        <div id="pRef2Wrap" style="display:none;margin-top:8px">
+        <div id="pRef2Wrap" hidden>
           <div class="pct-row">
-            <span style="font-family:var(--mono);font-size:.75rem;color:var(--muted);white-space:nowrap">+ also % of</span>
-            <select id="pPctRef2" style="flex:1;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:.82rem;outline:none" aria-label="Second percentage reference"></select>
+            <span class="pct-ref2-prefix">+ also % of</span>
+            <select id="pPctRef2" class="pct-ref2-select" aria-label="Second percentage reference"></select>
           </div>
         </div>
       </div>
     </div>
     <div class="popup-row">
-      <input type="checkbox" class="popup-check" id="pIsPct" onchange="togglePctMode()">
+      <input type="checkbox" class="popup-check" id="pIsPct">
       <label class="popup-check-label" for="pIsPct"><span data-i18n="calc_pct">Calculate as % of another field</span></label>
     </div>
 
@@ -367,19 +334,18 @@
       <input type="checkbox" class="popup-check" id="pIsAnnual">
       <label class="popup-check-label" for="pIsAnnual"><span data-i18n="annual_amt">Annual amount (enter full yearly value)</span></label>
     </div>
-    <div class="popup-row" id="pIsMonthsRow" style="display:none">
-      <input type="checkbox" class="popup-check" id="pIsMonths" onchange="toggleMonthsMode()">
+    <div class="popup-row" id="pIsMonthsRow" hidden>
+      <input type="checkbox" class="popup-check" id="pIsMonths">
       <label class="popup-check-label" for="pIsMonths"><span data-i18n="multiplier_unit">× basic salaries of</span></label>
     </div>
     <div class="popup-actions">
-      <button type="button" class="popup-btn cancel" onclick="closePopup()"><span data-i18n="cancel_btn">Cancel</span></button>
-      <button type="button" class="popup-btn confirm" id="popupConfirmBtn" onclick="confirmField()"><span data-i18n="add_field_btn">Add Field</span></button>
+      <button type="button" class="popup-btn cancel" id="popupCancelBtn"><span data-i18n="cancel_btn">Cancel</span></button>
+      <button type="button" class="popup-btn confirm" id="popupConfirmBtn"><span data-i18n="add_field_btn">Add Field</span></button>
     </div>
   </div>
 </div>
 
-<script defer src="/assets/js/pages/offer.js?v=20260914b"></script>
-<script defer src="/assets/js/platform.js"></script>
-<script defer src="/assets/js/pages/offer-riyal.js?v=20260823a"></script>
+<script defer src="/assets/js/pages/offer.js?v=20260915a"></script>
+<script defer src="/assets/js/platform.js?v=20260915a"></script>
 </body>
 </html>

@@ -33,7 +33,6 @@ html[lang="en"] .tool-card .tool-title-secondary { direction: rtl; text-align: l
   }
   .header-actions { gap: 4px !important; }
   .header-actions .icon-btn,
-  .header-actions .lang-btn,
   .tool-page header.site-header button,
   .tool-page header.site-header a:not(.brand) {
     min-width: 44px !important;

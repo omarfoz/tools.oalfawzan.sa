@@ -1,4 +1,4 @@
-/* SVG Studio — view, edit, optimize and generate SVGs. Local-first; AI generation reuses
+/* SVG Studio - view, edit, optimize and generate SVGs. Local-first; AI generation reuses
    the site's existing worker endpoint (same as offer.js / stock-analysis-dashboard.js). */
 (() => {
   'use strict';
@@ -7,11 +7,11 @@
   const STRINGS = {
     ar: {
       lang: 'ar', dir: 'rtl',
-      title: 'استوديو SVG — tools.oalfawzan.sa',
+      title: 'استوديو SVG - tools.oalfawzan.sa',
       meta: 'اعرض وحرّر وحسّن وولّد صور SVG بالذكاء الاصطناعي مباشرة من المتصفح.',
       tag: '// أداة', heading: 'استوديو SVG',
-      desc: 'اعرض وحرّر وحسّن وولّد صور SVG بالذكاء الاصطناعي — كل شيء يعمل داخل متصفحك.',
-      back: '← الرجوع لكل الأدوات', builtBy: 'من تطوير',
+      desc: 'اعرض وحرّر وحسّن وولّد صور SVG بالذكاء الاصطناعي - كل شيء يعمل داخل متصفحك.',
+      back: 'الرجوع لكل الأدوات', builtBy: 'من تطوير',
       editorTitle: 'محرر SVG',
       lblUpload: 'رفع ملف', lblUndo: 'تراجع', lblRedo: 'إعادة', lblCopy: 'نسخ', lblClear: 'مسح',
       qaTransform: 'تنسيق وضغط', qaExport: 'تصدير ومشاركة',
@@ -21,7 +21,7 @@
       dropHint: 'أفلت ملف SVG هنا أو الصق الكود في المحرر',
       zoomTip: 'عجلة الفأرة للتكبير · اسحب للتحريك · نقرة مزدوجة للملاءمة',
       statSize: 'الحجم', statDims: 'الأبعاد', statViewBox: 'viewBox', statPaths: 'مسارات', statGroups: 'مجموعات', statShapes: 'أشكال', statTexts: 'نصوص',
-      privacyNote: '🔒 ملف SVG يبقى في متصفحك — لا يُرسل أي شيء إلا عند استخدام توليد AI.',
+      privacyNote: '🔒 ملف SVG يبقى في متصفحك - لا يُرسل أي شيء إلا عند استخدام توليد AI.',
       aiTitle: 'توليد SVG بالذكاء الاصطناعي',
       aiPromptLabel: 'صف الرسمة المطلوبة',
       aiPlaceholder: 'مثال: أنشئ أيقونة حوسبة سحابية بسيطة بثلاثة خوادم وسحابة بخطوط دائرية نظيفة.',
@@ -51,10 +51,10 @@
       aiModifying: 'جارٍ التعديل…', aiModDone: 'تم تحديث الرسمة بالتعديلات المطلوبة.',
       errAiEmpty: 'يرجى كتابة وصف للرسمة أولًا.',
       errModifyEmpty: 'اكتب تعليمات التعديل أولًا.',
-      errNoSvgToModify: 'لا توجد رسمة لتعديلها — ولّد SVG أولًا أو ضع كودك في المحرر.',
-      statsNone: '—',
+      errNoSvgToModify: 'لا توجد رسمة لتعديلها - ولّد SVG أولًا أو ضع كودك في المحرر.',
+      statsNone: '-',
       zoomFit: 'ملاءمة',
-      canvasLabel: 'لوحة معاينة SVG — الأسهم للتحريك، وزرا + و− للتكبير',
+      canvasLabel: 'لوحة معاينة SVG - الأسهم للتحريك، وزرا + و− للتكبير',
       bgSwitcherLabel: 'خلفية المعاينة',
       bgChecker: 'خلفية رقعة الشطرنج', bgWhite: 'خلفية بيضاء', bgBlack: 'خلفية سوداء', bgTransparent: 'خلفية شفافة',
       bgCheckerTitle: 'رقعة الشطرنج', bgWhiteTitle: 'أبيض', bgBlackTitle: 'أسود', bgTransparentTitle: 'شفاف',
@@ -63,11 +63,11 @@
     },
     en: {
       lang: 'en', dir: 'ltr',
-      title: 'SVG Studio — tools.oalfawzan.sa',
+      title: 'SVG Studio - tools.oalfawzan.sa',
       meta: 'View, edit, optimize and generate SVG graphics with AI directly in your browser.',
       tag: '// TOOL', heading: 'SVG Studio',
-      desc: 'View, edit, optimize and generate SVGs with AI — everything runs in your browser.',
-      back: '← Back to all tools', builtBy: 'Built by',
+      desc: 'View, edit, optimize and generate SVGs with AI - everything runs in your browser.',
+      back: 'Back to all tools', builtBy: 'Built by',
       editorTitle: 'SVG Editor',
       lblUpload: 'Upload', lblUndo: 'Undo', lblRedo: 'Redo', lblCopy: 'Copy', lblClear: 'Clear',
       qaTransform: 'Format & compress', qaExport: 'Export & share',
@@ -77,7 +77,7 @@
       dropHint: 'Drop an SVG file here or paste code in the editor',
       zoomTip: 'Mouse wheel to zoom · drag to pan · double-click to fit',
       statSize: 'Size', statDims: 'Dims', statViewBox: 'viewBox', statPaths: 'Paths', statGroups: 'Groups', statShapes: 'Shapes', statTexts: 'Texts',
-      privacyNote: '🔒 Your SVG stays in your browser — nothing is sent except when using AI generation.',
+      privacyNote: '🔒 Your SVG stays in your browser - nothing is sent except when using AI generation.',
       aiTitle: 'Generate SVG with AI',
       aiPromptLabel: 'Describe the SVG you want',
       aiPlaceholder: 'Example: create a minimal cloud-computing icon with three servers and a cloud, using clean rounded strokes.',
@@ -107,10 +107,10 @@
       aiModifying: 'Modifying…', aiModDone: 'SVG updated with your changes.',
       errAiEmpty: 'Describe the SVG you want first.',
       errModifyEmpty: 'Write your modification instructions first.',
-      errNoSvgToModify: 'No SVG to modify — generate one first or put your code in the editor.',
-      statsNone: '—',
+      errNoSvgToModify: 'No SVG to modify - generate one first or put your code in the editor.',
+      statsNone: '-',
       zoomFit: 'Fit',
-      canvasLabel: 'SVG preview canvas — arrow keys pan, plus and minus zoom',
+      canvasLabel: 'SVG preview canvas - arrow keys pan, plus and minus zoom',
       bgSwitcherLabel: 'Preview background',
       bgChecker: 'Checkerboard background', bgWhite: 'White background', bgBlack: 'Black background', bgTransparent: 'Transparent background',
       bgCheckerTitle: 'Checkerboard', bgWhiteTitle: 'White', bgBlackTitle: 'Black', bgTransparentTitle: 'Transparent',
@@ -119,7 +119,7 @@
     }
   };
 
-  /* ── Shared AI endpoint — same as offer.js & stock-analysis-dashboard.js ── */
+  /* ── Shared AI endpoint - same as offer.js & stock-analysis-dashboard.js ── */
   const AI_ENDPOINT = 'https://tools.niug502.workers.dev';
 
   const $ = id => document.getElementById(id);
@@ -805,7 +805,7 @@
     $('title').textContent = s.heading;
     $('desc').textContent = s.desc;
     $('backLink').textContent = s.back;
-    $('builtBy').textContent = s.builtBy;
+    if ($('builtBy')) $('builtBy').textContent = s.builtBy;
     $('editorTitle').textContent = s.editorTitle;
     $('lblUpload').textContent = s.lblUpload;
     $('lblUndo').textContent = s.lblUndo;

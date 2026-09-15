@@ -1,4 +1,7 @@
-/* Shared visual layer aligned with oalfawzan.sa. Loaded last across the tools site. */
+/* Shared visual layer aligned with oalfawzan.sa.
+   Single design authority for every page: home, all tools, and 404.
+   Load order on every page: pages/<tool>.css -> platform.css -> this file -> mobile-enhancements.css */
+
 :root {
   color-scheme: dark;
   --site-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
@@ -365,7 +368,21 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
 .tool-card .launch { margin-top: auto !important; color: var(--site-accent) !important; font-size: .82rem !important; font-weight: 500 !important; }
 .empty-tools { border: 1px dashed var(--site-glass-border) !important; border-radius: 20px !important; color: var(--site-text-muted) !important; }
 .home [hidden] { display: none !important; }
-.site-footer { margin-top: 48px !important; padding: 28px 0 34px !important; border-top: 1px solid var(--site-glass-border) !important; color: var(--site-text-muted) !important; font-size: .84rem !important; letter-spacing: 0 !important; }
+
+/* Shared footer (identical markup on every page) */
+.site-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 3px !important;
+  margin-top: 48px !important;
+  padding: 28px 0 34px !important;
+  border-top: 1px solid var(--site-glass-border) !important;
+  text-align: center !important;
+  color: var(--site-text-muted) !important;
+  font-size: .84rem !important;
+  letter-spacing: 0 !important;
+}
 .site-footer a { color: var(--site-text-muted) !important; }
 
 /* Tool pages */
@@ -393,10 +410,11 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
   box-shadow: none !important;
   text-align: center !important;
 }
-.tool-page .hero-tag { display: inline-flex !important; width: auto !important; margin: 0 auto 10px !important; color: var(--site-text-faint) !important; font-size: .72rem !important; font-weight: 600 !important; letter-spacing: .14em !important; text-transform: uppercase !important; }
+.tool-page .hero-tag { display: inline-flex !important; width: auto !important; margin: 0 auto 10px !important; padding: 0 !important; border: 0 !important; background: transparent !important; color: var(--site-text-faint) !important; font-size: .72rem !important; font-weight: 600 !important; line-height: 1.3 !important; letter-spacing: .14em !important; text-transform: uppercase !important; }
 .tool-page .hero-tag::before { display: none !important; }
 .tool-page .hero h1,
 .tool-page .tool-hero h1,
+.tool-page .tool-heading h1,
 .tool-page > .wrap > h1 {
   max-width: none !important;
   margin: 0 0 12px !important;
@@ -406,15 +424,17 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
   line-height: 1.08 !important;
   letter-spacing: -.035em !important;
 }
+.tool-page .tool-heading { max-width: 680px !important; margin: 0 auto 28px !important; text-align: center !important; }
+.tool-page .tool-heading > div:first-child { margin: 0 auto !important; }
 .tool-page .hero h1 em { color: var(--site-accent) !important; font: inherit !important; font-style: normal !important; }
 .tool-page .hero p,
 .tool-page .tool-hero p,
 .tool-page p.sub { max-width: 560px !important; margin: 0 auto !important; color: var(--site-text-muted) !important; font-size: .96rem !important; line-height: 1.65 !important; }
-.tool-page .back-link,
-.tool-page .tool-back-link,
-.tool-page .logo.back-link {
+.tool-page .quick-actions { justify-content: center !important; margin-top: 16px !important; }
+.tool-page .back-link {
   display: inline-flex !important;
   align-items: center !important;
+  gap: 7px !important;
   min-height: 34px !important;
   margin: 0 0 22px !important;
   padding: 7px 13px !important;
@@ -426,7 +446,8 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
   font-size: .80rem !important;
   font-weight: 500 !important;
 }
-.tool-page .tool-breadcrumb { margin: 0 0 22px !important; padding: 0 !important; }
+html[dir="rtl"] .tool-page .back-link .back-icon,
+html[dir="rtl"] .back-link .back-icon { display: inline-block; transform: scaleX(-1); }
 .tool-page .panel,
 .tool-page .card,
 .tool-page .editor-card,
@@ -466,6 +487,8 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
 .tool-page .mode-tab,
 .tool-page .mode-btn,
 .tool-page .nat-btn,
+.tool-page .calc-btn,
+.tool-page .spin-button,
 .tool-page .export-btn,
 .tool-page .popup-btn,
 .tool-page .add-field-btn {
@@ -490,6 +513,7 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
   color: #fff !important;
   background: rgba(0,122,255,.90) !important;
   border-color: rgba(255,255,255,.20) !important;
+  font-weight: 700 !important;
 }
 html[data-theme="light"] .tool-page .btn.primary,
 html[data-theme="light"] .tool-page button.primary,
@@ -514,18 +538,44 @@ html[data-theme="light"] .tool-page .popup-btn.confirm { background: #0062cc !im
 }
 .tool-page .chart-wrap { border-color: var(--site-glass-border) !important; border-radius: 20px !important; background: rgba(255,255,255,.018) !important; }
 .tool-page .qr-box { background: #fff !important; border-radius: 20px !important; }
-.tool-page .tool-heading { max-width: 680px !important; margin: 0 auto 28px !important; text-align: center !important; }
-.tool-page .tool-heading > div:first-child { margin: 0 auto !important; }
-.tool-page .tool-heading h1 { margin: 4px 0 10px !important; font-size: clamp(2.20rem,5vw,2.85rem) !important; font-weight: 700 !important; line-height: 1.08 !important; letter-spacing: -.035em !important; }
-.tool-page .tool-heading .sub { margin: 0 auto !important; }
-.tool-page .quick-actions { justify-content: center !important; margin-top: 16px !important; }
-.tool-page .stock-hero-card { text-align: center !important; }
-.tool-page .stock-hero-card .pill { display: inline-flex !important; border-radius: 999px !important; }
-.tool-page .stock-hero-card .search { justify-content: center !important; }
 .tool-page .wheel-stage { filter: drop-shadow(0 16px 36px rgba(0,0,0,.16)); }
 .tool-page .winner-overlay { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
-.tool-page footer { padding: 34px 0 !important; font-size: .84rem !important; }
-.tool-page footer a { color: var(--site-accent) !important; }
+
+/* QR Generator: the type switcher is a nested glass control, centered under the hero. */
+.tool-page .mode-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  width: min(360px,100%) !important;
+  margin: 0 auto 22px !important;
+  padding: 4px !important;
+  border: 1px solid rgba(255,255,255,.09) !important;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,.018) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+}
+.tool-page .mode-tabs .mode-tab {
+  min-height: 44px !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-color: transparent !important;
+}
+.tool-page .mode-tabs .mode-tab.active {
+  color: var(--site-text) !important;
+  background: rgba(0,122,255,.14) !important;
+  border-color: rgba(0,122,255,.30) !important;
+}
+html[data-theme="light"] .tool-page .mode-tabs {
+  background: rgba(255,255,255,.28) !important;
+  border-color: rgba(255,255,255,.68) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.92) !important;
+}
+html[data-theme="light"] .tool-page .mode-tabs .mode-tab.active {
+  color: #0f172a !important;
+  background: rgba(0,98,204,.10) !important;
+  border-color: rgba(0,98,204,.24) !important;
+}
 
 @media (hover:hover) and (pointer:fine) {
   .header-actions .link-btn:hover,
@@ -571,8 +621,7 @@ html[data-theme="light"] .tool-page .popup-btn.confirm { background: #0062cc !im
   .tools-grid { grid-template-columns: 1fr !important; }
   .tool-card { min-height: 205px !important; padding: 22px !important; }
   .tool-page .hero h1,
-  .tool-page .tool-hero h1,
-  .tool-page .tool-heading h1 { font-size: 2.20rem !important; }
+  .tool-page .tool-hero h1 { font-size: 2.20rem !important; }
   .tool-page .panel,
   .tool-page .card,
   .tool-page .editor-card,
@@ -588,6 +637,8 @@ html[data-theme="light"] .tool-page .popup-btn.confirm { background: #0062cc !im
   .tool-page .mode-switcher,
   .tool-page .nat-unified,
   .tool-page .ai-card { padding: 20px !important; }
+  .tool-page .mode-tabs { width: 100% !important; margin-bottom: 18px !important; }
+  .tool-page .quick-actions { margin-top: 14px !important; }
   .site-header,
   .manifesto,
   .tool-card,
@@ -641,78 +692,6 @@ html[data-theme="light"] .tool-page .popup-btn.confirm { background: #0062cc !im
   .tools-grid > .tool-card:last-child:nth-child(odd):not([hidden]) h3 { grid-area: title !important; margin: 0 0 3px !important; font-size: 1.12rem !important; }
   .tools-grid > .tool-card:last-child:nth-child(odd):not([hidden]) p { grid-area: desc !important; max-width: 62ch !important; margin: 0 !important; }
   .tools-grid > .tool-card:last-child:nth-child(odd):not([hidden]) .launch { grid-area: launch !important; align-self: center !important; margin: 0 !important; white-space: nowrap; }
-}
-
-/* Stock Analysis uses the same open hero hierarchy as the other tools. */
-.tool-page .stock-hero-card {
-  max-width: 760px !important;
-  margin: 0 auto 30px !important;
-  padding: 6px 0 0 !important;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-.tool-page .stock-hero-card .pill {
-  display: inline-flex !important;
-  margin: 0 auto 10px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: var(--site-text-faint) !important;
-  font-size: .72rem !important;
-  font-weight: 600 !important;
-  letter-spacing: .14em !important;
-  text-transform: uppercase !important;
-}
-.tool-page .stock-hero-card h1 {
-  margin: 0 0 12px !important;
-  color: var(--site-text) !important;
-  font-size: clamp(2.20rem,5vw,2.85rem) !important;
-  font-weight: 700 !important;
-  line-height: 1.08 !important;
-  letter-spacing: -.035em !important;
-}
-.tool-page .stock-hero-card > p {
-  max-width: 650px !important;
-  margin: 0 auto !important;
-  color: var(--site-text-muted) !important;
-  font-size: .92rem !important;
-  line-height: 1.7 !important;
-}
-.tool-page .stock-hero-card .search {
-  width: min(760px,100%) !important;
-  margin: 22px auto 0 !important;
-  padding: 10px !important;
-  display: grid !important;
-  grid-template-columns: minmax(0,1fr) auto auto !important;
-  gap: 8px !important;
-  align-items: center !important;
-  background: linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.01)),rgba(255,255,255,.025) !important;
-  border: 1px solid var(--site-glass-border) !important;
-  border-radius: 20px !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08),0 8px 24px rgba(0,0,0,.10) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
-  backdrop-filter: blur(16px) saturate(150%) !important;
-}
-html[data-theme="light"] .tool-page .stock-hero-card .search {
-  background: rgba(255,255,255,.50) !important;
-  border-color: rgba(255,255,255,.82) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.98),0 8px 24px rgba(46,65,90,.08) !important;
-}
-.tool-page .stock-hero-card .search input { min-width: 0 !important; }
-.tool-page .stock-hero-card .search button { min-height: 44px !important; padding-inline: 15px !important; border-radius: 14px !important; }
-.tool-page .stock-hero-card + .card { padding: 16px !important; }
-.tool-page .stock-hero-card + .card .chart-wrap { min-height: 310px; }
-.tool-page .two-col .card.grid {
-  background: rgba(255,255,255,.018) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
-}
-.tool-page .two-col .card.grid .kpi {
-  background: rgba(255,255,255,.025) !important;
-  border-color: rgba(255,255,255,.09) !important;
 }
 
 /* Nested controls should feel lighter than their parent glass surface. */
@@ -791,26 +770,67 @@ html[data-theme="light"] .tool-page #wheelCanvas { filter: saturate(.72) contras
 .tool-page .workspace { gap: 18px !important; }
 .tool-page .main-grid { gap: 18px !important; }
 .tool-page .factors-card { margin-top: 16px !important; }
-.tool-page .tool-breadcrumb + .stock-hero-card { margin-top: -4px !important; }
 
-@media (max-width:700px) {
-  .tools-grid > .tool-card:last-child:nth-child(odd):not([hidden]) {
-    display: flex !important;
-    min-height: 205px !important;
-    padding: 22px !important;
-  }
-  .tools-grid > .tool-card:last-child:nth-child(odd):not([hidden]) .tool-icon { width: 42px !important; height: 42px !important; margin-top: 24px !important; }
-  .tools-grid > .tool-card:last-child:nth-child(odd):not([hidden]) h3 { margin: 16px 0 8px !important; font-size: 1.05rem !important; }
-  .tools-grid > .tool-card:last-child:nth-child(odd):not([hidden]) p { margin: 0 0 18px !important; }
-  .tools-grid > .tool-card:last-child:nth-child(odd):not([hidden]) .launch { margin-top: auto !important; }
-  .tool-page .stock-hero-card { margin-bottom: 24px !important; }
-  .tool-page .stock-hero-card .search {
-    grid-template-columns: 1fr 1fr !important;
-    padding: 9px !important;
-  }
-  .tool-page .stock-hero-card .search input { grid-column: 1 / -1 !important; }
-  .tool-page .stock-hero-card .search button { width: 100% !important; }
-  .tool-page .stock-hero-card + .card .chart-wrap { min-height: 250px; }
-  .tool-page .mode-switcher,
-  .tool-page .nat-unified { padding: 14px !important; }
+/* 404 shell: same width, hero hierarchy, and glass material as every other page. */
+.not-found-shell {
+  width: 100%;
+  max-width: var(--site-width);
+  margin: 0 auto;
+  padding: 0 var(--site-page-pad);
+}
+.not-found-main { padding-bottom: 20px; }
+.not-found-hero {
+  max-width: 680px;
+  margin: 0 auto 28px;
+  padding: 18px 0 12px;
+  text-align: center;
+}
+.not-found-code {
+  display: inline-flex;
+  margin-bottom: 12px;
+  color: var(--site-text-faint);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.not-found-hero h1 {
+  margin: 0 0 12px;
+  color: var(--site-text);
+  font-size: clamp(2.20rem,5vw,2.85rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+.not-found-hero p {
+  max-width: 560px;
+  margin: 0 auto;
+  color: var(--site-text-muted);
+  font-size: .96rem;
+  line-height: 1.65;
+}
+.not-found-card {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 26px;
+  text-align: center;
+  background: linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.004) 58%),var(--site-glass-fill);
+  border: 1px solid var(--site-glass-border);
+  border-radius: var(--site-radius-card);
+  box-shadow: inset 0 1px 0 var(--site-glass-highlight),0 8px 26px var(--site-glass-shadow);
+  -webkit-backdrop-filter: blur(var(--site-glass-blur)) saturate(var(--site-glass-saturation));
+  backdrop-filter: blur(var(--site-glass-blur)) saturate(var(--site-glass-saturation));
+}
+.not-found-card .back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: var(--site-radius-control);
+  color: #fff;
+  background: rgba(0,122,255,.90);
+  text-decoration: none;
+  font-weight: 600;
 }

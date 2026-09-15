@@ -25,15 +25,15 @@ A focused collection of browser-first utilities deployed as a static GitHub Page
 
 The tools site intentionally shares the visual language of `oalfawzan.sa`.
 
-- `assets/css/oalfawzan-theme.css` is the final shared visual layer.
-- It mirrors the portfolio's system font stack, blue accent, liquid-glass material, rounded navigation, spacing, light/dark theme behavior, and mobile blur optimization.
-- Every current tool loads the shared theme directly in `<head>` after its runtime CSS. This prevents a late visual restyle on slower devices.
-- `assets/js/platform.js` keeps a fallback theme loader for future or legacy pages that do not yet include the stylesheet directly.
-- Tool-specific CSS remains responsible for each tool's functional layout and specialized components.
+- Every page loads two shared CSS layers in `<head>`: `assets/css/platform.css` (reset, shared tokens, focus, a11y) then `assets/css/oalfawzan-theme.css` (the single design authority: liquid-glass material, blue accent, header/footer/hero chrome, shared components).
+- Page-specific CSS loads first and owns only the tool's functional layout; it must not redefine the palette, accent, radii, or chrome.
+- The theme mirrors the portfolio's system font stack, blue accent, liquid-glass material, rounded navigation, spacing, light/dark theme behavior, and mobile blur optimization.
+- `assets/js/theme-init.js` restores the saved theme and language before first paint on every page.
+- `assets/js/platform.js` provides shared theme/language helpers (`window.ToolsPlatform`), notifications, clipboard utilities, and loads `mobile-enhancements.css` for touch refinements.
 - The shared theme also contains the validated cross-tool refinements for homepage card balance, Stock Analysis hierarchy, nested glass surfaces, QR preview emphasis, and Wheel visual saturation.
 - The background artwork is shared from `https://oalfawzan.sa/image-1600.webp` so both sites retain the same visual backdrop.
 
-When adding a new tool, preserve this separation: tool CSS controls structure and behavior; the shared visual layer controls brand appearance.
+When adding a new tool, preserve this separation: tool CSS controls structure and behavior; the shared layers control brand appearance.
 
 ## Repository structure
 
@@ -48,9 +48,12 @@ When adding a new tool, preserve this separation: tool CSS controls structure an
 ├── svg-studio/
 ├── assets/
 │   ├── css/
-│   │   └── oalfawzan-theme.css
+│   │   ├── platform.css
+│   │   ├── oalfawzan-theme.css
+│   │   └── mobile-enhancements.css
 │   └── js/
-│       └── platform.js
+│       ├── platform.js
+│       └── theme-init.js
 └── 404.html
 ```
 
@@ -62,10 +65,11 @@ For a new tool:
 
 1. Create `/<tool-name>/index.html`.
 2. Add page-specific assets under `assets/css/pages` or `assets/js/pages` when needed.
-3. Load the tool-specific CSS, runtime CSS, then `/assets/css/oalfawzan-theme.css` in that order.
-4. Load `/assets/js/platform.js` for shared theme, language, notification, clipboard, and accessibility helpers.
-5. Add the tool card to the root `index.html`.
-6. Verify internal links, accessibility, mobile behavior, theme switching, first-paint styling, and JavaScript syntax before merging.
+3. In `<head>`, load the tool-specific CSS, then `/assets/css/platform.css`, then `/assets/css/oalfawzan-theme.css`, and include `/assets/js/theme-init.js` before the stylesheets.
+4. Use the same header, footer, hero, and back-link markup as the other tool pages.
+5. Load `/assets/js/platform.js` for shared theme, language, notification, clipboard, and accessibility helpers.
+6. Add the tool card to the root `index.html`.
+7. Verify internal links, accessibility, mobile behavior, theme switching, first-paint styling, and JavaScript syntax before merging.
 
 ## Quality goals
 

@@ -1,14 +1,14 @@
 (() => {
   'use strict';
   try {
-    const theme = localStorage.getItem('tools-theme');
-    const lang = localStorage.getItem('tools-language');
-    document.documentElement.dataset.theme = theme === 'light' || theme === 'dark'
-      ? theme
+    const t = localStorage.getItem('tools-theme') || localStorage.getItem('tools_theme');
+    const l = localStorage.getItem('tools-language') || localStorage.getItem('tools_lang') || localStorage.getItem('offer_lang');
+    document.documentElement.dataset.theme = t === 'light' || t === 'dark'
+      ? t
       : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-    if (lang === 'ar' || lang === 'en') {
-      document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    if (l === 'ar' || l === 'en') {
+      document.documentElement.lang = l;
+      document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
     }
   } catch (_) {}
 })();
