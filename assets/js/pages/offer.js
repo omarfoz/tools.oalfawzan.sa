@@ -123,6 +123,11 @@ function init() {
   if (state.noticeB != null) $('noticeB').value = state.noticeB;
   updateVacDiff();
 
+  // Restore time & commute fields, then share-link or saved state
+  restoreTimeInputs();
+  const shareLoaded = loadFromShareLink();
+  if (!shareLoaded) showRestoreBanner('local');
+
   // Restore nationality buttons from saved state, falling back to GOSI state
   ['A','B'].forEach(side => {
     const gosiId = side === 'A' ? 'a6' : 'b6';
@@ -143,6 +148,12 @@ function init() {
   $('vacB').addEventListener('input', e => { state.vacB = e.target.value === '' ? null : Math.min(Number(e.target.max), nonNegativeNumber(e.target.value)); autosave(); updateVacDiff(); });
   $('noticeA').addEventListener('input', e => { state.noticeA = e.target.value === '' ? null : Math.min(Number(e.target.max), nonNegativeNumber(e.target.value)); autosave(); });
   $('noticeB').addEventListener('input', e => { state.noticeB = e.target.value === '' ? null : Math.min(Number(e.target.max), nonNegativeNumber(e.target.value)); autosave(); });
+  [['hoursA','hoursA'],['hoursB','hoursB'],['commuteA','commuteA'],['commuteB','commuteB']].forEach(([id, key]) => {
+    $(id).addEventListener('input', e => {
+      state[key] = e.target.value === '' ? null : Math.min(Number(e.target.max), nonNegativeNumber(e.target.value));
+      autosave(); updateTrueHourly();
+    });
+  });
 
   // Restore mode (URL ?mode= wins, then saved preference)
   try {
@@ -158,6 +169,101 @@ function updateVacDiff() {
   const diff = known ? state.vacB - state.vacA : 0;
   $('vacDiff').textContent = known ? (diff > 0 ? '+' : '') + diff + ' ' + t('days_unit') : t('not_comparable');
   $('vacDiff').style.color = diff > 0 ? 'var(--current)' : diff < 0 ? 'var(--danger)' : 'var(--muted)';
+}
+
+// ── Time & commute profile ────────────────────────────────────────
+function restoreTimeInputs() {
+  ['hoursA','hoursB','commuteA','commuteB'].forEach(key => {
+    if (state[key] != null && $(key)) $(key).value = state[key];
+  });
+  updateTrueHourly();
+}
+function sideTime(side) {
+  return {
+    dailyHours: state['hours' + side] == null ? 8 : state['hours' + side],
+    commuteMinutes: state['commute' + side] == null ? 0 : state['commute' + side]
+  };
+}
+function updateTrueHourly() {
+  const el = $('trueHourly');
+  if (!el) return;
+  const a = OfferModel.timeProfile(computeSide('A'), sideTime('A'));
+  const b = OfferModel.timeProfile(computeSide('B'), sideTime('B'));
+  if (state.hoursA == null && state.hoursB == null && state.commuteA == null && state.commuteB == null) {
+    el.textContent = '-';
+    el.style.color = 'var(--muted)';
+    return;
+  }
+  el.textContent = 'SAR ' + fmtNum(a.trueHourlyValue) + ' → SAR ' + fmtNum(b.trueHourlyValue) + ' ' + t('per_hour');
+  el.style.color = a.trueHourlyValue === b.trueHourlyValue ? 'var(--muted)' : b.trueHourlyValue > a.trueHourlyValue ? 'var(--new)' : 'var(--current)';
+}
+
+// ── Share link (state in URL, base64url-encoded JSON like ?share=) ──
+function encodeShareState() {
+  const json = JSON.stringify(state);
+  const bytes = new TextEncoder().encode(json);
+  let binary = '';
+  bytes.forEach(b => { binary += String.fromCharCode(b); });
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeShareState(encoded) {
+  try {
+    let b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const parsed = JSON.parse(new TextDecoder().decode(bytes));
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch { return null; }
+}
+function buildShareUrl() {
+  const url = new URL(location.href);
+  url.search = '';
+  url.hash = '';
+  url.searchParams.set('share', encodeShareState());
+  return url.toString();
+}
+function loadFromShareLink() {
+  let encoded = null;
+  try { encoded = new URL(location.href).searchParams.get('share'); } catch { return false; }
+  if (!encoded) return false;
+  const parsed = decodeShareState(encoded);
+  if (!parsed) { setOfferStatus(t('share_invalid'), true); return false; }
+  state = parsed;
+  migrateCompensation();
+  $('coNameA').value = state.coA || '';
+  $('coNameB').value = state.coB || '';
+  updateLabels();
+  updateTabLabels();
+  renderFields('A');
+  renderFields('B');
+  renderFactors();
+  if (state.payroll) renderCompensationSettings();
+  if (state.vacA != null) $('vacA').value = state.vacA;
+  if (state.vacB != null) $('vacB').value = state.vacB;
+  if (state.noticeA != null) $('noticeA').value = state.noticeA;
+  if (state.noticeB != null) $('noticeB').value = state.noticeB;
+  restoreTimeInputs();
+  showRestoreBanner('share');
+  return true;
+}
+function showRestoreBanner(source) {
+  const banner = $('restoreBanner');
+  if (!banner) return;
+  if (source !== 'local' || localStorage.getItem('offer_v31')) {
+    $('restoreText').textContent = t(source === 'share' ? 'restore_share' : 'restore_local');
+    banner.hidden = false;
+  }
+}
+async function copyShareLink() {
+  const url = buildShareUrl();
+  try {
+    await navigator.clipboard.writeText(url);
+    setOfferStatus(t('share_copied'), false);
+  } catch {
+    setOfferStatus(url, false);
+  }
 }
 
 function syncModeUrl(mode) {
@@ -670,6 +776,7 @@ $('popupOverlay').addEventListener('keydown', e => {
 function liveUpdate() {
   updatePayrollNotes();
   updateTabLabels();
+  updateTrueHourly();
   try {
     const a = computeSide('A');
     const b = computeSide('B');
@@ -870,6 +977,16 @@ function calculate() {
     { l: t('guaranteed_cash'), a: a.guaranteedCash, b: b.guaranteedCash },
     { l: t('expected_monthly'), a: a.expectedCash / 12, b: b.expectedCash / 12 },
   ];
+  const hasTimeInputs = state.hoursA != null || state.hoursB != null || state.commuteA != null || state.commuteB != null;
+  if (hasTimeInputs) {
+    const ta = OfferModel.timeProfile(a, sideTime('A'));
+    const tb = OfferModel.timeProfile(b, sideTime('B'));
+    rows.push(
+      { l: t('true_hourly_lbl') + ' (' + t('hrs_unit') + ')', a: ta.totalHours, b: tb.totalHours },
+      { l: t('true_hourly_lbl'), a: ta.trueHourlyValue, b: tb.trueHourlyValue },
+      { l: t('commute_time_cost_lbl'), a: ta.commuteTimeCost, b: tb.commuteTimeCost }
+    );
+  }
 
   const coA = state.coA || t('current');
   const coB = state.coB || t('new_offer');
@@ -951,6 +1068,15 @@ ${rows}`;
   const netClose = netScale === 0 || Math.abs(b.net - a.net) / netScale <= state.closeThreshold / 100;
   const netLeader = netClose ? 'close' : b.net > a.net ? coB : coA;
 
+  // Time & commute facts (entered values only, never invented)
+  const hasTimeInputs = state.hoursA != null || state.hoursB != null || state.commuteA != null || state.commuteB != null;
+  const ta = hasTimeInputs ? OfferModel.timeProfile(a, sideTime('A')) : null;
+  const tb = hasTimeInputs ? OfferModel.timeProfile(b, sideTime('B')) : null;
+  const timeSection = hasTimeInputs ? `Time and commute profile (22 working days per month; commute is unpaid time):
+- ${coA}: ${state.hoursA == null ? 'default 8' : state.hoursA} daily hours, ${state.commuteA == null ? 0 : state.commuteA} commute minutes/day -> total monthly hours ${ta.totalHours}, true hourly value SAR ${fmt(ta.trueHourlyValue)}/hr, commute time cost SAR ${fmt(ta.commuteTimeCost)}/yr
+- ${coB}: ${state.hoursB == null ? 'default 8' : state.hoursB} daily hours, ${state.commuteB == null ? 0 : state.commuteB} commute minutes/day -> total monthly hours ${tb.totalHours}, true hourly value SAR ${fmt(tb.trueHourlyValue)}/hr, commute time cost SAR ${fmt(tb.commuteTimeCost)}/yr
+Present true hourly value as a time-adjusted view of net pay, not as a replacement for the cash comparison.` : '';
+
   const prompt = `You are a senior HR, compensation, and career decision advisor specializing in the Saudi Arabian job market.
 
 Your task is to explain the calculator's financial comparison using only the supplied inputs. Career decisions remain conditional on information actually provided.
@@ -1002,7 +1128,7 @@ Financial comparison:
 - Signed net monthly difference (Offer 2 minus Offer 1): SAR ${fmt(netGap)}
 - Signed annualized monthly cash difference (Offer 2 minus Offer 1): SAR ${fmt(effGap)}
 - Preliminary calculator signal: financial lead = ${financialLeader}, net monthly lead = ${netLeader}
-${qualSection || 'Career assessment: not assessed; no customized positive-weight career scores supplied.'}
+${timeSection ? timeSection + '\n' : ''}${qualSection || 'Career assessment: not assessed; no customized positive-weight career scores supplied.'}
 Leave inputs: Offer 1 = ${state.vacA == null ? 'unknown' : state.vacA + ' ' + state.leaveBasisA}; Offer 2 = ${state.vacB == null ? 'unknown' : state.vacB + ' ' + state.leaveBasisB}.
 Leave comparison allowed: ${state.vacA != null && state.vacB != null && state.leaveBasisA === state.leaveBasisB ? 'yes' : 'no'}.
 Notice inputs (months): Offer 1 = ${state.noticeA == null ? 'unknown' : state.noticeA}; Offer 2 = ${state.noticeB == null ? 'unknown' : state.noticeB}.
@@ -1057,20 +1183,17 @@ function autosave() {
 const STRINGS = {
   en: {
     tool_tag:'// TOOL_01', hero_h1_line1:'Job Offer', hero_h1_line2:'Comparator',
-    hero_p:'Fully customizable. Rename any field, toggle it on/off, add your own, set a field as % of another. Auto-saves to your browser.',
     current_company:'Current Company', new_company:'New Company',
-    nationality:'Nationality', saudi:'Saudi', non_saudi:'Non-Saudi',
+    saudi:'Saudi', non_saudi:'Non-Saudi',
     current:'Current', new_offer:'New Offer',
     add_field:'+ Add Field', add_deduction:'+ Add Deduction',
     qualitative_factors:'// Qualitative Factors',
     factors_hint:'Rate each factor 1-10 · weight what matters most · used mainly when offers are close',
     add_factor:'+ Add Factor', compare_btn:'Compare Offers',
-    net_monthly:'NET MONTHLY', yearly_total:'YEARLY TOTAL', eff_monthly:'EFFECTIVE MONTHLY VALUE',
-    overall_year:'TOTAL ANNUAL PACKAGE',
-    overall_month:'EFFECTIVE MONTHLY VALUE',
+    net_monthly:'NET MONTHLY',
     full_breakdown:'// Full Breakdown', ai_title:'AI Recommendation',
     add_field_title:'Add Field', field_name_lbl:'FIELD NAME',
-    amount_lbl:'AMOUNT (SAR/MONTH)', pct_lbl:'% OF FIELD',
+    pct_lbl:'% OF FIELD',
     calc_pct:'Calculate as % of another field',
     annual_amt:'Annual amount (enter full yearly value)',
     yearly_input_badge:'yearly',
@@ -1081,7 +1204,6 @@ const STRINGS = {
     net_monthly_salary:'NET MONTHLY SALARY', qualitative_score:'QUALITATIVE SCORE',
     reset_btn:'↺ Reset', save_btn:'Save', portfolio_btn:'← Portfolio',
     reset_confirm:'Reset everything to defaults?', saved_txt:'Saved',
-    gosi_note_saudi:'',
     gosi_note_non:'Non-Saudi: no GOSI deduction from employee salary',
     deduction_toggle:'Deduction - click to toggle', addition_toggle:'Addition - click to mark as deduction',
     weight_lbl:'WEIGHT %', remove_factor:'Remove',
@@ -1091,21 +1213,19 @@ const STRINGS = {
     breakdown_rows: {
       gross:'GROSS MONTHLY SALARY', gosi:'GOSI / DEDUCTIONS', net:'NET MONTHLY SALARY',
       year1:'1 YEAR (NET × 12)', year_bonus:'1 YEAR + BONUSES', overall_sal:'OVERALL SALARY (÷12)',
-      annual_ben:'OTHER ANNUAL BENEFITS', annual_ben_month:'OTHER ANNUAL BENEFITS (÷12)', year_ben:'OVERALL SALARY WITH BENEFITS/YEAR',
-      month_ben:'OVERALL SALARY WITH BENEFITS/MONTH'
+      annual_ben_month:'OTHER ANNUAL BENEFITS (÷12)'
     },
-    ai_prompt_suffix:'Use overall annual package as the main decision factor, net monthly as the second factor, and qualitative factors mainly when the offers are close. Give a direct recommendation with exact numbers. No bullet points.',
     ai_lang_instruction:'Respond in English.',
     new_factor:'New Factor',
     export_btn:'Export Excel',
     saudi_short:'Saudi', non_saudi_short:'Non-Saudi',
     multiplier_lbl:'SALARY MULTIPLIER', multiplier_unit:'× basic salaries of',
     pct_unit:'% of',
-    built_by:'Built by', figures_note:'Figures are estimates',
+    figures_note:'Figures are estimates',
     mode_simple_label:'Quick Compare', mode_simple_sub:'Job Seeker · Fast answer',
-    mode_detailed_label:'Full Analysis', mode_detailed_sub:'HR / Finance · Every detail',
+    mode_detailed_label:'Full Analysis',
     change_no_base:'N/A (zero baseline)', reference_cycle:'Choose references without a circular dependency.',
-    winner_label:'WINNER', winner_higher:'higher total package', winner_reason:'Why: {reason}',
+    winner_reason:'Why: {reason}',
     winner_tied_label:'RESULT', winner_tied:'Roughly Equal', winner_tied_sub:'Both offers are very close financially',
     field_basic:'Basic Salary', field_housing:'Housing Allowance',
     field_transport:'Transport Allowance', field_special:'Special Allowance',
@@ -1118,39 +1238,33 @@ const STRINGS = {
     factor_career_growth:'Career Growth & Learning', factor_management:'Management Quality',
     factor_commute:'Commute & Location', factor_wlb:'Work-Life Balance',
     factor_job_security:'Job Security & Stability', factor_brand:'Company Brand & Reputation', factor_role_scope:'Role Scope & Seniority',
-    hr_context_label:'Role & Context (optional)',
-    hr_context_placeholder:'e.g. Senior Engineer, 8 yrs exp, Riyadh',
     vacation_lbl:'Vacation Days / Year', notice_lbl:'Notice Period (months)',
-    hr_context_hint:'Helps the AI give a more tailored recommendation',
+    daily_hours_lbl:'Actual Daily Hours', commute_lbl:'Commute (min / day, round-trip)', true_hourly_lbl:'TRUE HOURLY VALUE',
+    commute_time_cost_lbl:'Commute time cost (annual value of unpaid commute hours)', time_totals_lbl:'Total monthly hours invested',
+    time_helper:'True hourly value = net monthly salary ÷ (work + commute hours), assuming 22 working days per month. Commute time is unpaid time.',
+    share_btn:'⇪ Share', share_copied:'Share link copied to clipboard', share_invalid:'This share link looks invalid.',
+    restore_share:'Showing a comparison shared with you — edit the values and compare again.', restore_local:'Restored your saved inputs from this device.',
+    restore_clear:'Clear saved data', restore_cleared:'Saved data cleared.', hrs_unit:'hrs', per_hour:'/hr',
     vac_diff_lbl:'VACATION DIFF',
-    package_helper:'Total annual package includes enabled annual bonus and annual benefits. Effective monthly value = total annual package ÷ 12.',
     decision_summary:'// Decision Summary',
-    summary_close:'The offers are financially close, so qualitative factors should decide.',
-    summary_financial_lead:'Financially, {leader} leads on total annual package.',
     summary_net_lead:'Take-home cash: {leader} leads on net monthly salary.',
-    summary_qual_used:'Qualitative scoring is active and is being used as a tie-breaker, not a replacement for a material financial gap.',
     summary_qual_unused:'No meaningful qualitative scoring was applied yet.',
-    summary_assumption:'Enabled annual bonus and annual benefit fields are treated as included in the package calculation.',
-    reason_package_lead:'{leader} leads on total annual package',
     reason_net_lead:'{leader} leads on net monthly pay',
     reason_vacation_lead:'{leader} offers more vacation'
   },
   ar: {
     tool_tag:'// الأداة_01', hero_h1_line1:'مقارنة', hero_h1_line2:'العروض الوظيفية',
-    hero_p:'قابل للتخصيص الكامل. عدّل أي حقل، فعّله أو أوقفه، أضف حقولك الخاصة، احسب كنسبة من حقل آخر. يحفظ تلقائياً في متصفحك.',
     current_company:'الشركة الحالية', new_company:'العرض الجديد',
-    nationality:'الجنسية', saudi:'سعودي', non_saudi:'غير سعودي',
+    saudi:'سعودي', non_saudi:'غير سعودي',
     current:'الحالي', new_offer:'العرض الجديد',
     add_field:'+ إضافة حقل', add_deduction:'+ إضافة خصم',
     qualitative_factors:'// العوامل النوعية',
     factors_hint:'قيّم كل عامل من 1-10 · أعطِ وزناً لما يهمك أكثر · ويُستخدم غالباً عند تقارب العروض',
     add_factor:'+ إضافة عامل', compare_btn:'قارن العروض',
-    net_monthly:'صافي الشهري', yearly_total:'الإجمالي السنوي', eff_monthly:'القيمة الشهرية الفعلية',
-    overall_year:'إجمالي الحزمة السنوية',
-    overall_month:'القيمة الشهرية الفعلية',
+    net_monthly:'صافي الشهري',
     full_breakdown:'// التفاصيل الكاملة', ai_title:'توصية الذكاء الاصطناعي',
     add_field_title:'إضافة حقل', field_name_lbl:'اسم الحقل',
-    amount_lbl:'المبلغ (ريال/شهر)', pct_lbl:'% من حقل',
+    pct_lbl:'% من حقل',
     calc_pct:'احسب كنسبة مئوية من حقل آخر',
     annual_amt:'مبلغ سنوي (أدخل القيمة السنوية كاملة)',
     yearly_input_badge:'سنوي',
@@ -1160,7 +1274,6 @@ const STRINGS = {
     net_monthly_salary:'صافي الراتب الشهري', qualitative_score:'النتيجة النوعية',
     reset_btn:'↺ إعادة تعيين', save_btn:'حفظ', portfolio_btn:'← المعرض',
     reset_confirm:'إعادة تعيين كل شيء إلى الإعدادات الافتراضية؟', saved_txt:'تم الحفظ',
-    gosi_note_saudi:'',
     gosi_note_non:'غير سعودي: لا يوجد اشتراك تأمينات على الموظف',
     deduction_toggle:'خصم - انقر للتبديل', addition_toggle:'إضافة - انقر للتعيين كخصم',
     weight_lbl:'الوزن %', remove_factor:'حذف',
@@ -1170,23 +1283,21 @@ const STRINGS = {
     breakdown_rows: {
       gross:'إجمالي الراتب الشهري', gosi:'التأمينات / الاستقطاعات', net:'صافي الراتب الشهري',
       year1:'سنة كاملة (صافي × 12)', year_bonus:'سنة + المكافآت', overall_sal:'الراتب الإجمالي (÷12)',
-      annual_ben:'مزايا سنوية أخرى', annual_ben_month:'مزايا سنوية أخرى (÷12)', year_ben:'إجمالي الراتب مع المزايا/سنة',
-      month_ben:'إجمالي الراتب مع المزايا/شهر'
+      annual_ben_month:'مزايا سنوية أخرى (÷12)'
     },
     edit_field_title:'تعديل الحقل', deduction_lbl:'خصم (يُطرح من الإجمالي)',
     ref2_hint:'أضف حقلاً ثانياً (مثلاً: التأمينات = الأساسي + السكن)',
-    ai_prompt_suffix:'اجعل إجمالي الحزمة السنوية هو العامل الرئيسي، ثم صافي الراتب الشهري، واستخدم العوامل النوعية غالباً عند تقارب العروض. قدّم توصية مباشرة مع أرقام واضحة. بدون نقاط.',
     ai_lang_instruction:'أجب باللغة العربية.',
     new_factor:'عامل جديد',
     export_btn:'تصدير Excel',
     saudi_short:'سعودي', non_saudi_short:'غير سعودي',
     multiplier_lbl:'مضاعف الراتب', multiplier_unit:'× أشهر من',
     pct_unit:'% من',
-    built_by:'من تطوير', figures_note:'الأرقام تقديرية',
+    figures_note:'الأرقام تقديرية',
     mode_simple_label:'مقارنة سريعة', mode_simple_sub:'الباحث عن عمل · جواب فوري',
-    mode_detailed_label:'تحليل شامل', mode_detailed_sub:'HR / المالية · كل التفاصيل',
+    mode_detailed_label:'تحليل شامل',
     change_no_base:'غير متاح (القيمة الأساسية صفر)', reference_cycle:'اختر حقولاً مرجعية دون اعتماد دائري.',
-    winner_label:'الفائز', winner_higher:'أعلى في الحزمة الإجمالية', winner_reason:'السبب: {reason}',
+    winner_reason:'السبب: {reason}',
     winner_tied_label:'النتيجة', winner_tied:'متقاربان', winner_tied_sub:'كلا العرضين متقاربان مالياً',
     field_basic:'الراتب الأساسي', field_housing:'بدل السكن',
     field_transport:'بدل المواصلات', field_special:'البدل الخاص',
@@ -1199,20 +1310,17 @@ const STRINGS = {
     factor_career_growth:'النمو الوظيفي والتعلم', factor_management:'جودة الإدارة',
     factor_commute:'التنقل والموقع', factor_wlb:'التوازن بين العمل والحياة',
     factor_job_security:'الاستقرار الوظيفي', factor_brand:'سمعة الشركة وعلامتها', factor_role_scope:'نطاق الدور والمرتبة',
-    hr_context_label:'المسمى الوظيفي والسياق (اختياري)',
-    hr_context_placeholder:'مثال: مهندس أول، 8 سنوات خبرة، الرياض',
     vacation_lbl:'أيام الإجازة / سنة', notice_lbl:'فترة الإشعار (أشهر)',
-    hr_context_hint:'يساعد الذكاء الاصطناعي على تقديم توصية أكثر دقة',
+    daily_hours_lbl:'ساعات العمل الفعلية يومياً', commute_lbl:'التنقل (دقيقة / يوم، ذهاب وعودة)', true_hourly_lbl:'القيمة الساعية الحقيقية',
+    commute_time_cost_lbl:'تكلفة وقت التنقل (القيمة السنوية لساعات التنقل غير المدفوعة)', time_totals_lbl:'إجمالي الساعات الشهرية المستثمرة',
+    time_helper:'القيمة الساعية الحقيقية = صافي الراتب الشهري ÷ (ساعات العمل + ساعات التنقل)، بافتراض 22 يوم عمل شهرياً. وقت التنقل غير مدفوع.',
+    share_btn:'⇪ مشاركة', share_copied:'تم نسخ رابط المشاركة', share_invalid:'رابط المشاركة غير صالح.',
+    restore_share:'تعرض مقارنة تمت مشاركتها معك — عدّل القيم وأعد المقارنة.', restore_local:'تم استرجاع بياناتك المحفوظة من هذا الجهاز.',
+    restore_clear:'حذف البيانات المحفوظة', restore_cleared:'تم حذف البيانات المحفوظة.', hrs_unit:'ساعة', per_hour:'/ساعة',
     vac_diff_lbl:'فرق الإجازة',
-    package_helper:'إجمالي الحزمة السنوية يشمل المكافآت السنوية والمزايا السنوية المفعّلة. والقيمة الشهرية الفعلية = إجمالي الحزمة السنوية ÷ 12.',
     decision_summary:'// ملخص القرار',
-    summary_close:'العرضان متقاربان مالياً، لذا يفترض أن تحسم العوامل النوعية القرار.',
-    summary_financial_lead:'مالياً، يتفوق {leader} في إجمالي الحزمة السنوية.',
     summary_net_lead:'من ناحية صافي الاستلام الشهري، يتفوق {leader}.',
-    summary_qual_used:'تم تفعيل التقييم النوعي ويُستخدم كعامل ترجيح عند التقارب، وليس بديلاً عن فارق مالي جوهري.',
     summary_qual_unused:'لم يتم تطبيق تقييم نوعي مؤثر حتى الآن.',
-    summary_assumption:'يتم احتساب أي مكافأة سنوية أو مزايا سنوية مفعّلة ضمن إجمالي الحزمة.',
-    reason_package_lead:'{leader} يتفوق في إجمالي الحزمة السنوية',
     reason_net_lead:'{leader} يتفوق في صافي الراتب الشهري',
     reason_vacation_lead:'{leader} يمنح إجازة أكثر'
   }
@@ -1252,7 +1360,6 @@ function applyLang(lang) {
   const btn = $('langBtn');
   if (btn) {
     btn.textContent = isAr ? 'EN' : 'عربي';
-    btn.classList.toggle('ar-active', isAr);
   }
   const themeBtn = $('themeBtn');
   updateThemeIcon();
@@ -1337,8 +1444,14 @@ function resetAll() {
   // Clear HR context fields in both state and UI
   state.vacA = null; state.vacB = null;
   state.noticeA = null; state.noticeB = null;
+  state.hoursA = null; state.hoursB = null;
+  state.commuteA = null; state.commuteB = null;
   $('vacA').value = ''; $('vacB').value = '';
   $('noticeA').value = ''; $('noticeB').value = '';
+  if ($('hoursA')) $('hoursA').value = '';
+  if ($('hoursB')) $('hoursB').value = '';
+  if ($('commuteA')) $('commuteA').value = '';
+  if ($('commuteB')) $('commuteB').value = '';
   updateLabels();
   setNationality('A', 'saudi');
   setNationality('B', 'saudi');
@@ -1352,6 +1465,8 @@ function resetAll() {
   $('oMonthA').textContent = '-'; $('oMonthB').textContent = '-';
   $('oYearBadge').textContent = ''; $('oMonthBadge').textContent = '';
   updateVacDiff();
+  updateTrueHourly();
+  if ($('restoreBanner')) $('restoreBanner').hidden = true;
   closePopup();
   autosave();
   updateOfferDataNotice();
@@ -1501,13 +1616,6 @@ function toggleMenu() {
   m.classList.toggle('open');
   if (btn) btn.setAttribute('aria-expanded', String(opening));
 }
-document.addEventListener('click', e => {
-  const m = $('headerMenu'), btn = $('menuBtn');
-  if (m && m.classList.contains('open') && !m.contains(e.target) && e.target !== btn) {
-    m.classList.remove('open');
-    if (btn) btn.setAttribute('aria-expanded', 'false');
-  }
-});
 
 // ── Card tab switcher ────────────────────────────────────────────
 function switchCard(side) {
@@ -1564,6 +1672,13 @@ document.addEventListener('keydown', e => {
 $('langBtn').addEventListener('click', () => toggleLang());
 $('themeBtn').addEventListener('click', () => toggleTheme());
 $('saveBtn').addEventListener('click', () => saveData());
+$('shareBtn').addEventListener('click', () => copyShareLink());
+if ($('restoreClear')) $('restoreClear').addEventListener('click', () => {
+  localStorage.removeItem('offer_v31');
+  const banner = $('restoreBanner');
+  if (banner) banner.hidden = true;
+  setOfferStatus(t('restore_cleared'), false);
+});
 $('menuBtn').addEventListener('click', () => toggleMenu());
 $('btnReset').addEventListener('click', () => { resetAll(); toggleMenu(); });
 $('modeSimpleBtn').addEventListener('click', () => setMode('simple'));
@@ -1624,6 +1739,13 @@ async function exportExcel() {
   summary.push([t('recovery'), comparison.recoveryMonths == null ? t('no_recovery') : comparison.recoveryMonths]);
   summary.push([t('threshold'), state.closeThreshold]);
   summary.push([t('benefit_warning')]);
+  if (state.hoursA != null || state.hoursB != null || state.commuteA != null || state.commuteB != null) {
+    const ta = OfferModel.timeProfile(a, sideTime('A'));
+    const tb = OfferModel.timeProfile(b, sideTime('B'));
+    summary.push([t('time_totals_lbl'), ta.totalHours, tb.totalHours]);
+    summary.push([t('true_hourly_lbl'), ta.trueHourlyValue, tb.trueHourlyValue]);
+    summary.push([t('commute_time_cost_lbl'), ta.commuteTimeCost, tb.commuteTimeCost]);
+  }
   sheet('Summary', summary);
   const fields = [[t('metric'), t('classification'), t('current_company'), t('yearly_input_badge'), t('expected_cash'), t('payout'), t('usage'), t('edit')]];
   ['A', 'B'].forEach(side => {
@@ -1641,6 +1763,8 @@ async function exportExcel() {
   assumptions.push([t('vacation_lbl'), state.vacA == null ? '' : state.vacA, state.vacB == null ? '' : state.vacB]);
   assumptions.push([t('leave_basis'), t(state.leaveBasisA), t(state.leaveBasisB)]);
   assumptions.push([t('notice_lbl'), state.noticeA == null ? '' : state.noticeA, state.noticeB == null ? '' : state.noticeB]);
+  assumptions.push([t('daily_hours_lbl'), state.hoursA == null ? '' : state.hoursA, state.hoursB == null ? '' : state.hoursB]);
+  assumptions.push([t('commute_lbl'), state.commuteA == null ? '' : state.commuteA, state.commuteB == null ? '' : state.commuteB]);
   ['signOn', 'relocation', 'lostBonus', 'repayment', 'unpaidGap', 'departureSettlement'].forEach(key => assumptions.push([t(key), OfferModel.number(state.transition.A[key]), OfferModel.number(state.transition.B[key])]));
   assumptions.push([t('package_helper')]);
   sheet('Payroll and first year', assumptions);
@@ -1652,20 +1776,14 @@ async function exportExcel() {
   XLSX.writeFile(workbook, 'offer-comparison-' + state.payroll.A.date + '.xlsx');
 }
 
-function resolveValueExport(f, fields) {
-  return resolveValue(f, fields);
-}
-
 // ── Close dropdown when tapping outside (mobile fix) ────────────
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.menu-wrap')) {
-    const menu = document.getElementById('headerMenu');
-    if (menu) menu.classList.remove('open');
+function closeHeaderMenuOnOutside(target) {
+  const menu = $('headerMenu');
+  if (menu && menu.classList.contains('open') && !target.closest('.menu-wrap')) {
+    menu.classList.remove('open');
+    const btn = $('menuBtn');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
   }
-});
-document.addEventListener('touchstart', function(e) {
-  if (!e.target.closest('.menu-wrap')) {
-    const menu = document.getElementById('headerMenu');
-    if (menu) menu.classList.remove('open');
-  }
-}, { passive: true });
+}
+document.addEventListener('click', e => closeHeaderMenuOnOutside(e.target));
+document.addEventListener('touchstart', e => closeHeaderMenuOnOutside(e.target), { passive: true });

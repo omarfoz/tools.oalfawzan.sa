@@ -6,7 +6,6 @@ const OfferModel = require('../assets/js/pages/offer-model.js');
 const context = vm.createContext({ state: {}, OfferModel, t: key => key });
 vm.runInContext(source.slice(source.indexOf('function nonNegativeNumber'), source.indexOf('// ── Mutations')), context);
 vm.runInContext(source.slice(source.indexOf('function computeSide'), source.indexOf('function buildWinnerReason')), context);
-vm.runInContext(source.slice(source.indexOf('function resolveValueExport'), source.indexOf('// ── Close dropdown')), context);
 const field = (id, value, extra = {}) => ({ id, value, enabled: true, ...extra });
 const basic = field('basic', 10000);
 const housing = field('housing', 0, { isPct: true, pct: 25, pctRef: 'basic' });
@@ -19,7 +18,6 @@ assert.equal(result.annualBenefits, 5000);
 assert.equal(result.annualDeductions, 10000);
 assert.equal(result.yearBenefits, 150375);
 assert.equal(result.overallBen * 12, result.yearBenefits);
-assert.equal(context.resolveValueExport(gosi, context.state.A), context.resolveValue(gosi, context.state.A));
 basic.value = 100000;
 assert.equal(context.resolveValue(gosi, context.state.A), 4387.5);
 basic.enabled = false;
@@ -70,6 +68,22 @@ assert.equal(OfferModel.compare(stay, { ...moved, expectedCash: 181000 }, 3).lea
 assert.equal(OfferModel.compare(stay, { ...stay, costs: 10000, signOn: 0 }, 3).recoveryMonths, null);
 assert.equal(OfferModel.qualitative([{ scoreA: 8, scoreB: 6, weight: 20 }, { scoreA: 2, scoreB: 10, weight: 80 }]).scoreA, 3.2);
 assert.equal(OfferModel.qualitative([{ scoreA: 8, scoreB: 6, weight: 0 }]).scoreA, null);
+
+// Time profile mirrors the verified reference model: 22 working days, unpaid commute.
+const netResult = { net: 11656.25 };
+const profile = OfferModel.timeProfile(netResult, { dailyHours: 8, commuteMinutes: 60 });
+assert.equal(profile.workHours, 176);
+assert.equal(profile.commuteHours, 22);
+assert.equal(profile.totalHours, 198);
+assert.equal(profile.hourlyRate, 66.23);
+assert.equal(profile.commuteTimeCost, 17484.38);
+assert.equal(profile.trueHourlyValue, 58.87);
+const noCommute = OfferModel.timeProfile({ net: 12000 }, { dailyHours: 8, commuteMinutes: 0 });
+assert.equal(noCommute.trueHourlyValue, 68.18);
+assert.equal(noCommute.commuteTimeCost, 0);
+const defaultHours = OfferModel.timeProfile({ net: 9000 }, {});
+assert.equal(defaultHours.totalHours, 176);
+assert.equal(OfferModel.timeProfile({ net: 0 }, { dailyHours: 0, commuteMinutes: 30 }).trueHourlyValue, 0);
 context.state.payroll = { A: { coverage: 'new', date: '2026-10-10', override: '' } };
 basic.enabled = true; basic.value = 10000;
 assert.equal(context.resolveValue(gosi, context.state.A), 1343.75);

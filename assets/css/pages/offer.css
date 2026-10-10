@@ -1,5 +1,5 @@
-@import url('/assets/css/pages/offer-base.css?v=20260915a');
-@import url('/assets/css/offer-mobile.css?v=20260915a');
+﻿@import url('/assets/css/pages/offer-base.css?v=20261010h');
+@import url('/assets/css/offer-mobile.css?v=20261010h');
 
 /* Formerly inline styles from offer/index.html */
 .factors-hint {
@@ -95,7 +95,7 @@ html[data-theme="light"] .pct-ref2-select { background: rgba(255,255,255,.5); }
 
   html body .main-grid .field-row {
     display: grid !important;
-    grid-template-columns: 34px minmax(0, 1fr) 112px 30px !important;
+    grid-template-columns: 44px minmax(0, 1fr) 112px 30px !important;
     grid-template-areas: 'toggle name amount type' !important;
     align-items: center !important;
     gap: 8px !important;
@@ -106,29 +106,46 @@ html[data-theme="light"] .pct-ref2-select { background: rgba(255,255,255,.5); }
   }
 
   html[dir='rtl'] body .main-grid .field-row {
-    grid-template-columns: 34px minmax(0, 1fr) 112px 30px !important;
+    grid-template-columns: 44px minmax(0, 1fr) 112px 30px !important;
   }
 
   html body .main-grid .toggle {
     grid-area: toggle !important;
-    width: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-    height: 18px !important;
-    min-height: 18px !important;
-    max-height: 18px !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
     padding: 0 !important;
     margin: 0 !important;
     border: 0 !important;
-    border-radius: 999px !important;
+    border-radius: 10px !important;
     box-shadow: none !important;
+    background: transparent !important;
+    position: relative !important;
   }
 
+  /* 44px switch hit area without enlarging the visual track. */
+  html body .main-grid .toggle::before {
+    content: '';
+    position: absolute;
+    width: 32px;
+    height: 18px;
+    left: 6px;
+    top: 13px;
+    border-radius: 999px;
+    background: var(--border2);
+    transition: background .2s;
+  }
+  html body .main-grid .toggle.on::before { background: var(--current); }
+  html body .main-grid .toggle.on-new::before { background: var(--new); }
+
   html body .main-grid .toggle::after {
+    top: 16px !important;
+    left: 9px !important;
     width: 12px !important;
     height: 12px !important;
-    top: 3px !important;
-    left: 3px !important;
   }
 
   html body .main-grid .field-name {
@@ -243,7 +260,7 @@ html[data-theme="light"] .pct-ref2-select { background: rgba(255,255,255,.5); }
 
 @media (max-width: 390px) {
   html body .main-grid .field-row {
-    grid-template-columns: 30px minmax(0, 1fr) 100px 26px !important;
+    grid-template-columns: 44px minmax(0, 1fr) 100px 26px !important;
     gap: 6px !important;
     padding-inline: 8px !important;
   }
@@ -255,52 +272,6 @@ html[data-theme="light"] .pct-ref2-select { background: rgba(255,255,255,.5); }
   html body .main-grid .field-name-input,
   html body .main-grid .amount-input {
     font-size: .82rem !important;
-  }
-}
-
-
-/* Lighthouse accessibility: 44px switch hit area without enlarging the visual track. */
-@media (max-width: 640px) {
-  html body .main-grid .field-row {
-    grid-template-columns: 44px minmax(0, 1fr) 112px 30px !important;
-  }
-  html[dir='rtl'] body .main-grid .field-row {
-    grid-template-columns: 44px minmax(0, 1fr) 112px 30px !important;
-  }
-  html body .main-grid .toggle {
-    width: 44px !important;
-    min-width: 44px !important;
-    max-width: 44px !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
-    background: transparent !important;
-    border-radius: 10px !important;
-    position: relative !important;
-  }
-  html body .main-grid .toggle::before {
-    content: '';
-    position: absolute;
-    width: 32px;
-    height: 18px;
-    left: 6px;
-    top: 13px;
-    border-radius: 999px;
-    background: var(--border2);
-    transition: background .2s;
-  }
-  html body .main-grid .toggle.on::before { background: var(--current); }
-  html body .main-grid .toggle.on-new::before { background: var(--new); }
-  html body .main-grid .toggle::after {
-    top: 16px !important;
-    left: 9px !important;
-    width: 12px !important;
-    height: 12px !important;
-  }
-}
-@media (max-width: 390px) {
-  html body .main-grid .field-row {
-    grid-template-columns: 44px minmax(0, 1fr) 100px 26px !important;
   }
 }
 
@@ -566,3 +537,36 @@ html body.tool-page :is(#simpleResult, #resultsWrap, #payrollDetails) { scroll-m
   html { scroll-behavior: auto; }
   html body.tool-page .fadein { animation: none !important; }
 }
+
+/* Share restore banner */
+.restore-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-block: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: .82rem;
+}
+.restore-banner[hidden] { display: none !important; }
+.restore-banner span { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.restore-clear {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: .75rem;
+  cursor: pointer;
+}
+.restore-clear:focus-visible { outline: 2px solid var(--new); outline-offset: 3px; }
+
+/* Time & commute inputs */
+.hr-time-grid { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); }
+#trueHourly { overflow-wrap: anywhere; }

@@ -84,7 +84,25 @@
     });
     return { weight, scoreA: weight ? scoreA / weight : null, scoreB: weight ? scoreB / weight : null };
   }
-  const model = { number, percent, category, rate, compute, compare, qualitative };
+  /* Time and commute analysis: net monthly cash spread over invested hours.
+     Reference model: 22 paid working days per month; commute is unpaid time. */
+  function timeProfile(result, time) {
+    const dailyHours = number(time.dailyHours) || 8;
+    const commuteMinutes = number(time.commuteMinutes);
+    const workingDays = 22;
+    const workHours = dailyHours * workingDays;
+    const commuteHours = commuteMinutes / 60 * workingDays;
+    const totalHours = workHours + commuteHours;
+    const hourlyRate = dailyHours > 0 ? result.net / (workingDays * dailyHours) : 0;
+    const commuteTimeCost = hourlyRate * commuteHours * 12;
+    return {
+      workHours: round2(workHours), commuteHours: round2(commuteHours), totalHours: round2(totalHours),
+      hourlyRate: round2(hourlyRate), commuteTimeCost: round2(commuteTimeCost),
+      trueHourlyValue: totalHours > 0 ? round2(result.net / totalHours) : 0
+    };
+  }
+  function round2(value) { return Math.round(value * 100) / 100; }
+  const model = { number, percent, category, rate, compute, compare, qualitative, timeProfile };
   if (typeof module !== 'undefined' && module.exports) module.exports = model;
   else root.OfferModel = model;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

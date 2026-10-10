@@ -388,7 +388,18 @@ html[data-theme="light"] .filter[aria-pressed="true"] { background: #0062cc !imp
 .site-footer a { color: var(--site-text-muted) !important; }
 
 /* Tool pages */
-.tool-page { background: transparent !important; color: var(--site-text) !important; }
+.tool-page {
+  background:
+    linear-gradient(rgba(13,22,45,.84), rgba(1,2,4,.94)),
+    url('https://oalfawzan.sa/image-1600.webp') center / cover fixed !important;
+  background-color: var(--site-bg) !important;
+  color: var(--site-text) !important;
+}
+html[data-theme="light"] .tool-page {
+  background: url('https://oalfawzan.sa/image-1600.webp') center / cover fixed !important;
+  background-color: var(--site-bg) !important;
+  color: #0f172a !important;
+}
 .tool-page::before { display: none !important; }
 .tool-page > .wrap,
 .tool-page > .container,
@@ -515,6 +526,7 @@ html[dir="rtl"] .back-link .back-icon { display: inline-block; transform: scaleX
 .tool-page .nat-btn.active,
 .tool-page .mode-btn.active,
 .tool-page .mode-btn.active-simple,
+.tool-page .mode-btn.active-detailed,
 .tool-page .popup-btn.confirm {
   color: #fff !important;
   background: rgba(0,122,255,.90) !important;
@@ -530,6 +542,7 @@ html[data-theme="light"] .tool-page .tab.is-active,
 html[data-theme="light"] .tool-page .nat-btn.active,
 html[data-theme="light"] .tool-page .mode-btn.active,
 html[data-theme="light"] .tool-page .mode-btn.active-simple,
+html[data-theme="light"] .tool-page .mode-btn.active-detailed,
 html[data-theme="light"] .tool-page .popup-btn.confirm { background: #0062cc !important; border-color: rgba(255,255,255,.62) !important; }
 .tool-page .result,
 .tool-page .status,
@@ -715,7 +728,7 @@ html[data-theme="light"] .tool-page .mode-tabs .mode-tab.active {
 .tool-page .panel-tabs .tab {
   box-shadow: none !important;
 }
-.tool-page .mode-switcher .mode-btn:not(.active):not(.active-simple),
+.tool-page .mode-switcher .mode-btn:not(.active):not(.active-simple):not(.active-detailed),
 .tool-page .nat-unified .nat-btn:not(.active),
 .tool-page .panel-tabs .tab:not(.is-active) {
   background: transparent !important;
@@ -723,6 +736,7 @@ html[data-theme="light"] .tool-page .mode-tabs .mode-tab.active {
 }
 .tool-page .mode-switcher .mode-btn.active,
 .tool-page .mode-switcher .mode-btn.active-simple,
+.tool-page .mode-switcher .mode-btn.active-detailed,
 .tool-page .nat-unified .nat-btn.active,
 .tool-page .panel-tabs .tab.is-active {
   color: var(--site-text) !important;
@@ -736,6 +750,7 @@ html[data-theme="light"] .tool-page .nat-unified {
 }
 html[data-theme="light"] .tool-page .mode-switcher .mode-btn.active,
 html[data-theme="light"] .tool-page .mode-switcher .mode-btn.active-simple,
+html[data-theme="light"] .tool-page .mode-switcher .mode-btn.active-detailed,
 html[data-theme="light"] .tool-page .nat-unified .nat-btn.active,
 html[data-theme="light"] .tool-page .panel-tabs .tab.is-active {
   color: #0f172a !important;

@@ -61,15 +61,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 /* ── Header ── */
 header{padding:16px 0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--border);margin-bottom:28px}
 @media(min-width:480px){header{padding:20px 0 28px;margin-bottom:32px}}
-.logo{font-size:.8rem;font-weight:600;color:var(--muted);text-decoration:none}
-.logo span{color:var(--text)}
 .header-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--muted2);padding:0 14px;min-height:42px;border-radius:10px;font-family:inherit;font-size:.8rem;font-weight:500;cursor:pointer;transition:background-color .15s ease,border-color .15s ease,color .15s ease,opacity .15s ease,box-shadow .15s ease;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
 .btn-ghost:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
 .btn-saved{border-color:var(--current)!important;color:var(--current)!important}
-.lang-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted2);padding:0 14px;min-height:42px;border-radius:10px;font-size:.82rem;font-weight:600;cursor:pointer;transition:background-color .15s ease,border-color .15s ease,color .15s ease,opacity .15s ease,box-shadow .15s ease;box-shadow:var(--shadow)}
-.lang-btn:hover{border-color:var(--border2);color:var(--text)}
-.lang-btn.ar-active{border-color:var(--new);color:var(--new);background:#EEF3FF}
 
 /* ── Hero ── */
 .hero{padding:0 0 24px}
@@ -94,7 +89,7 @@ header{padding:16px 0 24px;display:flex;align-items:center;justify-content:space
 
 /* ── Main grid ── */
 .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space);margin-bottom:12px;align-items:start}
-@media(max-width:640px){.company-names,.nationality-row{grid-template-columns:1fr}}
+@media(max-width:640px){.company-names{grid-template-columns:1fr}}
 @media(max-width:640px){.main-grid{grid-template-columns:1fr;gap:10px}}
 @media(max-width:640px){.main-grid .card{display:none}}
 @media(max-width:640px){.main-grid .card.active-card{display:block}}
@@ -281,8 +276,6 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:4px 0}
 .popup-overlay.open{display:flex}
 .popup{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:100%;box-shadow:var(--shadow-md)}
 @media(min-width:520px){.popup{border-radius:14px;padding:26px;max-width:420px}}
-.popup-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px}
-@media(min-width:520px){.popup-handle{display:none}}
 .popup-title{font-size:.95rem;font-weight:700;margin-bottom:18px;color:var(--text)}
 .popup-field{margin-bottom:14px}
 .popup-label{font-size:.72rem;font-weight:600;color:var(--muted2);margin-bottom:6px;display:block;letter-spacing:.03em;text-transform:uppercase}
@@ -332,7 +325,7 @@ footer a:hover{color:var(--text)}
 
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid rgba(0,122,255,.65);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
-@media(max-width:420px){header{gap:10px}.header-actions{width:100%;justify-content:space-between}.logo{overflow-wrap:anywhere}.inline-compare.action-row{flex-direction:column}.inline-compare .export-btn{width:100%}}
+@media(max-width:420px){header{gap:10px}.header-actions{width:100%;justify-content:space-between}.inline-compare.action-row{flex-direction:column}.inline-compare .export-btn{width:100%}}
 
 /* Defensive text wrapping to avoid overflow in RTL and long-label cases. */
 .card-label,.cmp-lbl,.overall-label,.summary-label,.total-label,.factors-title,.nat-note,.hero p{overflow-wrap:anywhere}
@@ -358,7 +351,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 /* sections hidden by mode */
 .detailed-only{transition:opacity .2s}
 body.mode-simple .detailed-only{display:none!important}
-body.mode-detailed .simple-only{display:none!important}
 
 /* ── Simple Mode Result ── */
 .simple-result{display:none;margin-bottom:10px}
@@ -385,9 +377,3 @@ body.mode-simple #resultsWrap .breakdown-card{display:none}
 .sm-val{font-size:.85rem;font-weight:700}
 .sm-badge{font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:8px}
 
-/* ── Detailed Mode specific tweaks ── */
-.mode-section-title{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.mode-section-title::before{content:'';width:3px;height:14px;background:var(--new);border-radius:2px;flex-shrink:0}
-
-/* ── Legacy metric cards (hidden but kept) ── */
-.big-metrics{display:none}

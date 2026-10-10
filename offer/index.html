@@ -9,9 +9,9 @@
 <meta name="description" content="قارن بين عرضي عمل من حيث الراتب الصافي والبدلات والمزايا السنوية والتأمينات والعوامل المهنية لاتخاذ قرار أوضح.">
 <link rel="canonical" href="https://tools.oalfawzan.sa/offer/">
 <script src="/assets/js/theme-init.js"></script>
-<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20261010g">
+<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20261010h">
 <link rel="stylesheet" href="/assets/css/platform.css?v=20260915a">
-<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20261010b">
+<link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20261010c">
 </head>
 <body class="tool-page">
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
@@ -23,6 +23,7 @@
       <button class="icon-btn" id="langBtn" type="button">EN</button>
       <button class="icon-btn" id="themeBtn" type="button" aria-label="تبديل المظهر"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg></button>
       <button type="button" class="btn-ghost" id="saveBtn">Save</button>
+      <button type="button" class="btn-ghost" id="shareBtn" aria-label="Copy share link for this comparison"><span data-i18n="share_btn">⇪ Share</span></button>
       <div class="menu-wrap">
         <button type="button" class="btn-ghost" id="menuBtn" aria-label="More options" aria-haspopup="true" aria-expanded="false">⋯</button>
         <div class="dropdown" id="headerMenu">
@@ -52,6 +53,11 @@
       <span class="mode-label" data-i18n="mode_detailed_label">تحليل كامل</span>
       <span class="mode-sub" data-i18n="mode_detailed_sub">الموارد البشرية / المالية · كل التفاصيل</span>
     </button>
+  </div>
+
+  <div class="restore-banner" id="restoreBanner" hidden>
+    <span id="restoreText"></span>
+    <button type="button" class="restore-clear" id="restoreClear" data-i18n="restore_clear">Clear saved data</button>
   </div>
 
   <div class="company-names">
@@ -155,6 +161,27 @@
         <div id="vacDiff" class="hr-vac-val">-</div>
       </div>
     </div>
+    <div class="hr-context-grid hr-time-grid">
+      <div>
+        <div class="section-label"><span data-i18n="daily_hours_lbl">Actual Daily Hours</span></div>
+        <div class="hr-pair-grid">
+          <input class="amount-input hr-current" id="hoursA" type="number" min="1" max="16" step="0.5" placeholder="8" aria-label="First offer daily working hours">
+          <input class="amount-input hr-new" id="hoursB" type="number" min="1" max="16" step="0.5" placeholder="8" aria-label="Second offer daily working hours">
+        </div>
+      </div>
+      <div>
+        <div class="section-label"><span data-i18n="commute_lbl">Commute (min / day, round-trip)</span></div>
+        <div class="hr-pair-grid">
+          <input class="amount-input hr-current" id="commuteA" type="number" min="0" max="480" step="5" placeholder="0" aria-label="First offer commute minutes">
+          <input class="amount-input hr-new" id="commuteB" type="number" min="0" max="480" step="5" placeholder="0" aria-label="Second offer commute minutes">
+        </div>
+      </div>
+      <div id="trueHourlyWrap" class="hr-vac-diff">
+        <div class="section-label" data-i18n="true_hourly_lbl">TRUE HOURLY VALUE</div>
+        <div id="trueHourly" class="hr-vac-val">-</div>
+      </div>
+    </div>
+    <p class="helper-note" data-i18n="time_helper">True hourly value = net monthly salary ÷ (work + commute hours), assuming 22 working days per month. Commute time is unpaid time.</p>
   </div>
 
   <section class="factors-card" id="transitionSettings" aria-label="First-year switching costs"></section>
@@ -364,8 +391,8 @@
 </div>
 
 <script defer src="/assets/js/pages/offer-model.js?v=20261010d"></script>
-<script defer src="/assets/js/pages/offer-enhancements.js?v=20261010g"></script>
-<script defer src="/assets/js/pages/offer.js?v=20261010g"></script>
-<script defer src="/assets/js/platform.js?v=20261010a"></script>
+<script defer src="/assets/js/pages/offer-enhancements.js?v=20261010h"></script>
+<script defer src="/assets/js/pages/offer.js?v=20261010h"></script>
+<script defer src="/assets/js/platform.js?v=20261010b"></script>
 </body>
 </html>

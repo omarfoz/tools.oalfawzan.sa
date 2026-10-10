@@ -36,28 +36,34 @@
     document.querySelectorAll('button:not([type])').forEach(b=>b.type='button');
     document.querySelectorAll('input,select,textarea').forEach(el=>{if(el.matches('[type="hidden"],[type="submit"],[type="button"],[type="reset"]')||el.labels?.length||el.hasAttribute('aria-label')||el.hasAttribute('aria-labelledby'))return;const hint=el.getAttribute('placeholder')||el.getAttribute('name')||el.id;if(hint)el.setAttribute('aria-label',hint)});
 
-    /* Offer mobile header: preserve Save, but place it inside the existing overflow menu. */
-    const saveBtn=document.getElementById('saveBtn');
+    /* Offer mobile header: preserve Save/Share as items inside the existing overflow menu. */
     const headerMenu=document.getElementById('headerMenu');
     const menuWrap=headerMenu?.closest('.menu-wrap');
-    if(saveBtn&&headerMenu&&menuWrap&&saveBtn.parentElement){
-      const originalParent=saveBtn.parentElement;
-      const originalNext=saveBtn.nextElementSibling;
+    if(headerMenu&&menuWrap){
       const mobileQuery=matchMedia('(max-width: 700px)');
-      const syncOfferHeader=()=>{
-        if(mobileQuery.matches){
-          if(saveBtn.parentElement!==headerMenu){
-            saveBtn.classList.add('mobile-menu-save');
-            headerMenu.prepend(saveBtn);
+      const relocate=(btn)=>{
+        if(!btn||!btn.parentElement)return;
+        const originalParent=btn.parentElement;
+        const originalNext=btn.nextElementSibling;
+        const sync=()=>{
+          if(mobileQuery.matches){
+            if(btn.parentElement!==headerMenu){
+              btn.classList.add('mobile-menu-save');
+              headerMenu.prepend(btn);
+            }
+          }else if(btn.parentElement===headerMenu){
+            btn.classList.remove('mobile-menu-save');
+            const anchor=originalNext&&originalNext.parentElement===originalParent?originalNext:menuWrap;
+            originalParent.insertBefore(btn,anchor);
           }
-        }else if(saveBtn.parentElement===headerMenu){
-          saveBtn.classList.remove('mobile-menu-save');
-          const anchor=originalNext&&originalNext.parentElement===originalParent?originalNext:menuWrap;
-          originalParent.insertBefore(saveBtn,anchor);
-        }
+        };
+        sync();
+        mobileQuery.addEventListener?.('change',sync);
       };
-      syncOfferHeader();
-      mobileQuery.addEventListener?.('change',syncOfferHeader);
+      const shareBtn=document.getElementById('shareBtn');
+      const saveBtn=document.getElementById('saveBtn');
+      if(shareBtn)relocate(shareBtn);
+      if(saveBtn)relocate(saveBtn);
     }
   });
 })();
