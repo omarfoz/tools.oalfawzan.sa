@@ -106,6 +106,7 @@ function init() {
   }
 
   migrateCompensation();
+  if (!localStorage.getItem('offer_v31')) state.isExample = true;
   applyLang(savedLang);
   $('coNameA').value = state.coA;
   $('coNameB').value = state.coB;
@@ -149,6 +150,7 @@ function init() {
     const m = (urlMode === 'simple' || urlMode === 'detailed') ? urlMode : localStorage.getItem('offer_mode');
     if (m === 'detailed') { setMode('detailed'); } else { setMode('simple'); }
   } catch { setMode('simple'); }
+  initOfferUX();
 }
 
 function updateVacDiff() {
@@ -173,6 +175,8 @@ function setMode(mode) {
   document.body.classList.add('mode-' + mode);
   $('modeSimpleBtn').className   = 'mode-btn' + (mode === 'simple'   ? ' active-simple'   : '');
   $('modeDetailedBtn').className = 'mode-btn' + (mode === 'detailed' ? ' active-detailed' : '');
+  $('modeSimpleBtn').setAttribute('aria-pressed', String(mode === 'simple'));
+  $('modeDetailedBtn').setAttribute('aria-pressed', String(mode === 'detailed'));
   invalidateComparison();
   // hide any stale results when switching modes
   $('simpleResult').style.display = 'none';
@@ -206,6 +210,12 @@ function updateLabels() {
 // ── Render ────────────────────────────────────────────────────────
 function renderFields(side) {
   const con = $('fields' + side);
+  const active = document.activeElement;
+  const activeField = active?.closest('.offer-field');
+  const focusId = activeField?.dataset.id;
+  const focusIndex = activeField ? [...activeField.querySelectorAll('button, input, select, summary')].indexOf(active) : -1;
+  const openSettings = [...con.querySelectorAll('.offer-field-settings[open]')].map(details => details.closest('.offer-field').dataset.id);
+  const benefitsOpen = Boolean(con.querySelector('.offer-optional-benefits[open]'));
   con.innerHTML = '';
   const monthly = state[side].filter(f => !f.isAnnual);
   const annual  = state[side].filter(f =>  f.isAnnual);
@@ -270,11 +280,28 @@ function renderFields(side) {
     <button type="button" class="add-field-btn" onclick="openAddFieldAnnual('${side}')">${t('add_field')}</button>
   `;
   con.appendChild(annualHeader);
-  annual.forEach(f => con.appendChild(makeRow(f, side)));
+  annual.filter(f => OfferModel.category(f) === 'variable' || OfferModel.category(f) === 'guaranteed').forEach(f => con.appendChild(makeRow(f, side)));
+  const benefits = annual.filter(f => !['variable', 'guaranteed'].includes(OfferModel.category(f)));
+  if (benefits.length) {
+    const optional = document.createElement('details');
+    optional.className = 'offer-optional-benefits';
+    optional.open = benefitsOpen;
+    const summary = document.createElement('summary'); summary.textContent = t('other_benefits');
+    optional.append(summary);
+    benefits.forEach(f => optional.append(makeRow(f, side)));
+    con.append(optional);
+  }
 
   const pad = document.createElement('div');
   pad.style.height = '12px';
   con.appendChild(pad);
+  alignOfferSections(con);
+  con.querySelectorAll('.offer-field').forEach(field => {
+    if (openSettings.includes(field.dataset.id)) field.querySelector('.offer-field-settings').open = true;
+  });
+  if (focusId && focusIndex >= 0) {
+    [...con.querySelectorAll('.offer-field')].find(field => field.dataset.id === focusId)?.querySelectorAll('button, input, select, summary')[focusIndex]?.focus();
+  }
   setTimeout(liveUpdate, 0);
 }
 
@@ -355,7 +382,24 @@ function makeRow(f, side) {
   });
 
   const wrapper = document.createElement('div');
+  wrapper.className = 'offer-field' + (f.enabled ? '' : ' offer-field-disabled');
+  wrapper.dataset.id = f.id;
   wrapper.append(row, makeCompensationControls(f, side));
+  const label = document.createElement('span');
+  label.className = 'offer-field-label'; label.textContent = fieldAccessibleName;
+  row.querySelector('.field-name').append(label);
+  const unit = document.createElement('span');
+  unit.className = 'offer-amount-unit';
+  unit.textContent = f.isMonths && f.isPct ? t('months_basic') : t('amount_unit');
+  row.querySelector('.field-amount').append(unit);
+  if (f.isPct && !f.isMonths) {
+    const formula = document.createElement('button');
+    formula.type = 'button'; formula.className = 'offer-formula';
+    formula.textContent = f.pct + '% · ' + tFieldName(state[side].find(item => item.id === f.pctRef) || { name: '' });
+    formula.setAttribute('aria-label', t('edit') + ': ' + fieldAccessibleName);
+    formula.addEventListener('click', () => f.isGosi ? openPayrollSettings() : openEditField(side, f.id));
+    wrapper.querySelector('.offer-field-controls').prepend(formula);
+  }
   return wrapper;
 }
 
@@ -625,6 +669,7 @@ $('popupOverlay').addEventListener('keydown', e => {
 // ── Calculate ─────────────────────────────────────────────────────
 function liveUpdate() {
   updatePayrollNotes();
+  updateTabLabels();
   try {
     const a = computeSide('A');
     const b = computeSide('B');
@@ -676,6 +721,16 @@ function updateDecisionSummary(a, b, py, pn) {
 }
 
 function calculate() {
+  const missing = ['A', 'B'].find(side => !state[side].some(f =>
+    !f.isAnnual && !f.isDeduction && f.enabled && OfferModel.category(f) === 'cash' && resolveValue(f, state[side]) > 0));
+  if (missing) {
+    $('comparisonStatus').textContent = t('missing_salary');
+    switchCard(missing);
+    const field = state[missing].find(f => FIELD_NAMES[f.id] === 'field_basic') || state[missing][0];
+    const row = [...$('fields' + missing).querySelectorAll('.field-row')].find(row => row.dataset.id === field?.id);
+    row?.querySelector(field?.enabled ? '.amount-input' : '.toggle')?.focus();
+    return;
+  }
   ['resultsWrap', 'simpleResult', 'totalsBar'].forEach(id => { $(id).hidden = false; });
   const a = computeSide('A'), b = computeSide('B');
   const pg = relativeChange(a.gross, b.gross);
@@ -685,6 +740,7 @@ function calculate() {
   renderCompensationResults(a, b);
   $('comparisonStatus').textContent = '';
   lastCalculatedRevision = inputRevision;
+  document.body.classList.add('offer-has-results');
   const fmtK = n => 'SAR ' + fmtNum(n);
 
   // ── SIMPLE MODE ──────────────────────────────────────────────────
@@ -754,7 +810,7 @@ function calculate() {
     }
     $('simpleResult').style.display = 'block';
     $('simpleResult').classList.add('fadein');
-    $('simpleResult').scrollIntoView({ behavior:'smooth', block:'start' });
+    $('compensationResults').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start' });
     updateDecisionSummary(a, b, py, pn);
     getAI(a, b, pg, pn, py);
     $('resultsWrap').style.display = 'block';
@@ -836,7 +892,7 @@ function calculate() {
 
   $('resultsWrap').style.display = 'block';
   $('resultsWrap').classList.add('fadein');
-  $('resultsWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('compensationResults').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
 
   updateDecisionSummary(a, b, py, pn);
   getAI(a, b, pg, pn, py);
@@ -1228,6 +1284,7 @@ function applyLang(lang) {
   if (phB) phB.placeholder = t('new_company');
 
   // Re-render fields and factors (they use t() internally)
+  updateOfferDataNotice();
   renderFields('A');
   renderFields('B');
   renderFactors();
@@ -1268,6 +1325,7 @@ function resetAll() {
   if (!confirm(t('reset_confirm'))) return;
   localStorage.removeItem('offer_v31');
   state = deepClone(DEFAULTS);
+  state.isExample = true;
   state.factors = deepClone(DEFAULT_FACTORS);
   state.nationality = { A: 'saudi', B: 'saudi' };
   migrateCompensation();
@@ -1296,6 +1354,7 @@ function resetAll() {
   updateVacDiff();
   closePopup();
   autosave();
+  updateOfferDataNotice();
 }
 
 // ── Nationality ───────────────────────────────────────────────────
@@ -1461,10 +1520,12 @@ function switchCard(side) {
       card.classList.add('active-card');
       tab.className = 'card-tab active-tab-' + s.toLowerCase();
       tab.setAttribute('aria-selected', 'true');
+      tab.tabIndex = 0;
     } else {
       card.classList.remove('active-card');
       tab.className = 'card-tab';
       tab.setAttribute('aria-selected', 'false');
+      tab.tabIndex = -1;
     }
   });
   updateTabLabels();
@@ -1475,6 +1536,9 @@ function updateTabLabels() {
     if (!tab) return;
     const span = tab.querySelector('[data-i18n]');
     if (span) span.textContent = value; else tab.textContent = value;
+    let net = tab.querySelector('.offer-tab-net');
+    if (!net) { net = document.createElement('span'); net.className = 'offer-tab-net'; tab.append(net); }
+    net.textContent = fmtNum(computeSide(tab.id === 'tabA' ? 'A' : 'B').net) + ' ' + t('amount_unit');
   };
   setTab(tabA, state.coA || t('current'));
   setTab(tabB, state.coB || t('new_offer'));

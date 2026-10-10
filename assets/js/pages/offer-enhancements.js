@@ -4,6 +4,15 @@ let aiRequestId = 0;
 let lastCalculatedRevision = -1;
 const COMPENSATION_LABELS = {
   en: {
+    start_empty: 'Start with your data', use_example: 'Use example',
+    example_notice: 'Example data — replace these amounts with your offers.',
+    personal_notice: 'Your comparison · changes are saved in this browser.',
+    replace_confirm: 'Replace your current inputs? Your saved comparison will be overwritten.',
+    field_settings: 'Field settings', months_basic: '× monthly basic salary',
+    amount_unit: 'SAR', payroll_edit: 'Review payroll settings', breakdown: 'Full financial breakdown', other_benefits: 'Other annual benefits',
+    hero_p: 'Enter both offers to compare monthly take-home pay and annual cash. Your data is saved in this browser.',
+    mode_detailed_sub: 'Bonuses, benefits and career priorities',
+    missing_salary: 'Enter a positive monthly cash amount for both offers before comparing.', financial_close_title: 'The offers are financially close',
     cash: 'Recurring cash', guaranteed: 'Guaranteed cash / bonus', variable: 'Variable bonus', reimbursement: 'Reimbursement', noncash: 'Noncash benefit', deduction: 'Deduction',
     classification: 'Compensation type', payout: 'Expected payout %', usage: 'Expected usage / value %', edit: 'Edit field',
     assumptions_title: 'Payroll and comparison assumptions', payroll_date: 'Calculation date', coverage: 'GOSI coverage', legacy: 'Existing system', new: 'New system (no contributions before 3 July 2024)', none: 'No employee GOSI', override: 'Employee rate override % (blank = automatic)',
@@ -20,6 +29,15 @@ const COMPENSATION_LABELS = {
     ai_prompt_suffix: 'Explain guaranteed and expected cash, benefits and first-year costs separately. Use the calculator signal and entered assumptions. Career scores do not alter the financial leader. Do not invent career advantages, costs, or recovery periods. Identify missing information. No bullet points.', gosi_note_saudi: 'Employee GOSI is based on selected coverage, date and rate override.', benefit_warning: 'Benefit valuations and bonus payouts are estimates, not guaranteed cash.'
   },
   ar: {
+    start_empty: 'ابدأ ببياناتك', use_example: 'استخدم المثال',
+    example_notice: 'بيانات توضيحية — استبدل هذه المبالغ بعروضك.',
+    personal_notice: 'مقارنتك · تُحفظ التغييرات في هذا المتصفح.',
+    replace_confirm: 'استبدال المدخلات الحالية؟ ستُستبدل المقارنة المحفوظة.',
+    field_settings: 'إعدادات الحقل', months_basic: '× الراتب الأساسي الشهري',
+    amount_unit: 'ريال', payroll_edit: 'راجع إعدادات التأمينات', breakdown: 'التفاصيل المالية الكاملة', other_benefits: 'المزايا السنوية الأخرى',
+    hero_p: 'أدخل العرضين لمقارنة صافي الراتب الشهري والنقد السنوي. تُحفظ بياناتك في هذا المتصفح.',
+    mode_detailed_sub: 'المكافآت والمزايا والأولويات المهنية',
+    missing_salary: 'أدخل مبلغاً نقدياً شهرياً أكبر من صفر للعرضين قبل المقارنة.', financial_close_title: 'العرضان متقاربان مالياً',
     cash: 'نقد دوري', guaranteed: 'نقد / مكافأة مضمونة', variable: 'مكافأة متغيرة', reimbursement: 'تعويض مصروفات', noncash: 'ميزة غير نقدية', deduction: 'استقطاع',
     classification: 'نوع التعويض', payout: 'نسبة الصرف المتوقعة %', usage: 'نسبة الاستخدام / القيمة المتوقعة %', edit: 'تعديل الحقل',
     assumptions_title: 'افتراضات الرواتب والمقارنة', payroll_date: 'تاريخ الحساب', coverage: 'نظام التأمينات', legacy: 'النظام السابق', new: 'النظام الجديد (دون اشتراك قبل 3 يوليو 2024)', none: 'دون استقطاع تأمينات للموظف', override: 'تخصيص نسبة الموظف % (فارغ = تلقائي)',
@@ -59,6 +77,7 @@ function migrateCompensation() {
   state.schemaVersion = 4;
 }
 function invalidateComparison() {
+  document.body.classList.remove('offer-has-results');
   inputRevision++;
   if (lastCalculatedRevision < 0) return;
   ['compensationResults', 'resultsWrap', 'simpleResult', 'totalsBar'].forEach(id => {
@@ -84,7 +103,10 @@ function numberControl(value, onChange, max) {
   input.addEventListener('input', () => {
     const n = OfferModel.number(input.value);
     const v = max == null ? n : Math.min(max, n);
-    input.value = v; onChange(v);
+    onChange(v);
+  });
+  input.addEventListener('change', () => {
+    if (input.value !== '') input.value = max == null ? OfferModel.number(input.value) : Math.min(max, OfferModel.number(input.value));
   });
   return input;
 }
@@ -101,24 +123,39 @@ function selectControl(value, keys, onChange) {
 function makeCompensationControls(field, side) {
   const controls = document.createElement('div');
   controls.className = 'offer-field-controls';
+  const settings = document.createElement('details');
+  settings.className = 'offer-field-settings';
+  const summary = document.createElement('summary');
+  summary.textContent = t('field_settings');
+  settings.append(summary);
+  controls.append(settings);
+  const content = document.createElement('div');
+  content.className = 'offer-settings-content';
+  settings.append(content);
   const edit = document.createElement('button');
   edit.type = 'button'; edit.textContent = t('edit');
   edit.setAttribute('aria-label', t('edit') + ': ' + tFieldName(field));
   edit.addEventListener('click', () => openEditField(side, field.id));
-  controls.append(edit);
+  content.append(edit);
+  if (!field.isGosi) {
+    const remove = document.createElement('button');
+    remove.type = 'button'; remove.textContent = t('remove_field');
+    remove.addEventListener('click', () => deleteField(side, field.id));
+    content.append(remove);
+  }
   if (!field.isDeduction) {
     const change = (key, value) => { field[key] = value; field.assumptionReview = false; if (key === 'category') renderFields(side); autosave(); liveUpdate(); };
-    labeledControl(controls, t('classification'), selectControl(OfferModel.category(field), ['cash', 'guaranteed', 'variable', 'reimbursement', 'noncash'], value => change('category', value)));
+    labeledControl(content, t('classification'), selectControl(OfferModel.category(field), ['cash', 'guaranteed', 'variable', 'reimbursement', 'noncash'], value => change('category', value)));
     if (OfferModel.category(field) === 'variable') labeledControl(controls, t('payout'), numberControl(field.payout, value => change('payout', value), 100));
     if (['reimbursement', 'noncash'].includes(OfferModel.category(field))) labeledControl(controls, t('usage'), numberControl(field.usage, value => change('usage', value), 100));
   }
+  controls.querySelectorAll('input, select').forEach(control => { control.disabled = !field.enabled; });
   return controls;
 }
 function renderCompensationSettings() {
   if (!state.payroll) return;
   const parent = $('offerAssumptions');
   parent.replaceChildren();
-  const title = document.createElement('h2'); title.textContent = t('assumptions_title'); parent.append(title);
   if (['A', 'B'].some(side => state[side].some(f => f.assumptionReview))) {
     const note = document.createElement('p'); note.className = 'helper-note'; note.textContent = t('migration_note'); parent.append(note);
   }
@@ -136,7 +173,10 @@ function renderCompensationSettings() {
       $('nat' + side + '_saudi').classList.toggle('active', nat === 'saudi');
       $('nat' + side + '_nonsaudi').classList.toggle('active', nat !== 'saudi');
       $('natNote' + side).textContent = t(nat === 'saudi' ? 'gosi_note_saudi' : 'gosi_note_non');
+      const active = document.activeElement;
+      const index = [...parent.querySelectorAll('input, select')].indexOf(active);
       renderFields(side); autosave(); renderCompensationSettings();
+      parent.querySelectorAll('input, select')[index]?.focus();
     };
     labeledControl(col, t('coverage'), selectControl(payroll.coverage, ['legacy', 'new', 'none'], value => { payroll.coverage = value; sync(); }));
     const date = document.createElement('input'); date.type = 'date'; date.value = payroll.date;
@@ -170,22 +210,152 @@ function updatePayrollNotes() {
     const note = $('payrollInfo' + side);
     if (note) note.textContent = t('gosi_details') + ': SAR ' + fmtNum(Math.min(base, 45000)) + ' / SAR 45,000 / ' + OfferModel.rate(state.payroll[side]) + '%' + (gosi && gosi.enabled ? '' : ' · ' + t('none'));
   });
+  $('payrollSummary').textContent = ['A', 'B'].map(side =>
+    (state['co' + side] || t(side === 'A' ? 'current' : 'new_offer')) + ': ' +
+    (state.payroll[side].coverage === 'none' ? t('none') : OfferModel.rate(state.payroll[side]) + '%')
+  ).join(' · ');
 }
 function renderCompensationResults(a, b) {
   const parent = $('compensationResults'); parent.replaceChildren(); parent.hidden = false; parent.style.display = 'block';
-  const title = document.createElement('h2'); title.textContent = t('results_title'); parent.append(title);
-  const scroll = document.createElement('div'); scroll.className = 'offer-table-scroll'; parent.append(scroll);
+  const comparison = OfferModel.compare(a, b, state.closeThreshold);
+  const headline = document.createElement('h2');
+  headline.textContent = comparison.close ? t('financial_close_title') : t('summary_financial_lead').replace('{leader}',
+    b.expectedCash > a.expectedCash ? (state.coB || t('new_offer')) : (state.coA || t('current')));
+  parent.append(headline);
+  headline.tabIndex = -1;
+  headline.focus({ preventScroll: true });
+  const metrics = document.createElement('div'); metrics.className = 'offer-result-metrics'; parent.append(metrics);
+  [['net_monthly', 'net'], ['guaranteed_cash', 'guaranteedCash'], ['expected_cash', 'expectedCash']].forEach(([label, key]) => {
+    const card = document.createElement('div'); card.className = 'offer-metric';
+    const heading = document.createElement('h3'); heading.textContent = t(label); card.append(heading);
+    [a[key], b[key], b[key] - a[key]].forEach((value, index) => {
+      const row = document.createElement('div');
+      const name = document.createElement('span');
+      name.textContent = index === 0 ? (state.coA || t('current')) : index === 1 ? (state.coB || t('new_offer')) : t('difference');
+      const amount = document.createElement('bdi'); amount.textContent = (index === 2 && value > 0 ? '+' : '') + fmtNum(value) + ' ' + t('amount_unit');
+      row.append(name, amount); card.append(row);
+    });
+    metrics.append(card);
+  });
+  const assumptions = document.createElement('p'); assumptions.className = 'helper-note'; assumptions.textContent = t('summary_assumption'); parent.append(assumptions);
+  const details = document.createElement('details'); parent.append(details);
+  const title = document.createElement('summary'); title.textContent = t('breakdown'); details.append(title);
+  const scroll = document.createElement('div'); scroll.className = 'offer-table-scroll'; details.append(scroll);
   const table = document.createElement('table'); table.className = 'offer-result-table'; scroll.append(table);
   const head = table.createTHead().insertRow();
   [t('metric'), state.coA || t('current'), state.coB || t('new_offer'), t('difference')].forEach(text => { const th = document.createElement('th'); th.scope = 'col'; th.textContent = text; head.append(th); });
   const body = table.createTBody();
   [['net_monthly', 'net'], ['guaranteed_cash', 'guaranteedCash'], ['expected_cash', 'expectedCash'], ['target_cash', 'targetCash'], ['benefits_value', 'benefitsValue'], ['first_year', 'firstYearCash'], ['settlement', 'departureSettlement']].forEach(([label, key]) => {
     const row = body.insertRow(); const th = document.createElement('th'); th.scope = 'row'; th.textContent = t(label); row.append(th);
-    [a[key], b[key], b[key] - a[key]].forEach(value => { const cell = row.insertCell(); cell.textContent = 'SAR ' + fmtNum(value); });
+    [a[key], b[key], b[key] - a[key]].forEach((value, index) => {
+      const cell = row.insertCell();
+      cell.dataset.label = index === 0 ? (state.coA || t('current')) : index === 1 ? (state.coB || t('new_offer')) : t('difference');
+      const amount = document.createElement('bdi');
+      amount.textContent = (index === 2 && value > 0 ? '+' : '') + fmtNum(value) + ' ' + t('amount_unit');
+      cell.append(amount);
+    });
   });
-  const comparison = OfferModel.compare(a, b, state.closeThreshold);
   const recovery = document.createElement('p'); recovery.textContent = t('recovery') + ': ' + (comparison.recoveryMonths == null ? t('no_recovery') : comparison.recoveryMonths === 0 ? t('no_upfront') : comparison.recoveryMonths.toFixed(1)); parent.append(recovery);
+  const assessed = (state.factors || []).some(f => f.weight > 0 && (f.scoreA !== 5 || f.scoreB !== 5));
   const scores = OfferModel.qualitative(state.factors);
-  const career = document.createElement('p'); career.textContent = t('career_scores') + ': ' + (scores.weight ? scores.scoreA.toFixed(1) + '/10 → ' + scores.scoreB.toFixed(1) + '/10' : t('unscored')); parent.append(career);
+  const career = document.createElement('p'); career.textContent = t('career_scores') + ': ' + (assessed && scores.weight ? scores.scoreA.toFixed(1) + '/10 → ' + scores.scoreB.toFixed(1) + '/10' : t('unscored')); parent.append(career);
   const note = document.createElement('p'); note.className = 'helper-note'; note.textContent = t('benefit_warning'); parent.append(note);
+}
+
+function updateOfferDataNotice() {
+  const notice = $('offerDataNotice');
+  if (notice) notice.textContent = t(state.isExample ? 'example_notice' : 'personal_notice');
+  $('coNameA').setAttribute('aria-label', t('current_company'));
+  $('coNameB').setAttribute('aria-label', t('new_company'));
+}
+
+function openPayrollSettings() {
+  $('payrollDetails').open = true;
+  $('payrollDetails').querySelector('summary').focus();
+  $('payrollDetails').scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+
+function alignOfferSections(container) {
+  // Share section tracks across desktop cards, even when one offer has extra fields.
+  const nodes = [...container.children];
+  const groups = {};
+  ['monthly', 'deductions', 'totals', 'annual'].forEach(section => {
+    const group = document.createElement('div');
+    group.className = 'offer-editor-section'; group.dataset.section = section;
+    groups[section] = group;
+    container.append(group);
+  });
+  let section = 'monthly';
+  nodes.forEach(node => {
+    if (node.querySelector('.section-label')?.textContent === t('deductions_section')) section = 'deductions';
+    if (node.querySelector('.summary-net')) section = 'totals';
+    if (node.tagName === 'HR') section = 'annual';
+    groups[section].append(node);
+  });
+}
+
+function replaceOfferData(example) {
+  if (!state.isExample && !confirm(t('replace_confirm'))) return;
+  state = deepClone(DEFAULTS);
+  state.isExample = example;
+  state.factors = deepClone(DEFAULT_FACTORS);
+  if (!example) {
+    ['A', 'B'].forEach(side => state[side].forEach(field => {
+      field.value = 0;
+      if (!field.isGosi) { field.isPct = false; field.isMonths = false; field.pct = 0; }
+      if (field.isAnnual) field.enabled = false;
+    }));
+  }
+  migrateCompensation();
+  ['A', 'B'].forEach(side => {
+    $('coName' + side).value = '';
+    $('vac' + side).value = ''; $('notice' + side).value = '';
+    const hours = $('hours' + side), commute = $('commute' + side);
+    if (hours) hours.value = '';
+    if (commute) commute.value = '';
+    state['hours' + side] = null; state['commute' + side] = null;
+    renderFields(side);
+  });
+  renderCompensationSettings(); renderFactors();
+  updateLabels(); updateVacDiff(); updateOfferDataNotice();
+  switchCard('A'); autosave();
+  $('coNameA').focus();
+}
+
+function initOfferUX() {
+  // The headline precedes supporting calculations in both modes.
+  $('simpleResult').after($('compensationResults'));
+  $('startEmptyBtn').addEventListener('click', () => replaceOfferData(false));
+  $('useExampleBtn').addEventListener('click', () => replaceOfferData(true));
+  const media = matchMedia('(max-width: 640px)');
+  const syncPanels = () => {
+    ['A', 'B'].forEach(side => {
+      const card = $('card' + side);
+      if (media.matches) {
+        card.setAttribute('role', 'tabpanel');
+        card.setAttribute('aria-labelledby', 'tab' + side);
+      } else {
+        card.removeAttribute('role'); card.setAttribute('aria-labelledby', 'label' + side);
+      }
+    });
+  };
+  media.addEventListener('change', syncPanels); syncPanels();
+  switchCard('A');
+  document.querySelector('.card-tabs').addEventListener('keydown', event => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const current = $('tabA').getAttribute('aria-selected') === 'true' ? 'A' : 'B';
+    const side = event.key === 'Home' ? 'A' : event.key === 'End' ? 'B' : current === 'A' ? 'B' : 'A';
+    switchCard(side); $('tab' + side).focus();
+  });
+  // Avoid covering the active field when a mobile keyboard reduces the viewport.
+  const syncKeyboard = () => {
+    const editing = document.activeElement?.matches('input, textarea, select');
+    document.body.classList.toggle('offer-keyboard-open', Boolean(editing && window.visualViewport &&
+      window.visualViewport.height < window.innerHeight * .75));
+  };
+  window.visualViewport?.addEventListener('resize', syncKeyboard);
+  document.addEventListener('focusin', syncKeyboard);
+  document.addEventListener('focusout', syncKeyboard);
+  updateOfferDataNotice();
 }

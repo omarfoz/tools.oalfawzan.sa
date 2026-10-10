@@ -9,7 +9,7 @@
 <meta name="description" content="قارن بين عرضي عمل من حيث الراتب الصافي والبدلات والمزايا السنوية والتأمينات والعوامل المهنية لاتخاذ قرار أوضح.">
 <link rel="canonical" href="https://tools.oalfawzan.sa/offer/">
 <script src="/assets/js/theme-init.js"></script>
-<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20261010f">
+<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20261010g">
 <link rel="stylesheet" href="/assets/css/platform.css?v=20260915a">
 <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20261010b">
 </head>
@@ -78,7 +78,13 @@
     </div>
   </div>
 
-  <section class="factors-card offer-assumptions" id="offerAssumptions" aria-label="Payroll and comparison assumptions"></section>
+  <div class="offer-start" id="offerStart">
+    <p id="offerDataNotice" role="status"></p>
+    <div class="offer-start-actions">
+      <button type="button" id="startEmptyBtn" data-i18n="start_empty">ابدأ ببياناتك</button>
+      <button type="button" id="useExampleBtn" data-i18n="use_example">استخدم المثال</button>
+    </div>
+  </div>
 
   <!-- Mobile card tab switcher -->
   <div class="card-tabs" role="tablist" aria-label="Offer cards">
@@ -87,14 +93,14 @@
   </div>
 
   <div class="main-grid">
-    <div class="card active-card" id="cardA">
+    <div class="card active-card" id="cardA" aria-labelledby="labelA">
       <div class="card-top">
         <div class="card-label" id="labelA">Current Company</div>
         <button type="button" class="add-field-btn detailed-only"><span data-i18n="add_field">+ Add Field</span></button>
       </div>
       <div id="fieldsA"></div>
     </div>
-    <div class="card" id="cardB">
+    <div class="card" id="cardB" aria-labelledby="labelB">
       <div class="card-top">
         <div class="card-label" id="labelB">New Company</div>
         <button type="button" class="add-field-btn detailed-only"><span data-i18n="add_field">+ Add Field</span></button>
@@ -102,6 +108,11 @@
       <div id="fieldsB"></div>
     </div>
   </div>
+
+  <details class="factors-card offer-assumptions" id="payrollDetails">
+    <summary><span data-i18n="assumptions_title">افتراضات الرواتب والمقارنة</span><span id="payrollSummary" class="helper-note"></span></summary>
+    <section id="offerAssumptions" aria-label="Payroll and comparison assumptions"></section>
+  </details>
 
   <!-- Qualitative Factors -->
   <div class="factors-card detailed-only">
@@ -151,7 +162,7 @@
 
   <div class="action-row inline-compare">
     <button type="button" class="calc-btn" id="calcBtn"><span data-i18n="compare_btn">Compare Offers</span></button>
-    <button type="button" class="export-btn detailed-only" id="exportBtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span data-i18n="export_btn">Export Excel</span></button>
+    <button type="button" class="export-btn" id="exportBtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span data-i18n="export_btn">Export Excel</span></button>
   </div>
 
   <!-- Sticky compare for mobile -->
@@ -353,8 +364,8 @@
 </div>
 
 <script defer src="/assets/js/pages/offer-model.js?v=20261010d"></script>
-<script defer src="/assets/js/pages/offer-enhancements.js?v=20261010e"></script>
-<script defer src="/assets/js/pages/offer.js?v=20261010f"></script>
+<script defer src="/assets/js/pages/offer-enhancements.js?v=20261010g"></script>
+<script defer src="/assets/js/pages/offer.js?v=20261010g"></script>
 <script defer src="/assets/js/platform.js?v=20261010a"></script>
 </body>
 </html>
