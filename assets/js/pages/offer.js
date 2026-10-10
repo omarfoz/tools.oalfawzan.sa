@@ -91,7 +91,7 @@ function ensureSingleCompareRowOnMobile() {
 
 // ── Init ──────────────────────────────────────────────────────────
 function init() {
-  const savedLang = localStorage.getItem('offer_lang') || 'ar';
+  const savedLang = localStorage.getItem('tools-language') || localStorage.getItem('tools_lang') || localStorage.getItem('offer_lang') || 'ar';
   applyTheme(currentTheme);
   ensureSingleCompareRowOnMobile();
 
@@ -1090,7 +1090,7 @@ const STRINGS = {
 };
 
 let currentLang = 'ar';
-let currentTheme = localStorage.getItem('tools_theme') || 'dark';
+let currentTheme = localStorage.getItem('tools-theme') || localStorage.getItem('tools_theme') || 'dark';
 
 function t(key) {
   return (STRINGS[currentLang][key] || STRINGS.en[key] || key);

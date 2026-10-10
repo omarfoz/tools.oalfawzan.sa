@@ -9,13 +9,6 @@
     themeLink.href = '/assets/css/oalfawzan-theme.css?v=20260911c';
     document.head.append(themeLink);
   }
-  if (!document.getElementById('mobile-enhancements')) {
-    const mobileLink = document.createElement('link');
-    mobileLink.id = 'mobile-enhancements';
-    mobileLink.rel = 'stylesheet';
-    mobileLink.href = '/assets/css/mobile-enhancements.css?v=20260915a';
-    document.head.append(mobileLink);
-  }
 
   const API = {};
   const THEME_KEY='tools-theme', LANG_KEY='tools-language', LEGACY_THEME='tools_theme', LEGACY_LANG='tools_lang', OFFER_LANG='offer_lang';

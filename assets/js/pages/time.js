@@ -22,8 +22,8 @@ const ZONES=[
   {value:'UTC',ar:'التوقيت العالمي UTC',en:'UTC'}
 ];
 
-let currentLang=localStorage.getItem('tools_lang')||'ar';
-let currentTheme=localStorage.getItem('tools_theme')||'dark';
+let currentLang=localStorage.getItem('tools-language') || localStorage.getItem('tools_lang')||'ar';
+let currentTheme=localStorage.getItem('tools-theme') || localStorage.getItem('tools_theme')||'dark';
 const tzDate=document.getElementById('tzDate');
 const tzTime=document.getElementById('tzTime');
 const fromZone=document.getElementById('fromZone');
@@ -185,9 +185,9 @@ function applyLang(lang){
   populateZones();
   initResultPlaceholders();
   refreshAllPickerDisplays();
-  localStorage.setItem('tools_lang',lang);
+  localStorage.setItem('tools-language',lang);localStorage.setItem('tools_lang',lang);
 }
-function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);updateThemeIcon()}
+function applyTheme(theme){currentTheme=theme==='light'?'light':'dark';document.documentElement.setAttribute('data-theme',currentTheme);localStorage.setItem('tools-theme',currentTheme);localStorage.setItem('tools_theme',currentTheme);updateThemeIcon()}
 
 function initResultPlaceholders(){
   const placeholder=STRINGS[currentLang].emptyResult;

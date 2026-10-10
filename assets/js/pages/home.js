@@ -4,13 +4,6 @@
   const ICONS={sun:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg>',moon:'<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/></svg>'};
   const DATA={ar:{title:'أدوات عمر الفوزان | tools.oalfawzan.sa',eyebrow:'TOOLS.OALFAWZAN.SA',h1a:'أدوات عملية،',h1b:'بدون تعقيد.',desc:'مجموعة أدوات مركّزة تساعدك على المقارنة والحساب والتحليل وإنجاز المهام اليومية مباشرة من المتصفح.',manifestoKicker:'الفكرة بسيطة',manifestoTitle:'افتح الأداة. أنجز المهمة. وارجع لشيء أهم.',manifestoDesc:'لا حسابات، لا تتبع، ولا خطوات زائدة. كل أداة مصممة لتؤدي وظيفة واضحة داخل المتصفح.',directory:'دليل الأدوات',sub:'اختر الأداة المناسبة أو ابحث بالاسم.',searchLabel:'البحث في الأدوات',search:'ابحث عن أداة…',all:'الكل',career:'العمل والمال',developer:'للمطورين',productivity:'الإنتاجية',market:'الأسواق',launch:'فتح الأداة',none:'لا توجد أدوات مطابقة للبحث.',profile:'الملف الشخصي',github:'GitHub',filtersLabel:'تصنيفات الأدوات'},en:{title:'Omar Alfawzan Tools | tools.oalfawzan.sa',eyebrow:'TOOLS.OALFAWZAN.SA',h1a:'Useful tools,',h1b:'without the overhead.',desc:'Focused browser utilities for comparing, calculating, analyzing, and getting everyday tasks done quickly.',manifestoKicker:'THE IDEA IS SIMPLE',manifestoTitle:'Open the tool. Finish the task. Get back to what matters.',manifestoDesc:'No accounts, no tracking, no unnecessary steps. Every tool is designed to do one clear job in your browser.',directory:'Tool directory',sub:'Choose a tool or search by name.',searchLabel:'Search tools',search:'Search tools…',all:'All',career:'Career & finance',developer:'Developer',productivity:'Productivity',market:'Markets',launch:'Open tool',none:'No tools match your search.',profile:'Portfolio',github:'GitHub',filtersLabel:'Tool categories'}};
 
-  if(!document.getElementById('mobile-enhancements')){
-    const link=document.createElement('link');
-    link.id='mobile-enhancements';
-    link.rel='stylesheet';
-    link.href='/assets/css/mobile-enhancements.css?v=20260914a';
-    document.head.append(link);
-  }
 
   const cards=[...document.querySelectorAll('.tool-card')];
   const filters=[...document.querySelectorAll('.filter')];

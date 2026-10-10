@@ -45,8 +45,8 @@ const I18N = {
   }
 };
 
-let currentLang = localStorage.getItem('tools_lang') || 'ar';
-let currentTheme = localStorage.getItem('tools_theme') || 'dark';
+let currentLang = localStorage.getItem('tools-language') || localStorage.getItem('tools_lang') || 'ar';
+let currentTheme = localStorage.getItem('tools-theme') || localStorage.getItem('tools_theme') || 'dark';
 const themeIcons = {
   sun: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.41M17.66 6.34l1.41-1.41"/></svg>',
   moon: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>'
@@ -93,6 +93,7 @@ function buildSmaSeries(candles, period){
 function applyTheme(theme){
   currentTheme = theme === 'light' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('tools-theme', currentTheme);
   localStorage.setItem('tools_theme', currentTheme);
   updateThemeIcon();
   if(chartDataCache) drawChart(chartDataCache);
@@ -125,6 +126,7 @@ function applyLanguage(lang){
   document.getElementById('langBtn').textContent = s.langBtn;
   updateThemeIcon();
   if(!lastMetrics) document.getElementById('aiText').textContent = s.aiInitial;
+  localStorage.setItem('tools-language', currentLang);
   localStorage.setItem('tools_lang', currentLang);
 }
 

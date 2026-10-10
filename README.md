@@ -29,7 +29,7 @@ The tools site intentionally shares the visual language of `oalfawzan.sa`.
 - Page-specific CSS loads first and owns only the tool's functional layout; it must not redefine the palette, accent, radii, or chrome.
 - The theme mirrors the portfolio's system font stack, blue accent, liquid-glass material, rounded navigation, spacing, light/dark theme behavior, and mobile blur optimization.
 - `assets/js/theme-init.js` restores the saved theme and language before first paint on every page.
-- `assets/js/platform.js` provides shared theme/language helpers (`window.ToolsPlatform`), notifications, clipboard utilities, and loads `mobile-enhancements.css` for touch refinements.
+- `assets/js/platform.js` provides shared theme/language helpers (`window.ToolsPlatform`), notifications, clipboard utilities, with mobile presentation handled by the shared theme.
 - The shared theme also contains the validated cross-tool refinements for homepage card balance, Stock Analysis hierarchy, nested glass surfaces, QR preview emphasis, and Wheel visual saturation.
 - The background artwork is shared from `https://oalfawzan.sa/image-1600.webp` so both sites retain the same visual backdrop.
 
@@ -49,8 +49,7 @@ When adding a new tool, preserve this separation: tool CSS controls structure an
 ├── assets/
 │   ├── css/
 │   │   ├── platform.css
-│   │   ├── oalfawzan-theme.css
-│   │   └── mobile-enhancements.css
+│   │   └── oalfawzan-theme.css
 │   └── js/
 │       ├── platform.js
 │       └── theme-init.js

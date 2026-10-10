@@ -7,7 +7,8 @@
 label{display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--muted);letter-spacing:.02em;min-width:0}
 input,select,.picker-value{padding:0 12px;font-family:var(--mono);width:100%;max-width:100%;min-width:0;display:block}
 input,select{height:var(--control-h)}
-.picker-field{position:relative;isolation:isolate}
+.picker-field{position:relative;isolation:isolate;border:1px solid var(--site-glass-border);border-radius:14px;background:var(--site-glass-fill-strong)}
+.picker-field:focus-within{outline:2px solid var(--site-accent);outline-offset:3px}
 .picker-field input[type="date"],.picker-field input[type="time"]{position:absolute;inset:0;opacity:.01;cursor:pointer;z-index:2;-webkit-appearance:none;appearance:none;color:transparent;background:transparent;border:0;padding:0;min-height:var(--control-h)}
 .picker-field input[type="date"]::-webkit-date-and-time-value,.picker-field input[type="time"]::-webkit-date-and-time-value{text-align:left}
 .picker-value{display:flex;align-items:center;justify-content:flex-start;direction:rtl;text-align:start;unicode-bidi:plaintext;pointer-events:none;position:relative;padding-inline-end:38px;min-height:var(--control-h)}

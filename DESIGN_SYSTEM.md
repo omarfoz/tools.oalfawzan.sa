@@ -5,7 +5,7 @@ This repository uses one shared design system for every page and tool. Two CSS l
 1. `assets/css/platform.css` - base layer: reset, shared tokens (`--ds-*`), focus styles, skip link, toasts.
 2. `assets/css/oalfawzan-theme.css` - the single design authority: the liquid-glass look (photo backdrop, glass panels, `#007aff` accent, radii 28/24/18px), site chrome (header, footer, back link, hero), and shared components (buttons, inputs, cards, tabs).
 
-Page-specific CSS loads before these two layers and owns only tool-specific layout. `assets/css/mobile-enhancements.css` is appended by `platform.js` for touch-target and mobile rhythm refinements.
+Page-specific CSS loads before these two layers and owns only tool-specific layout. Mobile touch targets and layout refinements live in `assets/css/oalfawzan-theme.css`, with no injected CSS layer.
 
 ## Foundations
 
