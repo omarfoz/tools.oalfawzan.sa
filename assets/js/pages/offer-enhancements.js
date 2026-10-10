@@ -17,7 +17,7 @@ const COMPENSATION_LABELS = {
     package_helper: 'Expected cash includes guaranteed cash plus variable bonus × expected payout. Benefits are valued separately; monthly annualized cash is not your monthly paycheck.',
     summary_qual_used: 'Career-factor scores are shown separately and do not change the financial leader.', summary_close: 'Expected annual cash is financially close under your selected threshold. Consider guarantees and career priorities.',
     summary_assumption: 'Variable bonuses use the entered payout assumptions. Reimbursements and noncash benefits are excluded from cash.', reason_package_lead: '{leader} has higher expected annual cash', summary_financial_lead: '{leader} has higher expected annual cash.',
-    ai_prompt_suffix: 'Explain guaranteed and expected cash, benefits and first-year costs separately. Use the calculator signal and entered assumptions. Career scores do not alter the financial leader. No bullet points.', gosi_note_saudi: 'Employee GOSI is based on selected coverage, date and rate override.', benefit_warning: 'Benefit valuations and bonus payouts are estimates, not guaranteed cash.'
+    ai_prompt_suffix: 'Explain guaranteed and expected cash, benefits and first-year costs separately. Use the calculator signal and entered assumptions. Career scores do not alter the financial leader. Do not invent career advantages, costs, or recovery periods. Identify missing information. No bullet points.', gosi_note_saudi: 'Employee GOSI is based on selected coverage, date and rate override.', benefit_warning: 'Benefit valuations and bonus payouts are estimates, not guaranteed cash.'
   },
   ar: {
     cash: 'نقد دوري', guaranteed: 'نقد / مكافأة مضمونة', variable: 'مكافأة متغيرة', reimbursement: 'تعويض مصروفات', noncash: 'ميزة غير نقدية', deduction: 'استقطاع',
@@ -33,7 +33,7 @@ const COMPENSATION_LABELS = {
     package_helper: 'النقد المتوقع يشمل النقد المضمون والمكافآت المتغيرة × نسبة الصرف المتوقعة. المزايا منفصلة؛ المتوسط الشهري السنوي لا يمثل راتبك الشهري.',
     summary_qual_used: 'تُعرض درجات العوامل المهنية منفصلة ولا تغير صاحب القيمة المالية الأعلى.', summary_close: 'النقد السنوي المتوقع متقارب وفق الحد المختار. راجع الضمانات والأولويات المهنية.',
     summary_assumption: 'تستخدم المكافآت المتغيرة نسب الصرف المدخلة. تعويض المصروفات والمزايا غير النقدية مستبعدة من النقد.', reason_package_lead: '{leader} يقدم نقداً سنوياً متوقعاً أعلى', summary_financial_lead: '{leader} يقدم نقداً سنوياً متوقعاً أعلى.',
-    ai_prompt_suffix: 'اشرح النقد المضمون والمتوقع والمزايا وتكاليف السنة الأولى منفصلة. التزم بنتيجة الحاسبة والافتراضات المدخلة. لا تغير الدرجات المهنية صاحب القيمة المالية الأعلى. دون نقاط.', gosi_note_saudi: 'استقطاع الموظف وفق النظام والتاريخ والنسبة المخصصة.', benefit_warning: 'قيم المزايا ونسب صرف المكافآت تقديرية وليست نقداً مضموناً.'
+    ai_prompt_suffix: 'اشرح النقد المضمون والمتوقع والمزايا وتكاليف السنة الأولى منفصلة. التزم بنتيجة الحاسبة والافتراضات المدخلة. لا تغير الدرجات المهنية صاحب القيمة المالية الأعلى. لا تفترض مزايا مهنية أو تكاليف أو فترات استرداد غير مدخلة. وضّح المعلومات الناقصة. دون نقاط.', gosi_note_saudi: 'استقطاع الموظف وفق النظام والتاريخ والنسبة المخصصة.', benefit_warning: 'قيم المزايا ونسب صرف المكافآت تقديرية وليست نقداً مضموناً.'
   }
 };
 function migrateCompensation() {
