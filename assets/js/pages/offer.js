@@ -105,6 +105,7 @@ function init() {
     nationality.B = state.nationality.B || nationality.B;
   }
 
+  migrateCompensation();
   applyLang(savedLang);
   $('coNameA').value = state.coA;
   $('coNameB').value = state.coB;
@@ -126,7 +127,7 @@ function init() {
     const gosiId = side === 'A' ? 'a6' : 'b6';
     const gosi = state[side] && state[side].find(x => x.id === gosiId);
     const inferredNat = (!gosi || gosi.enabled !== false) ? 'saudi' : 'nonsaudi';
-    const nat = (state.nationality && state.nationality[side]) || nationality[side] || inferredNat;
+    const nat = (state.nationality && state.nationality[side]) || inferredNat;
     nationality[side] = nat;
     state.nationality = state.nationality || {};
     state.nationality[side] = nat;
@@ -137,10 +138,10 @@ function init() {
     if (note) note.textContent = nat === 'saudi' ? t('gosi_note_saudi') : t('gosi_note_non');
   });
 
-  $('vacA').addEventListener('input', e => { state.vacA = +e.target.value || null; autosave(); updateVacDiff(); });
-  $('vacB').addEventListener('input', e => { state.vacB = +e.target.value || null; autosave(); updateVacDiff(); });
-  $('noticeA').addEventListener('input', e => { state.noticeA = +e.target.value || null; autosave(); });
-  $('noticeB').addEventListener('input', e => { state.noticeB = +e.target.value || null; autosave(); });
+  $('vacA').addEventListener('input', e => { state.vacA = e.target.value === '' ? null : Math.min(Number(e.target.max), nonNegativeNumber(e.target.value)); autosave(); updateVacDiff(); });
+  $('vacB').addEventListener('input', e => { state.vacB = e.target.value === '' ? null : Math.min(Number(e.target.max), nonNegativeNumber(e.target.value)); autosave(); updateVacDiff(); });
+  $('noticeA').addEventListener('input', e => { state.noticeA = e.target.value === '' ? null : Math.min(Number(e.target.max), nonNegativeNumber(e.target.value)); autosave(); });
+  $('noticeB').addEventListener('input', e => { state.noticeB = e.target.value === '' ? null : Math.min(Number(e.target.max), nonNegativeNumber(e.target.value)); autosave(); });
 
   // Restore mode (URL ?mode= wins, then saved preference)
   try {
@@ -151,19 +152,12 @@ function init() {
 }
 
 function updateVacDiff() {
-  const va = +$('vacA').value || 0, vb = +$('vacB').value || 0;
-  const el = $('vacDiff');
-  if (!va && !vb) { el.textContent = '-'; el.style.color = 'var(--muted)'; return; }
-  const diff = vb - va;
-  if (diff > 0) { el.textContent = '+' + diff + ' days'; el.style.color = 'var(--current)'; }
-  else if (diff < 0) { el.textContent = diff + ' days'; el.style.color = 'var(--danger)'; }
-  else { el.textContent = '= same'; el.style.color = 'var(--muted)'; }
+  const known = state.vacA != null && state.vacB != null && state.leaveBasisA === state.leaveBasisB;
+  const diff = known ? state.vacB - state.vacA : 0;
+  $('vacDiff').textContent = known ? (diff > 0 ? '+' : '') + diff + ' ' + t('days_unit') : t('not_comparable');
+  $('vacDiff').style.color = diff > 0 ? 'var(--current)' : diff < 0 ? 'var(--danger)' : 'var(--muted)';
 }
 
-// ── Mode (Simple / Detailed) ──────────────────────────────────────
-let currentMode = 'simple';
-
-/* Keep the mode in the URL (?mode=simple|detailed) so it is deep-linkable */
 function syncModeUrl(mode) {
   try {
     const url = new URL(location.href);
@@ -179,6 +173,7 @@ function setMode(mode) {
   document.body.classList.add('mode-' + mode);
   $('modeSimpleBtn').className   = 'mode-btn' + (mode === 'simple'   ? ' active-simple'   : '');
   $('modeDetailedBtn').className = 'mode-btn' + (mode === 'detailed' ? ' active-detailed' : '');
+  invalidateComparison();
   // hide any stale results when switching modes
   $('simpleResult').style.display = 'none';
   if ($('resultsWrap')) { $('resultsWrap').style.display = 'none'; $('resultsWrap').classList.remove('fadein'); }
@@ -188,6 +183,7 @@ function setMode(mode) {
   syncModeUrl(mode);
   // update compare button label
   updateModeLabels();
+  liveUpdate();
 }
 
 function updateModeLabels() {
@@ -237,10 +233,9 @@ function renderFields(side) {
     }
 
     // Gross = sum of all enabled non-deduction monthly fields
-    const grossVal = monthly.filter(f => f.enabled && !f.isDeduction)
-      .reduce((sum, f) => sum + resolveValue(f, state[side]), 0);
-    const deductVal = monthly.filter(f => f.enabled && f.isDeduction)
-      .reduce((sum, f) => sum + resolveValue(f, state[side]), 0);
+    const totals = computeSide(side);
+    const grossVal = totals.gross;
+    const deductVal = totals.deductions;
     const netVal = grossVal - deductVal;
     const color = side === 'A' ? 'var(--current)' : 'var(--new)';
 
@@ -309,14 +304,14 @@ function makeRow(f, side) {
     ${f.isPct ? `<span class="pct-badge">${f.isMonths ? (f.pct/100).toFixed(2).replace(/\.?0+$/,'')+'×' : f.pct+'%'} ${f.pctRef2 ? '(+2 fields)' : ''}</span>` : ''}
     ${f.isAnnual ? `<span class="pct-badge">${t('yearly_input_badge')}</span>` : ''}
     <div class="field-amount">
-      ${f.isMonths
+      ${f.isMonths && f.isPct
         ? `<div style="display:flex;align-items:center;gap:4px">
             <input class="amount-input" type="number" step="0.5" min="0" aria-label="${esc(amountInputLabel)}"
               value="${(f.pct/100).toFixed(2).replace(/\.?0+$/, '')}"
               style="width:60px;text-align:center"
               onchange="updateMultiplier('${side}','${f.id}',this.value)"
               ${!f.enabled ? 'disabled' : ''}>
-            <span style="font-size:.72rem;color:var(--muted);font-weight:500">× basic</span>
+            <span style="font-size:.72rem;color:var(--muted);font-weight:500">×</span>
            </div>`
         : `<input class="amount-input ${isReadonly ? 'readonly' : ''} ${f.isDeduction ? 'is-deduction' : ''}"
             type="number" value="${display.toFixed(0)}" aria-label="${esc(amountInputLabel)}"
@@ -332,13 +327,30 @@ function makeRow(f, side) {
     <button type="button" class="del-btn" onclick="deleteField('${side}','${f.id}')" title="${t('remove_field')}" aria-label="${t('remove_field')} - ${esc(fieldAccessibleName)}">${offerIcon('close')}</button>
   `;
 
+  const amountInput = row.querySelector('.amount-input');
+  if (amountInput && (!f.isPct || f.isMonths)) {
+    amountInput.min = '0';
+    amountInput.addEventListener('input', () => {
+      if (f.isPct && f.isMonths) f.pct = nonNegativeNumber(amountInput.value) * 100;
+      else f.value = nonNegativeNumber(amountInput.value);
+      autosave();
+      liveUpdate();
+      const totals = computeSide(side);
+      const summary = $('fields' + side).querySelectorAll('.summary-value');
+      if (summary[0]) summary[0].textContent = 'SAR ' + fmtNum(totals.gross);
+      if (summary[1]) summary[1].textContent = 'SAR ' + fmtNum(totals.net);
+    });
+  }
+
   // Double-click to edit in popup
   row.addEventListener('dblclick', e => {
     if (['INPUT','BUTTON'].includes(e.target.tagName)) return;
     openEditField(side, f.id);
   });
 
-  return row;
+  const wrapper = document.createElement('div');
+  wrapper.append(row, makeCompensationControls(f, side));
+  return wrapper;
 }
 
 /* Locale-aware number formatting: Arabic UI gets Arabic numerals via Intl */
@@ -372,17 +384,50 @@ function setOfferStatus(msg, isError) {
 }
 
 // ── Value resolution ──────────────────────────────────────────────
-function resolveValue(f, fields) {
-  if (!f.enabled) return 0;
-  if (f.isPct && f.pctRef) {
-    const ref  = fields.find(x => x.id === f.pctRef);
-    const ref2 = f.pctRef2 ? fields.find(x => x.id === f.pctRef2) : null;
-    let base = (ref ? resolveValue(ref, fields) : 0) + (ref2 ? resolveValue(ref2, fields) : 0);
-    // GOSI cap: max base is SAR 45,000
-    if (f.isGosi) base = Math.min(base, 45000);
-    return (f.pct / 100) * base;
+function nonNegativeNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, number) : 0;
+}
+
+// A zero baseline has no percentage change; retain direction for decisions.
+function relativeChange(before, after) {
+  return before === 0 ? (after === 0 ? 0 : Math.sign(after) * Infinity) : (after - before) / Math.abs(before);
+}
+
+function formatChange(change) {
+  return Number.isFinite(change) ? (change >= 0 ? '+' : '') + (change * 100).toFixed(1) + '%' : t('change_no_base');
+}
+
+function resolveValue(f, fields, visiting = new Set()) {
+  if (!f || !f.enabled || visiting.has(f.id)) return 0;
+  if (!f.isPct) return nonNegativeNumber(f.value);
+  if (!f.pctRef) return 0;
+  visiting.add(f.id);
+  const refs = [...new Set([f.pctRef, f.pctRef2].filter(Boolean))];
+  let base = refs.reduce((sum, id) => sum + resolveValue(fields.find(x => x.id === id), fields, visiting), 0);
+  visiting.delete(f.id);
+  if (f.isGosi) base = Math.min(base, 45000);
+  const side = state.A === fields ? 'A' : state.B === fields ? 'B' : null;
+  const appliedRate = f.isGosi && side && state.payroll ? OfferModel.rate(state.payroll[side]) : nonNegativeNumber(f.pct);
+  const value = appliedRate / 100 * base;
+  return Number.isFinite(value) ? value : 0;
+}
+
+function hasReferenceCycle(fields) {
+  const visiting = new Set(), visited = new Set();
+  function visit(field) {
+    if (visiting.has(field.id)) return true;
+    if (visited.has(field.id)) return false;
+    visiting.add(field.id);
+    if (field.isPct && [field.pctRef, field.pctRef2].some(id => {
+      const ref = fields.find(item => item.id === id);
+      return ref && visit(ref);
+    })) return true;
+    visiting.delete(field.id);
+    visited.add(field.id);
+    return false;
   }
-  return f.value || 0;
+  return fields.some(visit);
 }
 
 // ── Mutations ─────────────────────────────────────────────────────
@@ -396,11 +441,11 @@ function renameField(side, id, name) {
 }
 function updateFieldValue(side, id, val) {
   const f = state[side].find(x => x.id === id);
-  if (f) { f.value = parseFloat(val) || 0; renderFields(side); autosave(); }
+  if (f) { f.value = nonNegativeNumber(val); autosave(); liveUpdate(); }
 }
 function updateMultiplier(side, id, val) {
   const f = state[side].find(x => x.id === id);
-  if (f) { f.pct = (parseFloat(val) || 0) * 100; renderFields(side); autosave(); }
+  if (f) { f.pct = (nonNegativeNumber(val)) * 100; autosave(); liveUpdate(); }
 }
 function toggleDeduction(side, id) {
   const f = state[side].find(x => x.id === id);
@@ -455,6 +500,7 @@ function openEditField(side, id) {
   populatePctRef(side, f.pctRef, id);
   const hasRef2 = !!(f.pctRef2);
   $('pHasRef2').checked = hasRef2;
+  $('pRef2Wrap').hidden = !hasRef2;
   $('pRef2Wrap').style.display = hasRef2 ? 'block' : 'none';
   populatePctRef2(side, f.pctRef2, id);
   if ($('pIsMonths')) $('pIsMonths').checked = !!(f.isMonths);
@@ -491,6 +537,9 @@ function populatePctRef2(side, selected, excludeId) {
 
 function togglePctMode() {
   const on = $('pIsPct').checked;
+  $('pPctWrap').hidden = !on;
+  $('pValueWrap').hidden = on;
+  $('pIsMonthsRow').hidden = !on;
   $('pPctWrap').style.display    = on ? 'block' : 'none';
   $('pValueWrap').style.display  = on ? 'none'  : 'block';
   if ($('pIsMonthsRow')) $('pIsMonthsRow').style.display = on ? 'flex' : 'none';
@@ -506,26 +555,35 @@ function toggleMonthsMode() {
 
 function toggleRef2() {
   const on = $('pHasRef2').checked;
+  $('pRef2Wrap').hidden = !on;
   $('pRef2Wrap').style.display = on ? 'block' : 'none';
 }
 
 function confirmField() {
   const name        = $('pName').value.trim();
-  const value       = parseFloat($('pValue').value) || 0;
+  const value       = nonNegativeNumber($('pValue').value);
   const isPct       = $('pIsPct').checked;
   const pct         = parseFloat($('pPct').value) || 0;
   const pctRef      = $('pPctRef').value || '';
   const pctRef2     = $('pHasRef2').checked ? ($('pPctRef2').value || '') : '';
   const isMonths    = $('pIsPct') && $('pIsPct').checked && $('pIsMonths') && $('pIsMonths').checked;
   // If months mode, store pct as months*100 so resolveValue returns months*basicVal
-  const finalPct    = isMonths ? (parseFloat($('pPct').value)||0) * 100 : (parseFloat($('pPct').value)||0);
+  const finalPct    = nonNegativeNumber($('pPct').value) * (isMonths ? 100 : 1);
   const isDeduction = $('pIsDeduction').checked;
   const isAnnual    = $('pIsAnnual').checked;
   if (!name) { $('pName').focus(); return; }
   if (isPct && !pctRef) { $('pPctRef').focus(); return; }
 
+  const candidate = { id: popupEditId || 'pending', isPct, pctRef, pctRef2 };
+  const proposed = state[popupSide].filter(f => f.id !== popupEditId).concat(candidate);
+  if (hasReferenceCycle(proposed)) { setOfferStatus(t('reference_cycle'), true); return; }
+
   if (popupEditId) {
     const f = state[popupSide].find(x => x.id === popupEditId);
+    if (f && f.isGosi && state.payroll) {
+      state.payroll[popupSide].override = Math.min(100, finalPct);
+      f.assumptionReview = false;
+    }
     if (f) Object.assign(f, { name, value, isPct, pct: finalPct, pctRef, pctRef2, isDeduction, isAnnual, isMonths });
   } else {
     state[popupSide].push({
@@ -560,20 +618,21 @@ $('popupOverlay').addEventListener('keydown', e => {
 
 // ── Calculate ─────────────────────────────────────────────────────
 function liveUpdate() {
+  updatePayrollNotes();
   try {
     const a = computeSide('A');
     const b = computeSide('B');
     const fmtK = n => 'SAR ' + fmtNum(n);
     // Detailed mode: update overall card
     if ($('oYearA') && currentMode === 'detailed') {
-      $('oYearA').textContent  = fmtK(a.yearBenefits);
-      $('oYearB').textContent  = fmtK(b.yearBenefits);
-      $('oMonthA').textContent = fmtK(a.overallBen);
-      $('oMonthB').textContent = fmtK(b.overallBen);
-      const py = a.yearBenefits ? (b.yearBenefits - a.yearBenefits) / a.yearBenefits : 0;
+      $('oYearA').textContent  = fmtK(a.expectedCash);
+      $('oYearB').textContent  = fmtK(b.expectedCash);
+      $('oMonthA').textContent = fmtK(a.expectedCash / 12);
+      $('oMonthB').textContent = fmtK(b.expectedCash / 12);
+      const py = relativeChange(a.expectedCash, b.expectedCash);
       const bg  = py > 0.005 ? 'rgba(0,200,150,.15)' : py < -0.005 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)';
       const col = py > 0.005 ? 'var(--current)'      : py < -0.005 ? 'var(--danger)'        : 'var(--muted)';
-      const txt = py > 0.005 ? '+' + (py*100).toFixed(1)+'%' : py < -0.005 ? (py*100).toFixed(1)+'%' : '≈';
+      const txt = py > 0.005 ? formatChange(py) : py < -0.005 ? formatChange(py) : '≈';
       const badgeStyle = `background:${bg};color:${col}`;
       $('oYearBadge').textContent  = txt; $('oYearBadge').style.cssText  = `${badgeStyle};font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px`;
       $('oMonthBadge').textContent = txt; $('oMonthBadge').style.cssText = `${badgeStyle};font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px`;
@@ -582,37 +641,7 @@ function liveUpdate() {
 }
 
 function computeSide(side) {
-  const fields = state[side];
-  let gross = 0, deductions = 0, bonusMonthly = 0, annualBenefits = 0;
-
-  fields.forEach(f => {
-    if (!f.enabled) return;
-    const v = resolveValue(f, fields);
-    if (f.isAnnual) {
-      if (f.isMonths) bonusMonthly += v;            // bonus months × basic → yearly
-      else if (f.isDeduction) annualBenefits -= v;  // annual deductions reduce total
-      else annualBenefits += v;                     // fixed annual benefits
-    } else {
-      if (f.isDeduction) deductions += v;
-      else gross += v;
-    }
-  });
-
-  const net         = gross - deductions;           // Net Monthly Salary
-  const year1       = net * 12;                     // 1 Year (net × 12)
-  const yearBonus   = year1 + bonusMonthly;         // 1 Year + Bonuses
-  const overallSal  = yearBonus / 12;               // Overall Salary (monthly)
-  const yearBenefits= yearBonus + annualBenefits;   // Overall with Benefits (year)
-  const overallBen  = yearBenefits / 12;            // Overall with Benefits (monthly)
-
-  return {
-    gross, deductions, net,
-    year1, bonusMonthly, annualBenefits,
-    yearBonus, overallSal,
-    yearBenefits, overallBen,
-    yearly: yearBenefits   // used for % comparison
-  };
-
+  return OfferModel.compute(state[side], resolveValue, (state.transition || {})[side]);
 }
 
 function buildWinnerReason(a, b, py, pn) {
@@ -621,8 +650,8 @@ function buildWinnerReason(a, b, py, pn) {
   const reasons = [];
   if (Math.abs(py) > 0.005) reasons.push(t('reason_package_lead').replace('{leader}', py > 0 ? coB : coA));
   if (Math.abs(pn) > 0.005) reasons.push(t('reason_net_lead').replace('{leader}', pn > 0 ? coB : coA));
-  const vacDiff = (state.vacB || 0) - (state.vacA || 0);
-  if (Math.abs(py) <= 0.03 && vacDiff !== 0) reasons.push(t('reason_vacation_lead').replace('{leader}', vacDiff > 0 ? coB : coA));
+  const vacDiff = state.vacA != null && state.vacB != null ? state.vacB - state.vacA : 0;
+  if (OfferModel.compare(a, b, state.closeThreshold).close && vacDiff !== 0 && state.leaveBasisA === state.leaveBasisB) reasons.push(t('reason_vacation_lead').replace('{leader}', vacDiff > 0 ? coB : coA));
   return reasons.length ? reasons.join(' · ') : t('summary_close');
 }
 
@@ -630,21 +659,26 @@ function updateDecisionSummary(a, b, py, pn) {
   const coA = state.coA || t('current');
   const coB = state.coB || t('new_offer');
   const parts = [];
-  if (Math.abs(py) <= 0.03) parts.push(t('summary_close'));
+  if (OfferModel.compare(a, b, state.closeThreshold).close) parts.push(t('summary_close'));
   else parts.push(t('summary_financial_lead').replace('{leader}', py > 0 ? coB : coA));
   if (Math.abs(pn) > 0.005) parts.push(t('summary_net_lead').replace('{leader}', pn > 0 ? coB : coA));
   const factors = state.factors || [];
-  const hasCustomScores = factors.some(f => f.scoreA !== 5 || f.scoreB !== 5);
+  const hasCustomScores = factors.some(f => f.weight > 0 && (f.scoreA !== 5 || f.scoreB !== 5));
   parts.push(hasCustomScores ? t('summary_qual_used') : t('summary_qual_unused'));
   parts.push(t('summary_assumption'));
   if ($('decisionSummaryText')) $('decisionSummaryText').textContent = parts.join(' ');
 }
 
 function calculate() {
+  ['resultsWrap', 'simpleResult', 'totalsBar'].forEach(id => { $(id).hidden = false; });
   const a = computeSide('A'), b = computeSide('B');
-  const pg = a.gross   ? (b.gross   - a.gross)   / a.gross   : 0;
-  const pn = a.net     ? (b.net     - a.net)     / a.net     : 0;
-  const py = a.yearly  ? (b.yearly  - a.yearly)  / a.yearly  : 0;
+  const pg = relativeChange(a.gross, b.gross);
+  const pn = relativeChange(a.net, b.net);
+  const py = relativeChange(a.yearly, b.yearly);
+  const comparison = OfferModel.compare(a, b, state.closeThreshold);
+  renderCompensationResults(a, b);
+  $('comparisonStatus').textContent = '';
+  lastCalculatedRevision = inputRevision;
   const fmtK = n => 'SAR ' + fmtNum(n);
 
   // ── SIMPLE MODE ──────────────────────────────────────────────────
@@ -652,7 +686,7 @@ function calculate() {
     const coA = state.coA || t('current');
     const coB = state.coB || t('new_offer');
     const card = $('winnerCard');
-    const pctStr = p => (p >= 0 ? '+' : '') + (p * 100).toFixed(1) + '%';
+    const pctStr = p => formatChange(p);
     const smBadge = (p, el) => {
       const bg  = p > 0.005 ? 'rgba(0,200,150,.15)' : p < -0.005 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)';
       const col = p > 0.005 ? 'var(--current)'      : p < -0.005 ? 'var(--danger)'        : 'var(--muted)';
@@ -662,19 +696,19 @@ function calculate() {
     // winner
     card.className = 'winner-card';
     $('winnerName').style.color = ''; // reset any inline tie-color
-    if (py > 0.005) {
+    if (comparison.leader === 'B') {
       card.classList.add('winner-b');
       $('winnerLabel').textContent = t('winner_label');
       $('winnerName').textContent  = coB;
       $('winnerName').className    = 'winner-name wc-b';
-      $('winnerUplift').textContent = '+' + (py*100).toFixed(1) + '% ' + t('winner_higher');
+      $('winnerUplift').textContent = Number.isFinite(py) ? formatChange(py) + ' ' + t('winner_higher') : t('reason_package_lead').replace('{leader}', coB);
       $('winnerReason').textContent = t('winner_reason').replace('{reason}', buildWinnerReason(a, b, py, pn));
-    } else if (py < -0.005) {
+    } else if (comparison.leader === 'A') {
       card.classList.add('winner-a');
       $('winnerLabel').textContent = t('winner_label');
       $('winnerName').textContent  = coA;
       $('winnerName').className    = 'winner-name wc-a';
-      $('winnerUplift').textContent = Math.abs(py*100).toFixed(1) + '% ' + t('winner_higher');
+      $('winnerUplift').textContent = Number.isFinite(relativeChange(b.yearly, a.yearly)) ? formatChange(relativeChange(b.yearly, a.yearly)) + ' ' + t('winner_higher') : t('reason_package_lead').replace('{leader}', coA);
       $('winnerReason').textContent = t('winner_reason').replace('{reason}', buildWinnerReason(a, b, py, pn));
     } else {
       card.classList.add('winner-tie');
@@ -688,28 +722,29 @@ function calculate() {
     $('smNetA').textContent  = fmtK(a.net);
     $('smNetB').textContent  = fmtK(b.net);
     smBadge(pn, $('smNetBadge'));
-    $('smYearA').textContent = fmtK(a.yearBenefits);
-    $('smYearB').textContent = fmtK(b.yearBenefits);
+    $('smYearA').textContent = fmtK(a.expectedCash);
+    $('smYearB').textContent = fmtK(b.expectedCash);
     smBadge(py, $('smYearBadge'));
     // vacation - always reset first
     $('smVacCell').style.display    = 'none';
     $('smNoticeCell').style.display = 'none';
     const va = state.vacA, vb = state.vacB;
-    if (va || vb) {
+    if (va != null || vb != null) {
       $('smVacCell').style.display = '';
-      $('smVacA').textContent = va ? va + ' d' : '-';
-      $('smVacB').textContent = vb ? vb + ' d' : '-';
-      const vacDiff = (vb || 0) - (va || 0);
+      $('smVacA').textContent = va != null ? va + ' d' : '-';
+      $('smVacB').textContent = vb != null ? vb + ' d' : '-';
+      const comparableLeave = va != null && vb != null && state.leaveBasisA === state.leaveBasisB;
+      const vacDiff = comparableLeave ? vb - va : 0;
       const vacEl = $('smVacBadge');
-      vacEl.textContent = vacDiff > 0 ? '+' + vacDiff + ' d' : vacDiff < 0 ? vacDiff + ' d' : '≈';
+      vacEl.textContent = !comparableLeave ? t('not_comparable') : vacDiff > 0 ? '+' + vacDiff + ' d' : vacDiff < 0 ? vacDiff + ' d' : '≈';
       vacEl.style.cssText = `background:${vacDiff > 0 ? 'rgba(0,200,150,.15)' : vacDiff < 0 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)'};color:${vacDiff > 0 ? 'var(--current)' : vacDiff < 0 ? 'var(--danger)' : 'var(--muted)'};font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:8px`;
     }
     // notice
     const na = state.noticeA, nb = state.noticeB;
-    if (na || nb) {
+    if (na != null || nb != null) {
       $('smNoticeCell').style.display = '';
-      $('smNoticeA').textContent = na ? na + ' mo' : '-';
-      $('smNoticeB').textContent = nb ? nb + ' mo' : '-';
+      $('smNoticeA').textContent = na != null ? na + ' mo' : '-';
+      $('smNoticeB').textContent = nb != null ? nb + ' mo' : '-';
     }
     $('simpleResult').style.display = 'block';
     $('simpleResult').classList.add('fadein');
@@ -722,7 +757,7 @@ function calculate() {
   }
 
   // ── DETAILED MODE ────────────────────────────────────────────────
-  const pctStr = p => (p >= 0 ? '+' : '') + (p * 100).toFixed(1) + '%';
+  const pctStr = p => formatChange(p);
   const badgeHtml = (p) => {
     const txt = p > 0.005 ? pctStr(p) : p < -0.005 ? pctStr(p) : '≈';
     const bg  = p > 0.005 ? 'rgba(0,200,150,.15)' : p < -0.005 ? 'rgba(255,71,87,.15)' : 'rgba(255,255,255,.06)';
@@ -732,20 +767,20 @@ function calculate() {
   $('tNetA').textContent  = fmtK(a.net);
   $('tNetB').textContent  = fmtK(b.net);
   $('tNetBadge').outerHTML = badgeHtml(pn).replace('class="total-badge"', 'id="tNetBadge" class="total-badge"');
-  $('tYearA').textContent  = fmtK(a.yearBenefits);
-  $('tYearB').textContent  = fmtK(b.yearBenefits);
+  $('tYearA').textContent  = fmtK(a.expectedCash);
+  $('tYearB').textContent  = fmtK(b.expectedCash);
   $('tYearBadge').outerHTML = badgeHtml(py).replace('class="total-badge"', 'id="tYearBadge" class="total-badge"');
-  $('tEffA').textContent   = fmtK(a.overallBen);
-  $('tEffB').textContent   = fmtK(b.overallBen);
+  $('tEffA').textContent   = fmtK(a.expectedCash / 12);
+  $('tEffB').textContent   = fmtK(b.expectedCash / 12);
   $('tEffBadge').outerHTML = badgeHtml(py).replace('class="total-badge"', 'id="tEffBadge" class="total-badge"');
   $('totalsBar').style.display = 'block';
 
   // Overall salary with benefits
-  const oYearA  = a.yearBenefits;
-  const oYearB  = b.yearBenefits;
-  const oMonthA = a.overallBen;
-  const oMonthB = b.overallBen;
-  const poYear  = oYearA ? (oYearB - oYearA) / oYearA : 0;
+  const oYearA  = a.expectedCash;
+  const oYearB  = b.expectedCash;
+  const oMonthA = a.expectedCash / 12;
+  const oMonthB = b.expectedCash / 12;
+  const poYear  = relativeChange(oYearA, oYearB);
 
   $('oYearA').textContent  = fmtK(oYearA);
   $('oYearB').textContent  = fmtK(oYearB);
@@ -756,7 +791,7 @@ function calculate() {
 
 
   const fmt = n => fmtNum(n);
-  const pf  = p => (p >= 0 ? '+' : '') + (p * 100).toFixed(1) + '%';
+  const pf  = p => formatChange(p);
   const bdg = p => p > 0.005 ? `<span class="badge badge-up">${pf(p)}</span>` : p < -0.005 ? `<span class="badge badge-dn">${pf(p)}</span>` : `<span class="badge badge-eq">≈</span>`;
 
   const br = STRINGS[currentLang].breakdown_rows;
@@ -767,10 +802,11 @@ function calculate() {
     { l: br.year1,    a: a.year1,          b: b.year1        },
     { l: br.year_bonus,a: a.yearBonus,     b: b.yearBonus    },
     { l: br.overall_sal,a: a.overallSal,   b: b.overallSal   },
-    { l: br.annual_ben, a: a.annualBenefits,b:b.annualBenefits},
+    { l: t('benefits_value'), a: a.annualBenefits,b:b.annualBenefits},
     { l: br.annual_ben_month, a: a.annualBenefits / 12, b: b.annualBenefits / 12 },
-    { l: br.year_ben,  a: a.yearBenefits,  b: b.yearBenefits },
-    { l: br.month_ben, a: a.overallBen,    b: b.overallBen   },
+    { l: t('expected_cash'), a: a.expectedCash, b: b.expectedCash },
+    { l: t('guaranteed_cash'), a: a.guaranteedCash, b: b.guaranteedCash },
+    { l: t('expected_monthly'), a: a.expectedCash / 12, b: b.expectedCash / 12 },
   ];
 
   const coA = state.coA || t('current');
@@ -783,7 +819,7 @@ function calculate() {
       <span style="font-size:.72rem;color:var(--new);font-weight:700;text-align:right">${esc(coB)}</span>
     </div>` +
     rows.map(r => {
-      const p = r.a ? (r.b - r.a) / Math.abs(r.a) : 0;
+      const p = relativeChange(r.a, r.b);
       return `<div class="cmp-row">
         <div class="cmp-lbl">${r.l}</div>
         <div class="cmp-val cv">SAR ${fmt(r.a)}</div>
@@ -805,6 +841,8 @@ function calculate() {
 // ── AI ────────────────────────────────────────────────────────────
 async function getAI(a, b, pg, pn, py) {
 
+  const requestRevision = inputRevision;
+  const requestId = ++aiRequestId;
   $('aiText').innerHTML =
     '<div class="dot-pulse"><span></span><span></span><span></span></div>';
 
@@ -817,7 +855,7 @@ async function getAI(a, b, pg, pn, py) {
   let qualSection = '';
 
   // Only include factors in prompt when in detailed mode OR when user actually scored them
-  const hasCustomScores = factors.some(f => f.scoreA !== 5 || f.scoreB !== 5);
+  const hasCustomScores = factors.some(f => f.weight > 0 && (f.scoreA !== 5 || f.scoreB !== 5));
   if (factors.length && (currentMode === 'detailed' || hasCustomScores)) {
 
     const totalWeight =
@@ -844,50 +882,64 @@ ${rows}`;
 
   }
 
-  const annualGap = b.yearBenefits - a.yearBenefits;
+  const annualGap = b.expectedCash - a.expectedCash;
   const netGap = b.net - a.net;
-  const effGap = b.overallBen - a.overallBen;
-  const financialLeader = py > 0.03 ? coB : py < -0.03 ? coA : 'close';
-  const netLeader = pn > 0.03 ? coB : pn < -0.03 ? coA : 'close';
+  const effGap = (b.expectedCash - a.expectedCash) / 12;
+  const comparison = OfferModel.compare(a, b, state.closeThreshold);
+  const financialLeader = comparison.leader === 'B' ? coB : comparison.leader === 'A' ? coA : 'close';
+  const netScale = Math.max(Math.abs(a.net), Math.abs(b.net));
+  const netClose = netScale === 0 || Math.abs(b.net - a.net) / netScale <= state.closeThreshold / 100;
+  const netLeader = netClose ? 'close' : b.net > a.net ? coB : coA;
 
   const prompt = `You are a senior HR, compensation, and career decision advisor specializing in the Saudi Arabian job market.
 
 Your task is to compare two job offers and give a practical recommendation for a professional deciding whether to stay or move.
 
 Decision rules:
-1. Prioritize the total annual package.
+1. Compare guaranteed annual cash first, then expected annual cash. Benefits are separate and are not spendable salary.
 2. Use net monthly salary as the second most important factor.
 3. Use effective monthly value only to make the package easier to understand.
 4. Use qualitative factors, vacation days, and notice period as modifiers, not as replacements for a material financial gap.
-5. If the annual package difference is about 3% or less, say the offers are financially close and explain which qualitative factors should decide.
+5. Use the supplied financial-closeness signal (threshold ${state.closeThreshold}%). Do not invent a different threshold.
 6. Be direct, specific, and practical.
-7. End with a clear recommendation: choose ${coA}, choose ${coB}, or either is reasonable depending on priorities.
+7. Explain the financial lead and career trade-offs separately. Do not declare an overall winner from financial totals alone. State when bonus assumptions drive the lead.
 
 Offer 1 - ${coA}
 - Gross monthly salary: SAR ${fmt(a.gross)}
 - Net monthly salary: SAR ${fmt(a.net)}
-- Total annual package: SAR ${fmt(a.yearBenefits)}
-- Effective monthly value: SAR ${fmt(a.overallBen)}${state.vacA ? `
-- Vacation days per year: ${state.vacA}` : ''}${state.noticeA ? `
+- Guaranteed annual cash: SAR ${fmt(a.guaranteedCash)}
+- Expected annual cash: SAR ${fmt(a.expectedCash)}
+- Target annual cash (full variable payout): SAR ${fmt(a.targetCash)}
+- Benefits value (not cash): SAR ${fmt(a.benefitsValue)}
+- First-year cash: SAR ${fmt(a.firstYearCash)}
+- Effective monthly value: SAR ${fmt(a.expectedCash / 12)}${state.vacA != null ? `
+- Vacation days per year: ${state.vacA} (${state.leaveBasisA})` : ''}${state.noticeA != null ? `
 - Notice period: ${state.noticeA} month(s)` : ''}
 
 Offer 2 - ${coB}
 - Gross monthly salary: SAR ${fmt(b.gross)}
 - Net monthly salary: SAR ${fmt(b.net)}
-- Total annual package: SAR ${fmt(b.yearBenefits)}
-- Effective monthly value: SAR ${fmt(b.overallBen)}${state.vacB ? `
-- Vacation days per year: ${state.vacB}` : ''}${state.noticeB ? `
+- Guaranteed annual cash: SAR ${fmt(b.guaranteedCash)}
+- Expected annual cash: SAR ${fmt(b.expectedCash)}
+- Target annual cash (full variable payout): SAR ${fmt(b.targetCash)}
+- Benefits value (not cash): SAR ${fmt(b.benefitsValue)}
+- First-year cash: SAR ${fmt(b.firstYearCash)}
+- Effective monthly value: SAR ${fmt(b.expectedCash / 12)}${state.vacB != null ? `
+- Vacation days per year: ${state.vacB} (${state.leaveBasisB})` : ''}${state.noticeB != null ? `
 - Notice period: ${state.noticeB} month(s)` : ''}
 
 Financial comparison:
-- Gross monthly change: ${(pg*100).toFixed(1)}%
-- Net monthly change: ${(pn*100).toFixed(1)}%
-- Total annual package change: ${(py*100).toFixed(1)}%
-- Annual package gap: SAR ${fmt(Math.abs(annualGap))}
+- Gross monthly change: ${formatChange(pg)}
+- Net monthly change: ${formatChange(pn)}
+- Expected annual cash change: ${formatChange(py)}
+- Expected annual cash gap: SAR ${fmt(Math.abs(annualGap))}
 - Net monthly gap: SAR ${fmt(Math.abs(netGap))}
 - Effective monthly gap: SAR ${fmt(Math.abs(effGap))}
 - Preliminary calculator signal: financial lead = ${financialLeader}, net monthly lead = ${netLeader}
 ${qualSection}
+Field assumptions: ${JSON.stringify({ A: a.details, B: b.details })}
+First-year cash gap: ${comparison.firstYearGap}; recovery months: ${comparison.recoveryMonths == null ? 'not recovered at the recurring cash difference' : comparison.recoveryMonths}.
+Departure settlements are excluded from salary and first-year cash.
 
 ${t('ai_lang_instruction')}
 ${t('ai_prompt_suffix')}
@@ -907,24 +959,28 @@ Write 4-6 sentences in a confident advisory tone. No bullet points.`;
       }
     );
 
+    if (!res.ok) throw new Error('Recommendation unavailable');
     const data = await res.json();
 
     const text =
       data?.text ||
       t('ai_unavailable');
 
-    $('aiText').textContent = text;
+    if (requestRevision === inputRevision && requestId === aiRequestId) $('aiText').textContent = text;
 
   } catch (err) {
 
-    $('aiText').textContent = t('ai_unavailable');
+    if (requestRevision === inputRevision && requestId === aiRequestId) $('aiText').textContent = t('ai_unavailable');
 
   }
 
 }
 
 // ── Persist ───────────────────────────────────────────────────────
-function autosave() { localStorage.setItem('offer_v31', JSON.stringify(state)); }
+function autosave() {
+  invalidateComparison();
+  localStorage.setItem('offer_v31', JSON.stringify(state));
+}
 
 // ── i18n ──────────────────────────────────────────────────────────
 const STRINGS = {
@@ -977,6 +1033,7 @@ const STRINGS = {
     built_by:'Built by', figures_note:'Figures are estimates',
     mode_simple_label:'Quick Compare', mode_simple_sub:'Job Seeker · Fast answer',
     mode_detailed_label:'Full Analysis', mode_detailed_sub:'HR / Finance · Every detail',
+    change_no_base:'N/A (zero baseline)', reference_cycle:'Choose references without a circular dependency.',
     winner_label:'WINNER', winner_higher:'higher total package', winner_reason:'Why: {reason}',
     winner_tied_label:'RESULT', winner_tied:'Roughly Equal', winner_tied_sub:'Both offers are very close financially',
     field_basic:'Basic Salary', field_housing:'Housing Allowance',
@@ -1057,6 +1114,7 @@ const STRINGS = {
     built_by:'من تطوير', figures_note:'الأرقام تقديرية',
     mode_simple_label:'مقارنة سريعة', mode_simple_sub:'الباحث عن عمل · جواب فوري',
     mode_detailed_label:'تحليل شامل', mode_detailed_sub:'HR / المالية · كل التفاصيل',
+    change_no_base:'غير متاح (القيمة الأساسية صفر)', reference_cycle:'اختر حقولاً مرجعية دون اعتماد دائري.',
     winner_label:'الفائز', winner_higher:'أعلى في الحزمة الإجمالية', winner_reason:'السبب: {reason}',
     winner_tied_label:'النتيجة', winner_tied:'متقاربان', winner_tied_sub:'كلا العرضين متقاربان مالياً',
     field_basic:'الراتب الأساسي', field_housing:'بدل السكن',
@@ -1160,6 +1218,8 @@ function applyLang(lang) {
   renderFactors();
   updateTabLabels();
   updateModeLabels();
+  if (state.payroll) renderCompensationSettings();
+  invalidateComparison();
 
   // Persist lang
   localStorage.setItem('offer_lang', lang);
@@ -1195,6 +1255,8 @@ function resetAll() {
   state = deepClone(DEFAULTS);
   state.factors = deepClone(DEFAULT_FACTORS);
   state.nationality = { A: 'saudi', B: 'saudi' };
+  migrateCompensation();
+  renderCompensationSettings();
   nationality.A = 'saudi';
   nationality.B = 'saudi';
   $('coNameA').value = state.coA;
@@ -1231,16 +1293,18 @@ function setNationality(side, nat) {
   // Update buttons
   $('nat' + side + '_saudi').classList.toggle('active', nat === 'saudi');
   $('nat' + side + '_nonsaudi').classList.toggle('active', nat === 'nonsaudi');
+  if (state.payroll) state.payroll[side].coverage = nat === 'saudi' ? 'legacy' : 'none';
   // Update GOSI pct - 0% for non-Saudi employees
   const gosiId = side === 'A' ? 'a6' : 'b6';
   const gosi = state[side].find(x => x.id === gosiId);
   if (gosi) {
-    gosi.pct = nat === 'saudi' ? 9.75 : 0;
+    gosi.pct = state.payroll ? OfferModel.rate(state.payroll[side]) : nat === 'saudi' ? 9.75 : 0;
     gosi.enabled = nat === 'saudi';
   }
   // Update note
   $('natNote' + side).textContent = nat === 'saudi' ? t('gosi_note_saudi') : t('gosi_note_non');
   renderFields(side);
+  renderCompensationSettings();
   autosave();
 }
 
@@ -1314,7 +1378,11 @@ function makeFactorRow(f) {
 function updateFactor(id, key, val) {
   if (!state.factors) state.factors = deepClone(DEFAULT_FACTORS);
   const f = state.factors.find(x => x.id === id);
-  if (f) { f[key] = val; updateFactorScore(); autosave(); }
+  if (f) {
+    f[key] = key === 'name' ? val : Math.min(key === 'weight' ? 100 : 10, Math.max(key === 'weight' ? 0 : 1, nonNegativeNumber(val)));
+    updateFactorScore();
+    autosave();
+  }
 }
 
 function deleteFactor(id) {
@@ -1333,6 +1401,7 @@ function addFactor() {
 
 function updateFactorScore() {
   const factors = state.factors || DEFAULT_FACTORS;
+  $('factorScoreBar').hidden = false;
   if (!factors.length) { $('factorScoreBar').style.display='none'; return; }
   const totalWeight = factors.reduce((s,f) => s + (f.weight||0), 0);
   if (!totalWeight) { $('factorScoreBar').style.display='none'; return; }
@@ -1453,7 +1522,7 @@ function ensureXlsxLibrary() {
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
       script.async = true;
       script.onload = () => resolve(window.XLSX);
-      script.onerror = () => reject(new Error('Failed to load Excel export library'));
+      script.onerror = () => { xlsxLibraryPromise = null; script.remove(); reject(new Error('Failed to load Excel export library')); };
       document.head.appendChild(script);
     });
   }
@@ -1462,275 +1531,50 @@ function ensureXlsxLibrary() {
 async function exportExcel() {
   try { await ensureXlsxLibrary(); }
   catch (_) { setOfferStatus(t('export_fail'), true); return; }
-  const wb = XLSX.utils.book_new();
-  const coA = state.coA || 'Current Company';
-  const coB = state.coB || 'New Company';
-  const a = computeSide('A');
-  const b = computeSide('B');
-  const fmt = n => Math.round(n);
-
-  // ── Colors ──
-  const GREEN  = { fgColor: { rgb: '0A8A5F' } };
-  const BLUE   = { fgColor: { rgb: '1A5CDB' } };
-  const LIGHT_GREEN = { fgColor: { rgb: 'E8F5F0' } };
-  const LIGHT_BLUE  = { fgColor: { rgb: 'EEF3FF' } };
-  const GRAY   = { fgColor: { rgb: 'F2F2EF' } };
-  const DARK   = { fgColor: { rgb: '1A1A1A' } };
-  const WHITE  = { fgColor: { rgb: 'FFFFFF' } };
-
-  const hdrFont  = { bold: true, sz: 11 };
-  const monoFont = { name: 'Courier New', sz: 10 };
-  const bodyFont = { name: 'Arial', sz: 10 };
-  const titleFont= { bold: true, sz: 13, color: { rgb: 'FFFFFF' } };
-  const subFont  = { bold: true, sz: 10 };
-
-  const center = { horizontal: 'center', vertical: 'center', wrapText: true };
-  const right  = { horizontal: 'right',  vertical: 'center' };
-  const left   = { horizontal: 'left',   vertical: 'center' };
-
-  const sarFmt  = '#,##0 "SAR"';
-  const pctFmt  = '+0.0%;-0.0%;"-"';
-
-  function cell(v, opts = {}) {
-    return {
-      v,
-      t: opts.t || (typeof v === 'number' ? 'n' : 's'),
-      z: opts.z,
-      s: {
-        font:      opts.font  || bodyFont,
-        fill:      opts.fill  ? { patternType: 'solid', fgColor: opts.fill } : undefined,
-        alignment: opts.align || left,
-        border:    opts.border || {
-          bottom: { style: 'thin', color: { rgb: 'E5E5E0' } }
-        }
-      }
-    };
+  const a = computeSide('A'), b = computeSide('B');
+  const coA = state.coA || t('current'), coB = state.coB || t('new_offer');
+  const workbook = XLSX.utils.book_new();
+  function sheet(name, rows) {
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = rows[0].map((_, index) => ({ wch: index === 0 ? 42 : 24 }));
+    XLSX.utils.book_append_sheet(workbook, ws, name);
   }
-
-  function hdr(v, fill, color) {
-    return cell(v, {
-      font:  { ...hdrFont, color: color || { rgb: 'FFFFFF' } },
-      fill:  fill || { rgb: '1A1A1A' },
-      align: center
+  const summary = [[t('metric'), coA, coB, t('difference')]];
+  [['net_monthly', 'net'], ['guaranteed_cash', 'guaranteedCash'], ['expected_cash', 'expectedCash'], ['target_cash', 'targetCash'], ['benefits_value', 'benefitsValue'], ['first_year', 'firstYearCash'], ['settlement', 'departureSettlement']].forEach(([label, key]) => summary.push([t(label), a[key], b[key], b[key] - a[key]]));
+  const comparison = OfferModel.compare(a, b, state.closeThreshold);
+  summary.push([t('recovery'), comparison.recoveryMonths == null ? t('no_recovery') : comparison.recoveryMonths]);
+  summary.push([t('threshold'), state.closeThreshold]);
+  summary.push([t('benefit_warning')]);
+  sheet('Summary', summary);
+  const fields = [[t('metric'), t('classification'), t('current_company'), t('yearly_input_badge'), t('expected_cash'), t('payout'), t('usage'), t('edit')]];
+  ['A', 'B'].forEach(side => {
+    const result = side === 'A' ? a : b;
+    state[side].forEach((field, index) => {
+      const detail = result.details[index];
+      fields.push([tFieldName(field), t(detail.category), side === 'A' ? coA : coB, detail.annual, detail.expected, detail.payout, detail.usage, field.enabled ? 'Enabled' : 'Disabled']);
     });
-  }
-
-  function num(v, fill) {
-    return cell(v, { t: 'n', z: sarFmt, font: monoFont, fill: fill, align: right });
-  }
-
-  function pct(v, isPositive) {
-    const color = v > 0.005 ? { rgb: '0A8A5F' } : v < -0.005 ? { rgb: 'C0392B' } : { rgb: '888880' };
-    return cell(v, { t: 'n', z: pctFmt, font: { ...monoFont, bold: true, color }, align: center });
-  }
-
-  function lbl(v, bold) {
-    return cell(v, { font: bold ? { ...bodyFont, bold: true } : bodyFont, fill: { rgb: 'F7F7F5' } });
-  }
-
-  // ════════════════════════════════════════════════════════════════
-  // SHEET 1 - SUMMARY
-  // ════════════════════════════════════════════════════════════════
-  const summaryData = [];
-
-  // Title row
-  summaryData.push([
-    hdr('JOB OFFER COMPARISON', { rgb: '1A1A1A' }),
-    cell(''), cell(''), cell('')
-  ]);
-  summaryData.push([
-    cell('Generated by tools.oalfawzan.sa', { font: { ...bodyFont, color: { rgb: '888880' } } }),
-    cell(''), cell(''), cell('')
-  ]);
-  summaryData.push([cell(''), cell(''), cell(''), cell('')]);
-
-  // Column headers
-  summaryData.push([
-    hdr('METRIC', { rgb: '333333' }),
-    hdr(coA,      { rgb: '0A8A5F' }),
-    hdr(coB,      { rgb: '1A5CDB' }),
-    hdr('CHANGE', { rgb: '333333' })
-  ]);
-
-  const py = a.yearBenefits ? (b.yearBenefits - a.yearBenefits) / a.yearBenefits : 0;
-  const pn = a.net     ? (b.net     - a.net)     / a.net     : 0;
-  const pg = a.gross   ? (b.gross   - a.gross)   / a.gross   : 0;
-
-  const summaryRows = [
-    ['Gross Monthly Salary',               a.gross,          b.gross,          pg],
-    ['GOSI / Deductions',                  a.deductions,     b.deductions,     a.deductions?(b.deductions-a.deductions)/a.deductions:0],
-    ['Net Monthly Salary',                 a.net,            b.net,            pn],
-    ['Net Annual (×12)',                   a.year1,          b.year1,          a.year1?(b.year1-a.year1)/a.year1:0],
-    ['Net Annual + Bonuses',               a.yearBonus,      b.yearBonus,      a.yearBonus?(b.yearBonus-a.yearBonus)/a.yearBonus:0],
-    ['Overall Monthly Salary',             a.overallSal,     b.overallSal,     a.overallSal?(b.overallSal-a.overallSal)/a.overallSal:0],
-    ['Other Annual Benefits',              a.annualBenefits, b.annualBenefits, a.annualBenefits?(b.annualBenefits-a.annualBenefits)/a.annualBenefits:0],
-    ['Overall with Benefits / Year',       a.yearBenefits,   b.yearBenefits,   py],
-    ['Overall with Benefits / Month',      a.overallBen,     b.overallBen,     py],
-  ];
-
-  summaryRows.forEach((r, i) => {
-    const isKey = i === 7 || i === 8;
-    const fill = isKey ? { rgb: 'FFF9E6' } : undefined;
-    summaryData.push([
-      cell(r[0], { font: isKey ? { ...bodyFont, bold: true } : bodyFont, fill: fill }),
-      num(fmt(r[1]), fill),
-      num(fmt(r[2]), fill),
-      pct(r[3])
-    ]);
   });
-
-  const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
-  ws1['!cols'] = [{ wch: 34 }, { wch: 18 }, { wch: 18 }, { wch: 12 }];
-  ws1['!rows'] = [{ hpt: 28 }, { hpt: 16 }, { hpt: 8 }, { hpt: 22 }];
-  ws1['!merges'] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
-    { s: { r: 1, c: 0 }, e: { r: 1, c: 3 } },
-  ];
-  XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
-
-  // ════════════════════════════════════════════════════════════════
-  // SHEET 2 - FIELD BREAKDOWN
-  // ════════════════════════════════════════════════════════════════
-  const fieldsData = [];
-  fieldsData.push([
-    hdr('FIELD BREAKDOWN', { rgb: '1A1A1A' }), cell(''), cell(''), cell(''), cell('')
-  ]);
-  fieldsData.push([cell(''), cell(''), cell(''), cell(''), cell('')]);
-  fieldsData.push([
-    hdr('Field',     { rgb: '333333' }),
-    hdr('Type',      { rgb: '333333' }),
-    hdr(coA + ' (SAR)', { rgb: '0A8A5F' }),
-    hdr(coB + ' (SAR)', { rgb: '1A5CDB' }),
-    hdr('Diff',      { rgb: '333333' })
-  ]);
-
-  const allFields = new Set([
-    ...state.A.map(f => tFieldName(f)),
-    ...state.B.map(f => tFieldName(f))
-  ]);
-
-  // Monthly fields
-  fieldsData.push([
-    cell('── MONTHLY ──', { font: { ...bodyFont, bold: true, color:{ rgb:'888880' } }, fill: { rgb:'F2F2EF' } }),
-    cell('', { fill: { rgb:'F2F2EF' } }), cell('', { fill: { rgb:'F2F2EF' } }),
-    cell('', { fill: { rgb:'F2F2EF' } }), cell('', { fill: { rgb:'F2F2EF' } })
-  ]);
-
-  const monthlyA = state.A.filter(f => !f.isAnnual);
-  const monthlyB = state.B.filter(f => !f.isAnnual);
-  const allMonthly = [...new Set([...monthlyA.map(f => tFieldName(f)), ...monthlyB.map(f => tFieldName(f))])];
-
-  allMonthly.forEach(name => {
-    const fa = monthlyA.find(f => tFieldName(f) === name);
-    const fb = monthlyB.find(f => tFieldName(f) === name);
-    const va = fa && fa.enabled ? resolveValueExport(fa, state.A) : 0;
-    const vb = fb && fb.enabled ? resolveValueExport(fb, state.B) : 0;
-    const isDeduction = (fa && fa.isDeduction) || (fb && fb.isDeduction);
-    const diff = vb - va;
-    fieldsData.push([
-      cell(name, { font: isDeduction ? { ...bodyFont, color:{ rgb:'C0392B' } } : bodyFont }),
-      cell(isDeduction ? 'Deduction' : 'Monthly', { font: { ...bodyFont, color:{ rgb:'888880' } }, align: center }),
-      fa ? num(fmt(va)) : cell('-', { align: center }),
-      fb ? num(fmt(vb)) : cell('-', { align: center }),
-      diff !== 0 ? num(fmt(diff), diff > 0 ? { rgb:'E8F5F0' } : { rgb:'FEE9E7' }) : cell('-', { align: center })
-    ]);
-  });
-
-  // Annual fields
-  fieldsData.push([
-    cell('── ANNUAL ──', { font: { ...bodyFont, bold: true, color:{ rgb:'888880' } }, fill: { rgb:'F2F2EF' } }),
-    cell('', { fill: { rgb:'F2F2EF' } }), cell('', { fill: { rgb:'F2F2EF' } }),
-    cell('', { fill: { rgb:'F2F2EF' } }), cell('', { fill: { rgb:'F2F2EF' } })
-  ]);
-
-  const annualA = state.A.filter(f => f.isAnnual);
-  const annualB = state.B.filter(f => f.isAnnual);
-  const allAnnual = [...new Set([...annualA.map(f => tFieldName(f)), ...annualB.map(f => tFieldName(f))])];
-
-  allAnnual.forEach(name => {
-    const fa = annualA.find(f => tFieldName(f) === name);
-    const fb = annualB.find(f => tFieldName(f) === name);
-    const va = fa && fa.enabled ? resolveValueExport(fa, state.A) : 0;
-    const vb = fb && fb.enabled ? resolveValueExport(fb, state.B) : 0;
-    const diff = vb - va;
-    fieldsData.push([
-      cell(name),
-      cell('Annual', { font: { ...bodyFont, color:{ rgb:'888880' } }, align: center }),
-      fa ? num(fmt(va)) : cell('-', { align: center }),
-      fb ? num(fmt(vb)) : cell('-', { align: center }),
-      diff !== 0 ? num(fmt(diff), diff > 0 ? { rgb:'E8F5F0' } : { rgb:'FEE9E7' }) : cell('-', { align: center })
-    ]);
-  });
-
-  const ws2 = XLSX.utils.aoa_to_sheet(fieldsData);
-  ws2['!cols'] = [{ wch: 28 }, { wch: 12 }, { wch: 18 }, { wch: 18 }, { wch: 14 }];
-  ws2['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
-  XLSX.utils.book_append_sheet(wb, ws2, 'Field Breakdown');
-
-  // ════════════════════════════════════════════════════════════════
-  // SHEET 3 - QUALITATIVE FACTORS
-  // ════════════════════════════════════════════════════════════════
-  const factors = state.factors || [];
-  if (factors.length) {
-    const qualData = [];
-    qualData.push([hdr('QUALITATIVE FACTORS', { rgb: '1A1A1A' }), cell(''), cell(''), cell(''), cell('')]);
-    qualData.push([cell(''), cell(''), cell(''), cell(''), cell('')]);
-    qualData.push([
-      hdr('Factor',      { rgb: '333333' }),
-      hdr('Weight %',    { rgb: '333333' }),
-      hdr(coA + ' /10',  { rgb: '0A8A5F' }),
-      hdr(coB + ' /10',  { rgb: '1A5CDB' }),
-      hdr('Edge',        { rgb: '333333' })
-    ]);
-
-    const totalWeight = factors.reduce((s, f) => s + (f.weight || 0), 0) || 1;
-    let wScoreA = 0, wScoreB = 0;
-
-    factors.forEach(f => {
-      const edge = f.scoreB > f.scoreA ? coB : f.scoreA > f.scoreB ? coA : 'Tied';
-      const edgeFill = f.scoreB > f.scoreA ? { rgb: 'EEF3FF' } : f.scoreA > f.scoreB ? { rgb: 'E8F5F0' } : undefined;
-      qualData.push([
-        cell(tFactorName(f)),
-        cell(f.weight / 100, { t: 'n', z: '0%', align: center }),
-        cell(f.scoreA,       { t: 'n', z: '0.0', font: { ...monoFont, bold: true, color:{ rgb:'0A8A5F' } }, align: center }),
-        cell(f.scoreB,       { t: 'n', z: '0.0', font: { ...monoFont, bold: true, color:{ rgb:'1A5CDB' } }, align: center }),
-        cell(edge,           { font: { ...bodyFont, bold: edge !== 'Tied' }, fill: edgeFill, align: center })
-      ]);
-      wScoreA += (f.scoreA * f.weight / totalWeight);
-      wScoreB += (f.scoreB * f.weight / totalWeight);
-    });
-
-    qualData.push([cell(''), cell(''), cell(''), cell(''), cell('')]);
-    const winnerFill = wScoreB > wScoreA ? { rgb: 'EEF3FF' } : { rgb: 'E8F5F0' };
-    qualData.push([
-      cell('Weighted Total Score', { font: { ...bodyFont, bold: true }, fill: winnerFill }),
-      cell('', { fill: winnerFill }),
-      cell(parseFloat(wScoreA.toFixed(1)), { t: 'n', z: '0.0"/10"', font: { ...monoFont, bold: true, color:{ rgb:'0A8A5F' } }, fill: winnerFill, align: center }),
-      cell(parseFloat(wScoreB.toFixed(1)), { t: 'n', z: '0.0"/10"', font: { ...monoFont, bold: true, color:{ rgb:'1A5CDB' } }, fill: winnerFill, align: center }),
-      cell(wScoreB > wScoreA ? coB + ' leads' : wScoreA > wScoreB ? coA + ' leads' : 'Tied', { font: { ...bodyFont, bold: true }, fill: winnerFill, align: center })
-    ]);
-
-    const ws3 = XLSX.utils.aoa_to_sheet(qualData);
-    ws3['!cols'] = [{ wch: 28 }, { wch: 10 }, { wch: 16 }, { wch: 16 }, { wch: 18 }];
-    ws3['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
-    XLSX.utils.book_append_sheet(wb, ws3, 'Qualitative Factors');
-  }
-
-  // Download
-  const fname = `offer-comparison-${new Date().toISOString().slice(0,10)}.xlsx`;
-  XLSX.writeFile(wb, fname);
+  sheet('Field assumptions', fields);
+  const assumptions = [[t('metric'), coA, coB]];
+  ['coverage', 'date', 'override'].forEach(key => assumptions.push([t(key === 'date' ? 'payroll_date' : key), key === 'coverage' ? t(state.payroll.A[key]) : state.payroll.A[key], key === 'coverage' ? t(state.payroll.B[key]) : state.payroll.B[key]]));
+  assumptions.push([t('gosi_details'), OfferModel.rate(state.payroll.A), OfferModel.rate(state.payroll.B)]);
+  assumptions.push(['GOSI wage cap (SAR)', 45000, 45000]);
+  assumptions.push([t('vacation_lbl'), state.vacA == null ? '' : state.vacA, state.vacB == null ? '' : state.vacB]);
+  assumptions.push([t('leave_basis'), t(state.leaveBasisA), t(state.leaveBasisB)]);
+  assumptions.push([t('notice_lbl'), state.noticeA == null ? '' : state.noticeA, state.noticeB == null ? '' : state.noticeB]);
+  ['signOn', 'relocation', 'lostBonus', 'repayment', 'unpaidGap', 'departureSettlement'].forEach(key => assumptions.push([t(key), OfferModel.number(state.transition.A[key]), OfferModel.number(state.transition.B[key])]));
+  assumptions.push([t('package_helper')]);
+  sheet('Payroll and first year', assumptions);
+  const scores = OfferModel.qualitative(state.factors);
+  const factors = [[t('qualitative_factors'), t('weight_pct'), coA, coB]];
+  (state.factors || []).forEach(factor => factors.push([tFactorName(factor), factor.weight, factor.scoreA, factor.scoreB]));
+  factors.push([t('career_scores'), scores.weight, scores.scoreA == null ? '' : scores.scoreA, scores.scoreB == null ? '' : scores.scoreB]);
+  sheet('Career factors', factors);
+  XLSX.writeFile(workbook, 'offer-comparison-' + state.payroll.A.date + '.xlsx');
 }
 
 function resolveValueExport(f, fields) {
-  if (!f.enabled) return 0;
-  if (f.isPct && f.pctRef) {
-    const ref  = fields.find(x => x.id === f.pctRef);
-    const ref2 = f.pctRef2 ? fields.find(x => x.id === f.pctRef2) : null;
-    let base = (ref ? resolveValueExport(ref, fields) : 0) + (ref2 ? resolveValueExport(ref2, fields) : 0);
-    if (f.isGosi) base = Math.min(base, 45000);
-    return (f.pct / 100) * base;
-  }
-  return f.value || 0;
+  return resolveValue(f, fields);
 }
 
 // ── Close dropdown when tapping outside (mobile fix) ────────────

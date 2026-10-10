@@ -6,7 +6,7 @@ A focused collection of browser-first utilities deployed as a static GitHub Page
 
 ## Tools
 
-1. **Job Offer Comparator** (`/offer/`): compare compensation, benefits, annual value, and offer trade-offs.
+1. **Job Offer Comparator** (`/offer/`): compare take-home pay, guaranteed and expected annual cash, benefits value, first-year switching costs, and career trade-offs.
 2. **Time Toolkit** (`/time/`): time-zone, date-duration, and Hijri/Gregorian utilities.
 3. **Wheel of Names** (`/wheel-of-names/`): random selection from a list of names.
 4. **QR Generator** (`/qr-generator/`): create downloadable QR codes from text, URLs, and vCards.
@@ -84,3 +84,13 @@ For a new tool:
 ## License
 
 See repository licensing information before reuse or redistribution.
+## Offer comparison assumptions
+
+- Recurring and guaranteed cash, variable bonuses, reimbursements, and noncash benefits are classified separately. Expected bonuses use the entered payout percentage; benefit valuations use the entered usage percentage. Benefits do not increase take-home pay.
+- Existing saved offers retain their amounts and enabled fields. Inferred classifications are flagged for review; variable bonuses start at 50% expected payout unless already specified.
+- GOSI coverage and calculation dates are editable per offer, with an optional employee-rate override. The new-system schedule follows [official GOSI guidance](https://awareness.gosi.gov.sa/businessJourney.html). Confirm coverage and the contributory wage against the employee's payroll record.
+- First-year cash includes sign-on payments and deducts entered relocation costs, lost bonuses, repayments, and unpaid gaps. Departure settlements are displayed separately and are not calculated as legal entitlements. Recovery time is a simple estimate using the recurring expected-cash difference; it excludes tax, financing, and timing effects.
+- The financial-closeness threshold uses the larger absolute expected annual cash amount as its denominator. Career-factor scores are normalized by their total relative weight and displayed separately. Leave differences require matching day-count bases and both entered values.
+- Excel export uses the same model as the screen and includes field, payroll, bonus, benefit, and transition assumptions.
+
+Run offer-model regression checks with `node scripts/offer-calculation.test.cjs`, JavaScript syntax checks with `node --check` on the three `assets/js/pages/offer*.js` files, and the repository audit with `python scripts/repo_audit.py`.

@@ -9,7 +9,7 @@
 <meta name="description" content="قارن بين عرضي عمل من حيث الراتب الصافي والبدلات والمزايا السنوية والتأمينات والعوامل المهنية لاتخاذ قرار أوضح.">
 <link rel="canonical" href="https://tools.oalfawzan.sa/offer/">
 <script src="/assets/js/theme-init.js"></script>
-<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20260915a">
+<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20261010d">
 <link rel="stylesheet" href="/assets/css/platform.css?v=20260915a">
 <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20261010b">
 </head>
@@ -58,7 +58,7 @@
     <input class="co-name-input current" id="coNameA" type="text" placeholder="" data-i18n-ph="current_company" aria-label="First company name">
     <input class="co-name-input new-co"  id="coNameB" type="text" placeholder="" data-i18n-ph="new_company" aria-label="Second company name">
   </div>
-  <div class="nat-unified detailed-only">
+  <div class="nat-unified">
     <div class="nat-col">
       <div class="nat-col-label current-col" id="natLabelA">Current</div>
       <div class="nat-toggle-wrap">
@@ -77,6 +77,8 @@
       <span class="nat-note" id="natNoteB">GOSI: 9.75% of (Basic + Housing), capped SAR 45,000</span>
     </div>
   </div>
+
+  <section class="factors-card offer-assumptions" id="offerAssumptions" aria-label="Payroll and comparison assumptions"></section>
 
   <!-- Mobile card tab switcher -->
   <div class="card-tabs" role="tablist" aria-label="Offer cards">
@@ -144,6 +146,9 @@
     </div>
   </div>
 
+  <section class="factors-card" id="transitionSettings" aria-label="First-year switching costs"></section>
+  <p id="comparisonStatus" class="helper-note" role="status" aria-live="polite"></p>
+
   <div class="action-row inline-compare">
     <button type="button" class="calc-btn" id="calcBtn"><span data-i18n="compare_btn">Compare Offers</span></button>
     <button type="button" class="export-btn detailed-only" id="exportBtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span data-i18n="export_btn">Export Excel</span></button>
@@ -156,6 +161,8 @@
       <button type="button" class="export-btn" id="exportBtnSticky"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/></svg><span data-i18n="export_btn">Excel</span></button>
     </div>
   </div>
+
+  <section class="factors-card" id="compensationResults" hidden aria-label="Compensation comparison"></section>
 
   <!-- Simple Mode Result -->
   <div class="simple-result" id="simpleResult">
@@ -345,7 +352,9 @@
   </div>
 </div>
 
-<script defer src="/assets/js/pages/offer.js?v=20261010b"></script>
+<script defer src="/assets/js/pages/offer-model.js?v=20261010d"></script>
+<script defer src="/assets/js/pages/offer-enhancements.js?v=20261010d"></script>
+<script defer src="/assets/js/pages/offer.js?v=20261010d"></script>
 <script defer src="/assets/js/platform.js?v=20261010a"></script>
 </body>
 </html>
