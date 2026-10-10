@@ -210,62 +210,68 @@ function renderFields(side) {
   const monthly = state[side].filter(f => !f.isAnnual);
   const annual  = state[side].filter(f =>  f.isAnnual);
 
-  if (monthly.length) {
-    const additions   = monthly.filter(f => !f.isDeduction);
-    const deductions  = monthly.filter(f =>  f.isDeduction);
-    con.appendChild(makeSection('Monthly', 'monthly_section'));
-    additions.forEach(f => con.appendChild(makeRow(f, side)));
-    if (!deductions.length) {
-      const addDedBtn = document.createElement('div');
-      addDedBtn.style.cssText = 'padding:6px 16px 10px;border-top:1px dashed var(--border);margin-top:4px';
-      addDedBtn.innerHTML = `<button type="button" class="add-field-btn" style="font-size:.65rem" onclick="openAddDeduction('${side}')">${t('add_deduction')}</button>`;
-      con.appendChild(addDedBtn);
-    }
-    if (deductions.length) {
-      const dedHdr = document.createElement('div');
-      dedHdr.style.cssText = 'padding:8px 16px 4px;border-top:1px dashed rgba(192,57,43,.2);margin-top:4px;display:flex;align-items:center;justify-content:space-between';
-      dedHdr.innerHTML = `
-        <div class="section-label" style="color:var(--danger);opacity:.7;margin-bottom:0">${t('deductions_section')}</div>
-        <button type="button" class="add-field-btn" style="border-color:rgba(255,107,107,.55);color:var(--danger);font-weight:700" onclick="openAddDeduction('${side}')">${t('add_deduction')}</button>
-      `;
-      con.appendChild(dedHdr);
-      deductions.forEach(f => con.appendChild(makeRow(f, side)));
-    }
-
-    // Gross = sum of all enabled non-deduction monthly fields
-    const totals = computeSide(side);
-    const grossVal = totals.gross;
-    const deductVal = totals.deductions;
-    const netVal = grossVal - deductVal;
-    const color = side === 'A' ? 'var(--current)' : 'var(--new)';
-
-    const summaryRow = document.createElement('div');
-    summaryRow.style.cssText = 'border-top:1px solid var(--border);margin-top:2px';
-    summaryRow.innerHTML = `
-      <div class="summary-gross">
-        <span class="summary-label">${t('gross_monthly')}</span>
-        <span class="summary-value" style="color:${color}">SAR ${fmtNum(grossVal)}</span>
-      </div>
-      <div class="summary-net">
-        <span class="summary-label">${t('net_monthly_salary')}</span>
-        <span class="summary-value" style="color:${color}">SAR ${fmtNum(netVal)}</span>
-      </div>
-    `;
-    con.appendChild(summaryRow);
+  const additions   = monthly.filter(f => !f.isDeduction);
+  const deductions  = monthly.filter(f =>  f.isDeduction);
+  const monthlyHeader = makeSection('Monthly', 'monthly_section');
+  monthlyHeader.classList.add('offer-section-header');
+  const addMonthly = document.createElement('button');
+  addMonthly.type = 'button';
+  addMonthly.className = 'add-field-btn';
+  addMonthly.textContent = t('add_monthly_field');
+  addMonthly.addEventListener('click', () => openAddField(side));
+  monthlyHeader.appendChild(addMonthly);
+  con.appendChild(monthlyHeader);
+  additions.forEach(f => con.appendChild(makeRow(f, side)));
+  if (!deductions.length) {
+    const addDedBtn = document.createElement('div');
+    addDedBtn.style.cssText = 'padding:6px 16px 10px;border-top:1px dashed var(--border);margin-top:4px';
+    addDedBtn.innerHTML = `<button type="button" class="add-field-btn" style="font-size:.65rem" onclick="openAddDeduction('${side}')">${t('add_deduction')}</button>`;
+    con.appendChild(addDedBtn);
   }
-  if (annual.length) {
-    const hr = document.createElement('hr');
-    hr.className = 'divider';
-    con.appendChild(hr);
-    const annualHeader = document.createElement('div');
-    annualHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px 2px';
-    annualHeader.innerHTML = `
-      <div class="section-label" style="margin-bottom:0">${t('annual_section')}</div>
-      <button type="button" class="add-field-btn" onclick="openAddFieldAnnual('${side}')">${t('add_field')}</button>
+  if (deductions.length) {
+    const dedHdr = document.createElement('div');
+    dedHdr.style.cssText = 'padding:8px 16px 4px;border-top:1px dashed rgba(192,57,43,.2);margin-top:4px;display:flex;align-items:center;justify-content:space-between';
+    dedHdr.innerHTML = `
+      <div class="section-label" style="color:var(--danger);opacity:.7;margin-bottom:0">${t('deductions_section')}</div>
+      <button type="button" class="add-field-btn" style="border-color:rgba(255,107,107,.55);color:var(--danger);font-weight:700" onclick="openAddDeduction('${side}')">${t('add_deduction')}</button>
     `;
-    con.appendChild(annualHeader);
-    annual.forEach(f => con.appendChild(makeRow(f, side)));
+    con.appendChild(dedHdr);
+    deductions.forEach(f => con.appendChild(makeRow(f, side)));
   }
+
+  // Gross = sum of all enabled non-deduction monthly fields
+  const totals = computeSide(side);
+  const grossVal = totals.gross;
+  const deductVal = totals.deductions;
+  const netVal = grossVal - deductVal;
+  const color = side === 'A' ? 'var(--current)' : 'var(--new)';
+
+  const summaryRow = document.createElement('div');
+  summaryRow.style.cssText = 'border-top:1px solid var(--border);margin-top:2px';
+  summaryRow.innerHTML = `
+    <div class="summary-gross">
+      <span class="summary-label">${t('gross_monthly')}</span>
+      <span class="summary-value" style="color:${color}">SAR ${fmtNum(grossVal)}</span>
+    </div>
+    <div class="summary-net">
+      <span class="summary-label">${t('net_monthly_salary')}</span>
+      <span class="summary-value" style="color:${color}">SAR ${fmtNum(netVal)}</span>
+    </div>
+  `;
+  con.appendChild(summaryRow);
+
+  const hr = document.createElement('hr');
+  hr.className = 'divider';
+  con.appendChild(hr);
+  const annualHeader = document.createElement('div');
+  annualHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:12px 16px 2px';
+  annualHeader.innerHTML = `
+    <div class="section-label" style="margin-bottom:0">${t('annual_section')}</div>
+    <button type="button" class="add-field-btn" onclick="openAddFieldAnnual('${side}')">${t('add_field')}</button>
+  `;
+  con.appendChild(annualHeader);
+  annual.forEach(f => con.appendChild(makeRow(f, side)));
+
   const pad = document.createElement('div');
   pad.style.height = '12px';
   con.appendChild(pad);
@@ -1014,7 +1020,7 @@ const STRINGS = {
     yearly_input_badge:'yearly',
     add_field_btn:'Add Field', cancel_btn:'Cancel', edit_field_title:'Edit Field', deduction_lbl:'Deduction (subtracted from total)',
     ref2_hint:'Add a second field (e.g. GOSI = Basic + Housing)',
-    monthly_section:'Monthly', annual_section:'Annual Benefits',
+    add_monthly_field:'+ Add Monthly Field', monthly_section:'Monthly', annual_section:'Annual Benefits',
     deductions_section:'Deductions', gross_monthly:'GROSS MONTHLY SALARY',
     net_monthly_salary:'NET MONTHLY SALARY', qualitative_score:'QUALITATIVE SCORE',
     reset_btn:'↺ Reset', save_btn:'Save', portfolio_btn:'← Portfolio',
@@ -1093,7 +1099,7 @@ const STRINGS = {
     annual_amt:'مبلغ سنوي (أدخل القيمة السنوية كاملة)',
     yearly_input_badge:'سنوي',
     add_field_btn:'إضافة', cancel_btn:'إلغاء',
-    monthly_section:'الراتب الشهري', annual_section:'المزايا السنوية',
+    add_monthly_field:'+ إضافة حقل شهري', monthly_section:'الراتب الشهري', annual_section:'المزايا السنوية',
     deductions_section:'الاستقطاعات', gross_monthly:'إجمالي الراتب الشهري',
     net_monthly_salary:'صافي الراتب الشهري', qualitative_score:'النتيجة النوعية',
     reset_btn:'↺ إعادة تعيين', save_btn:'حفظ', portfolio_btn:'← المعرض',

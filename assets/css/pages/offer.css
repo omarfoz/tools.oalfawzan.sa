@@ -379,3 +379,12 @@ html[data-theme="light"] .pct-ref2-select { background: rgba(255,255,255,.5); }
   .offer-settings-grid { grid-template-columns: 1fr; gap: 16px; }
   .offer-field-controls { padding-inline: 10px; }
 }
+
+.offer-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.offer-section-header .section-label { margin-bottom: 0; }
