@@ -187,3 +187,7 @@ html[lang="en"] .only-en{display:initial}
  .breakdown[open] .table-wrap{display:block}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+
+/* Final polish: make the bilingual language switch readable on narrow screens. */
+#langBtn{width:auto;min-width:78px;padding-inline:12px;white-space:nowrap;font-size:.81rem}
+@media(max-width:560px){#langBtn{min-width:70px;padding-inline:8px}}
