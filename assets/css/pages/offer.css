@@ -570,3 +570,394 @@ html body.tool-page :is(#simpleResult, #resultsWrap, #payrollDetails) { scroll-m
 /* Time & commute inputs */
 .hr-time-grid { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); }
 #trueHourly { overflow-wrap: anywhere; }
+
+
+/* 2026-10: Offer comparison UI refresh.
+   One clear three-step workflow, one financial result, restrained surfaces.
+   Existing calculations and editor hooks stay untouched. */
+
+/* Language-aware editorial text, without adding new runtime strings. */
+html[lang="ar"] .offer-en,
+html[lang="en"] .offer-ar { display: none !important; }
+
+html body.tool-page .hero {
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+  padding-block: 22px 14px !important;
+}
+html body.tool-page .hero h1 {
+  margin-block: 6px 12px;
+  font-size: clamp(2rem, 4.5vw, 2.85rem) !important;
+  line-height: 1.3;
+  letter-spacing: -.025em;
+}
+html body.tool-page .hero p {
+  max-width: 600px;
+  margin-inline: auto;
+  line-height: 1.8 !important;
+  color: var(--site-text-muted, var(--muted2));
+}
+html body.tool-page .mode-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 16px;
+  padding: 5px;
+  border: 1px solid var(--site-glass-border, var(--border));
+  border-radius: var(--site-radius-control, 18px);
+  background: var(--site-glass-fill, var(--surface));
+}
+html body.tool-page .mode-btn {
+  border-radius: var(--site-radius-control, 18px);
+  padding: 13px 14px;
+  min-height: 76px;
+  text-align: start;
+  transition: background-color .15s ease, color .15s ease;
+}
+html body.tool-page .mode-btn .mode-icon {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-inline-end: 6px;
+  margin-bottom: 0;
+}
+html body.tool-page .mode-btn .mode-label {
+  display: inline;
+  color: var(--site-text, var(--text));
+  font-size: .96rem;
+  letter-spacing: 0;
+}
+html body.tool-page .mode-btn .mode-sub {
+  display: block;
+  margin-top: 5px;
+  font-size: .76rem;
+  line-height: 1.55;
+  color: var(--site-text-muted, var(--muted2));
+}
+html body.tool-page :is(.mode-btn.active-simple, .mode-btn.active-detailed) {
+  background: color-mix(in srgb, var(--site-accent, #007aff) 12%, var(--site-glass-fill-strong, var(--surface2)));
+  box-shadow: inset 0 0 0 1px var(--site-accent, #007aff);
+}
+html body.tool-page :is(.mode-btn.active-simple, .mode-btn.active-detailed) .mode-label {
+  color: var(--site-accent, #007aff);
+}
+html body.tool-page .mode-btn:focus-visible {
+  outline: 2px solid var(--site-accent, #007aff);
+  outline-offset: 3px;
+}
+
+.offer-step-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 26px 0 13px;
+}
+.offer-step-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  height: 36px;
+  border: 1px solid var(--site-glass-border, var(--border));
+  border-radius: 50%;
+  color: var(--site-accent, #007aff);
+  font: 700 .78rem/1 var(--mono, var(--sans, sans-serif));
+  font-variant-numeric: tabular-nums;
+}
+.offer-step-copy { min-width: 0; }
+html body.tool-page .offer-step-copy h2 {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 750;
+  line-height: 1.55;
+  color: var(--site-text, var(--text));
+}
+html body.tool-page .offer-step-copy p {
+  margin: 2px 0 0;
+  font-size: .84rem;
+  line-height: 1.65;
+  color: var(--site-text-muted, var(--muted2));
+}
+
+/* The first-choice CTA is deliberate, but example data remains available. */
+html body.tool-page .offer-start {
+  gap: 16px;
+  margin: 10px 0 26px;
+  padding: 16px 18px;
+  border: 1px solid var(--site-glass-border, var(--border));
+  border-radius: var(--site-radius-card, 24px);
+  background: var(--site-glass-fill, var(--surface));
+}
+html body.tool-page .offer-start p {
+  flex: 1 1 230px;
+  font-size: .85rem;
+  line-height: 1.65;
+  color: var(--site-text-muted, var(--muted2));
+}
+html body.tool-page .offer-start-actions {
+  flex: 0 1 auto;
+  display: flex;
+  gap: 8px;
+}
+html body.tool-page .offer-start-actions button {
+  min-height: 44px;
+  border-radius: var(--site-radius-control, 18px);
+  font-weight: 700;
+  white-space: normal;
+  line-height: 1.3;
+}
+html body.tool-page #startEmptyBtn {
+  background: var(--site-accent, #007aff);
+  color: #fff;
+  border-color: var(--site-accent, #007aff);
+}
+html body.tool-page #useExampleBtn { background: var(--site-glass-fill-strong, var(--surface2)); }
+
+/* Explicit company labels eliminate anonymous text inputs. */
+html body.tool-page .company-names {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 14px;
+  margin: 0 0 12px;
+}
+.offer-company-field { display: block; min-width: 0; }
+.offer-company-label {
+  display: block;
+  margin-block-end: 7px;
+  padding-inline: 4px;
+  color: var(--site-text-muted, var(--muted2));
+  font-size: .81rem;
+  font-weight: 650;
+}
+html body.tool-page .co-name-input {
+  min-height: 50px;
+  width: 100%;
+  border: 1px solid var(--site-glass-border, var(--border));
+  border-radius: var(--site-radius-control, 18px);
+  background: var(--site-glass-fill-strong, var(--surface2));
+  color: var(--site-text, var(--text));
+  font-size: 1rem;
+  font-weight: 650;
+  padding: 12px 14px;
+}
+html body.tool-page .co-name-input.current { border-inline-start: 3px solid var(--current); border-top-width: 1px; }
+html body.tool-page .co-name-input.new-co { border-inline-start: 3px solid var(--new); border-top-width: 1px; }
+.offer-editor-hint {
+  margin: 8px 0 12px !important;
+  font-size: .82rem;
+  color: var(--site-text-muted, var(--muted2));
+  line-height: 1.7;
+}
+
+/* Preserve dual editing columns; let labels and numbers breathe. */
+html body.tool-page .main-grid {
+  gap: 14px !important;
+  margin-bottom: 12px;
+}
+html body.tool-page .main-grid .card {
+  min-width: 0;
+  border: 1px solid var(--site-glass-border, var(--border));
+  border-radius: var(--site-radius-card, 24px) !important;
+}
+html body.tool-page .main-grid .card-top {
+  padding: 16px !important;
+  min-height: 62px;
+  background: var(--site-glass-fill-strong, var(--surface2));
+  border-bottom: 1px solid var(--site-glass-border, var(--border));
+}
+html body.tool-page .main-grid .card-label {
+  font-size: .95rem;
+  font-weight: 750;
+  color: var(--site-text, var(--text));
+  letter-spacing: 0;
+}
+html body.tool-page .main-grid .section-label { font-size: .78rem; opacity: 1; letter-spacing: 0; }
+html body.tool-page .offer-field-label { color: var(--site-text, var(--text)); font-weight: 600; }
+html body.tool-page .offer-field .amount-input {
+  border-radius: var(--site-radius-control, 18px) !important;
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem !important;
+}
+html body.tool-page .offer-field .field-row {
+  border-bottom: 0 !important;
+}
+html body.tool-page .offer-field {
+  border-color: color-mix(in srgb, var(--site-glass-border, var(--border)) 75%, transparent) !important;
+}
+html body.tool-page .summary-net {
+  background: color-mix(in srgb, var(--site-accent, #007aff) 8%, var(--site-glass-fill-strong, var(--surface2))) !important;
+}
+html body.tool-page .summary-net .summary-label,
+html body.tool-page .summary-net .summary-value { font-size: .91rem; }
+html body.tool-page .offer-field-settings summary,
+html body.tool-page .offer-optional-benefits > summary,
+html body.tool-page #payrollDetails > summary,
+html body.tool-page #transitionSettings summary {
+  font-size: .88rem;
+  font-weight: 650;
+  line-height: 1.55;
+}
+html body.tool-page .offer-assumptions {
+  margin-block: 16px 0 !important;
+}
+html body.tool-page .offer-assumptions > summary {
+  display: list-item;
+  overflow-wrap: anywhere;
+}
+html body.tool-page .offer-assumptions #payrollSummary {
+  color: var(--site-text-muted, var(--muted2));
+  font-size: .78rem;
+  font-weight: 400;
+}
+
+/* The new compensation summary is the only visible financial breakdown.
+   Legacy result nodes stay in DOM because calculator JS still updates them. */
+html body.tool-page #simpleResult,
+html body.tool-page #totalsBar,
+html body.tool-page #overallWrap,
+html body.tool-page #resultsWrap .audit-card,
+html body.tool-page #resultsWrap .breakdown-card { display: none !important; }
+html body.tool-page:not(.offer-has-results) .offer-results-intro {
+  display: none !important;
+}
+.offer-results-intro {
+  margin: 28px 0 10px;
+  padding-inline: 4px;
+}
+.offer-results-kicker {
+  display: block;
+  font-size: 1.17rem;
+  font-weight: 750;
+  color: var(--site-text, var(--text));
+}
+.offer-results-intro p {
+  margin-top: 4px;
+  font-size: .84rem;
+  line-height: 1.7;
+  color: var(--site-text-muted, var(--muted2));
+}
+html body.tool-page #compensationResults {
+  margin-top: 0 !important;
+  padding: 22px !important;
+  border-radius: var(--site-radius-card, 24px);
+}
+html body.tool-page #compensationResults h2 {
+  font-size: clamp(1.12rem, 2.2vw, 1.5rem);
+  line-height: 1.6;
+  margin-bottom: 16px;
+  overflow-wrap: anywhere;
+}
+html body.tool-page .offer-result-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 10px 0 18px;
+}
+html body.tool-page .offer-metric {
+  border: 1px solid var(--site-glass-border, var(--border));
+  border-radius: var(--site-radius-control, 18px);
+  background: var(--site-glass-fill-strong, var(--surface2));
+  padding: 16px;
+}
+html body.tool-page .offer-metric h3 {
+  font-size: .88rem;
+  margin-bottom: 12px;
+}
+html body.tool-page .offer-metric > div {
+  gap: 12px;
+  align-items: baseline;
+  font-size: .83rem;
+  line-height: 1.65;
+}
+html body.tool-page .offer-metric > div:last-child {
+  border-top: 1px solid var(--site-glass-border, var(--border));
+  font-size: .94rem;
+  color: var(--site-accent, #007aff);
+}
+html body.tool-page .offer-metric bdi {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-weight: 750;
+  white-space: nowrap;
+}
+html body.tool-page #compensationResults > details {
+  margin-block: 16px;
+  border-top: 1px solid var(--site-glass-border, var(--border));
+  padding-top: 16px;
+}
+html body.tool-page #compensationResults > details > summary {
+  min-height: 44px;
+  font-weight: 700;
+  cursor: pointer;
+}
+html body.tool-page #compensationResults > p {
+  line-height: 1.8;
+  font-size: .84rem;
+  margin: 10px 0;
+}
+html body.tool-page #resultsWrap { margin-block: 12px 24px; }
+html body.tool-page #resultsWrap .ai-card {
+  border: 1px solid var(--site-glass-border, var(--border));
+  border-radius: var(--site-radius-card, 24px);
+  box-shadow: none;
+  margin: 0;
+}
+html body.tool-page #comparisonStatus:not(:empty) {
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-inline-start: 3px solid var(--site-accent, #007aff);
+  background: var(--site-glass-fill-strong, var(--surface2));
+  border-radius: var(--site-radius-control, 18px);
+}
+html body.tool-page .inline-compare {
+  margin: 12px 0 20px;
+}
+html body.tool-page .action-row .calc-btn { min-height: 54px; font-size: 1rem; }
+html body.tool-page .action-row :is(.calc-btn,.export-btn) {
+  border-radius: var(--site-radius-control, 18px);
+}
+
+/* Responsive: no cramped side-by-side numbers or oversized controls on phones. */
+@media (max-width: 800px) {
+  html body.tool-page .offer-result-metrics { grid-template-columns: 1fr; }
+  html body.tool-page .offer-metric > div { font-size: .9rem; }
+}
+@media (max-width: 640px) {
+  html body.tool-page .hero {
+    padding: 14px 0 8px !important;
+    margin-bottom: 10px !important;
+  }
+  html body.tool-page .hero h1 { font-size: 2.02rem !important; }
+  .offer-step-heading { gap: 9px; margin-top: 22px; }
+  .offer-step-number { flex-basis: 32px; height: 32px; font-size: .72rem; }
+  html body.tool-page .offer-step-copy h2 { font-size: 1rem; }
+  html body.tool-page .offer-step-copy p { font-size: .79rem; }
+  html body.tool-page .mode-switcher { padding: 4px !important; margin-bottom: 10px !important; }
+  html body.tool-page .mode-btn { min-height: 76px !important; padding: 9px !important; border-radius: var(--site-radius-control, 18px) !important; }
+  html body.tool-page .mode-btn .mode-icon { display: none !important; }
+  html body.tool-page .mode-btn .mode-label { display: block; font-size: .86rem !important; }
+  html body.tool-page .mode-btn .mode-sub { font-size: .69rem !important; margin-top: 5px; }
+  html body.tool-page .offer-start { padding: 13px !important; margin-bottom: 22px; }
+  html body.tool-page .offer-start-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+  html body.tool-page .offer-start-actions button { padding: 9px 6px; font-size: .82rem; }
+  html body.tool-page .company-names { grid-template-columns: 1fr !important; gap: 9px; }
+  html body.tool-page .co-name-input { min-height: 48px !important; font-size: 1rem !important; }
+  html body.tool-page .main-grid .card-top { padding: 12px 14px !important; }
+  html body.tool-page .main-grid .card { border-radius: var(--site-radius-card, 24px) !important; }
+  html body.tool-page .offer-field .field-row { gap: 6px 10px !important; }
+  html body.tool-page .main-grid .offer-field .amount-input { font-size: 1rem !important; }
+  html body.tool-page #compensationResults { padding: 16px !important; }
+  html body.tool-page .offer-metric { padding: 13px; }
+  html body.tool-page .offer-result-table tr { border-radius: var(--site-radius-control, 18px); }
+  html body.tool-page .sticky-compare {
+    background: color-mix(in srgb, var(--site-bg, var(--bg)) 96%, transparent) !important;
+    border-top: 1px solid var(--site-glass-border, var(--border)) !important;
+  }
+  html body.tool-page .sticky-compare .calc-btn,
+  html body.tool-page .sticky-compare .export-btn {
+    min-height: 50px !important;
+    border-radius: var(--site-radius-control, 18px) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html body.tool-page .mode-btn { transition: none !important; }
+}
