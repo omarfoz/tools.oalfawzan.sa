@@ -9,7 +9,7 @@
 <meta name="description" content="قارن بين عرضي عمل من حيث الراتب الصافي والبدلات والمزايا السنوية والتأمينات والعوامل المهنية لاتخاذ قرار أوضح.">
 <link rel="canonical" href="https://tools.oalfawzan.sa/offer/">
 <script src="/assets/js/theme-init.js"></script>
-<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20261010h">
+<link rel="stylesheet" href="/assets/css/pages/offer.css?v=20261028a">
 <link rel="stylesheet" href="/assets/css/platform.css?v=20260915a">
 <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20261010c">
 </head>
@@ -37,8 +37,13 @@
 
   <div class="hero">
     <div class="hero-tag"><span data-i18n="tool_tag">// أداة مقارنة</span></div>
-    <h1><span data-i18n="hero_h1_line1">مقارن عروض</span><br><em data-i18n="hero_h1_line2">العمل</em></h1>
+    <h1><span data-i18n="hero_h1_line1">مقارن عروض</span> <em data-i18n="hero_h1_line2">العمل</em></h1>
     <p><span data-i18n="hero_p">قارن الراتب والمزايا والقيمة السنوية والعوامل المهنية، مع إمكانية تخصيص الحقول وحفظ بياناتك في المتصفح.</span></p>
+  </div>
+
+  <div class="offer-step-heading">
+    <span class="offer-step-number" aria-hidden="true">01</span>
+    <div class="offer-step-copy"><h2><span class="offer-ar">اختر طريقة المقارنة</span><span class="offer-en">Choose a comparison</span></h2><p><span class="offer-ar">ابدأ بالمقارنة السريعة، وانتقل للتفاصيل وقت الحاجة.</span><span class="offer-en">Start with the quick comparison. Add details only when you need them.</span></p></div>
   </div>
 
   <!-- Mode Switcher -->
@@ -60,9 +65,22 @@
     <button type="button" class="restore-clear" id="restoreClear" data-i18n="restore_clear">Clear saved data</button>
   </div>
 
+  <div class="offer-start" id="offerStart">
+    <p id="offerDataNotice" role="status"></p>
+    <div class="offer-start-actions">
+      <button type="button" id="startEmptyBtn" data-i18n="start_empty">ابدأ ببياناتك</button>
+      <button type="button" id="useExampleBtn" data-i18n="use_example">استخدم المثال</button>
+    </div>
+  </div>
+
+  <div class="offer-step-heading">
+    <span class="offer-step-number" aria-hidden="true">02</span>
+    <div class="offer-step-copy"><h2><span class="offer-ar">أدخل بيانات العرضين</span><span class="offer-en">Enter both offers</span></h2><p><span class="offer-ar">عدّل المبالغ، وأوقف أي بدل لا ينطبق عليك. تتحدث المجاميع تلقائيًا.</span><span class="offer-en">Update amounts and disable benefits that do not apply. Totals update automatically.</span></p></div>
+  </div>
+
   <div class="company-names">
-    <input class="co-name-input current" id="coNameA" type="text" placeholder="" data-i18n-ph="current_company" aria-label="First company name">
-    <input class="co-name-input new-co"  id="coNameB" type="text" placeholder="" data-i18n-ph="new_company" aria-label="Second company name">
+    <label class="offer-company-field"><span class="offer-company-label"><span class="offer-ar">جهة عملك الحالية</span><span class="offer-en">Your current employer</span></span><input class="co-name-input current" id="coNameA" type="text" placeholder="" data-i18n-ph="current_company" autocomplete="organization" aria-label="First company name"></label>
+    <label class="offer-company-field"><span class="offer-company-label"><span class="offer-ar">جهة العرض الجديد</span><span class="offer-en">New offer employer</span></span><input class="co-name-input new-co" id="coNameB" type="text" placeholder="" data-i18n-ph="new_company" autocomplete="off" aria-label="Second company name"></label>
   </div>
   <div class="nat-unified">
     <div class="nat-col">
@@ -84,19 +102,14 @@
     </div>
   </div>
 
-  <div class="offer-start" id="offerStart">
-    <p id="offerDataNotice" role="status"></p>
-    <div class="offer-start-actions">
-      <button type="button" id="startEmptyBtn" data-i18n="start_empty">ابدأ ببياناتك</button>
-      <button type="button" id="useExampleBtn" data-i18n="use_example">استخدم المثال</button>
-    </div>
-  </div>
 
   <!-- Mobile card tab switcher -->
   <div class="card-tabs" role="tablist" aria-label="Offer cards">
     <button type="button" class="card-tab active-tab-a" id="tabA" role="tab" aria-selected="true" aria-controls="cardA"><span data-i18n="current">Current</span></button>
     <button type="button" class="card-tab" id="tabB" role="tab" aria-selected="false" aria-controls="cardB"><span data-i18n="new_offer">New Offer</span></button>
   </div>
+
+  <p class="offer-editor-hint"><span class="offer-ar">كل عمود يمثل عرضًا. المبلغ الشهري بالريال، والمكافآت السنوية موضّحة بشكل مستقل.</span><span class="offer-en">Each column represents an offer. Monthly amounts are in SAR; annual bonuses are shown separately.</span></p>
 
   <div class="main-grid">
     <div class="card active-card" id="cardA" aria-labelledby="labelA">
@@ -184,7 +197,12 @@
     <p class="helper-note" data-i18n="time_helper">True hourly value = net monthly salary ÷ (work + commute hours), assuming 22 working days per month. Commute time is unpaid time.</p>
   </div>
 
-  <section class="factors-card" id="transitionSettings" aria-label="First-year switching costs"></section>
+  <section class="factors-card detailed-only" id="transitionSettings" aria-label="First-year switching costs"></section>
+  <div class="offer-step-heading">
+    <span class="offer-step-number" aria-hidden="true">03</span>
+    <div class="offer-step-copy"><h2><span class="offer-ar">قارن النتائج</span><span class="offer-en">Compare the results</span></h2><p><span class="offer-ar">اعرض صافي الراتب الشهري والنقد السنوي المتوقع، ثم افتح تفاصيل الحساب إذا رغبت.</span><span class="offer-en">See monthly take-home and expected annual cash, then expand the detailed breakdown if needed.</span></p></div>
+  </div>
+
   <p id="comparisonStatus" class="helper-note" role="status" aria-live="polite"></p>
 
   <div class="action-row inline-compare">
@@ -200,6 +218,10 @@
     </div>
   </div>
 
+  <div class="offer-results-intro">
+    <span class="offer-results-kicker"><span class="offer-ar">نتيجة المقارنة</span><span class="offer-en">Comparison result</span></span>
+    <p><span class="offer-ar">النتيجة مبنية على الأرقام والافتراضات التي أدخلتها. المزايا غير النقدية منفصلة عن الراتب.</span><span class="offer-en">Results use your inputs and assumptions. Non-cash benefits are separate from take-home pay.</span></p>
+  </div>
   <section class="factors-card" id="compensationResults" hidden aria-label="Compensation comparison"></section>
 
   <!-- Simple Mode Result -->
