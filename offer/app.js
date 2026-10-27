@@ -37,7 +37,7 @@
       second_step:'نتيجة المقارنة',second_hint:'الأرقام بالريال السعودي. المزايا غير النقدية لا تدخل في صافي الراتب.',
       empty_title:'جاهز للمقارنة',empty_text:'أدخل الراتب الأساسي في العرضين لعرض نتيجة واقعية، أو جرّب المثال الافتراضي.',
       monthly:'صافي الراتب الشهري',annual_guaranteed:'النقد السنوي المضمون',
-      annual_expected:'النقد السنوي المتوقع',difference:'الفرق لصالح الجديد',
+      annual_expected:'النقد السنوي المتوقع',difference:'الفرق (الجديد − الحالي)',
       current_label:'الحالي',new_label:'الجديد',
       headline_b:'العرض الجديد أعلى ماليًا',headline_a:'الوظيفة الحالية أعلى ماليًا',
       headline_equal:'العرضان متساويان في صافي الاستلام الشهري',
@@ -90,7 +90,7 @@
       second_step:'Comparison results',second_hint:'All figures are in SAR. Non-cash benefits are separate from take-home pay.',
       empty_title:'Ready to compare',empty_text:'Enter the base salary for both offers to see your results, or try the sample.',
       monthly:'Monthly take-home',annual_guaranteed:'Guaranteed annual cash',annual_expected:'Expected annual cash',
-      difference:'Change vs. current',current_label:'Current',new_label:'New',
+      difference:'Difference (new − current)',current_label:'Current',new_label:'New',
       headline_b:'The new offer pays more monthly',headline_a:'The current job pays more monthly',
       headline_equal:'Both offers have the same monthly take-home',
       headline_near:'The monthly difference is small',
@@ -300,13 +300,13 @@
     if(!ready()){message(t('export_error'));return;}
     const a=compute(state.a),b=compute(state.b);
     const lines=[[t('item'),state.a.company||t('old'),state.b.company||t('new')],
-      ['Base salary',a.base,b.base],['Housing allowance',a.housing,b.housing],['Transport allowance',a.transport,b.transport],
-      ['Other monthly allowances',a.other,b.other],['Gross monthly',a.gross,b.gross],
-      ['GOSI employee deduction',a.gosi,b.gosi],['Other deductions',a.deduction,b.deduction],
-      ['Monthly take-home',a.net,b.net],['Guaranteed annual cash',a.guaranteed,b.guaranteed],
-      ['Expected annual bonus',a.expectedBonus,b.expectedBonus],['Expected annual cash',a.expected,b.expected],
-      ['First-year cash',a.firstYear,b.firstYear],['Non-cash benefits annual',a.benefits,b.benefits],
-      ['Annual leave days',a.vacation,b.vacation],['Hourly value with commute',a.hourly,b.hourly]];
+      [t('basic'),a.base,b.base],[t('housing'),a.housing,b.housing],[t('transport'),a.transport,b.transport],
+      [t('other'),a.other,b.other],[t('gross'),a.gross,b.gross],
+      [t('social'),a.gosi,b.gosi],[t('other_deductions'),a.deduction,b.deduction],
+      [t('monthly_net'),a.net,b.net],[t('guaranteed_cash'),a.guaranteed,b.guaranteed],
+      [t('annual_bonus'),a.expectedBonus,b.expectedBonus],[t('expected_cash'),a.expected,b.expected],
+      [t('first_year'),a.firstYear,b.firstYear],[t('benefits'),a.benefits,b.benefits],
+      [t('vacation'),a.vacation,b.vacation],[t('hourly'),a.hourly,b.hourly]];
     const csv='\uFEFFsep=,\r\n'+lines.map(row=>row.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
     const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
     const aTag=document.createElement('a');aTag.href=url;aTag.download='job-offer-comparison.csv';document.body.append(aTag);aTag.click();aTag.remove();
