@@ -17,7 +17,7 @@
       page_title:'مقارنة عروض العمل',brand_sub:'أداة مقارنة الرواتب',lang:'English',theme:'تغيير المظهر',
       eyebrow:'قرارك الوظيفي، بالأرقام',hero:'قارن عرضك الوظيفي بوضوح',
       hero_desc:'أدخل تفاصيل وظيفتك الحالية والعرض الجديد، وشاهد الفرق في الراتب الشهري والقيمة السنوية بدون تعقيد.',
-      sample:'تجربة بأرقام افتراضية',reset:'مسح البيانات',first_step:'بيانات العرضين',
+      sample:'تجربة بأرقام افتراضية',reset:'مسح البيانات',restore_old:'استرجاع بياناتي السابقة',restored_old:'استرجعت بيانات المقارنة السابقة. راجع البدلات المجمّعة.',restore_confirm:'بنسترجع بياناتك من النسخة السابقة، وقد تُجمع بعض البدلات في حقل واحد. تبي تكمل؟',first_step:'بيانات العرضين',
       first_hint:'ابدأ بالأساسي والبدلات. المجاميع تتحدث تلقائيًا.',
       old:'الوظيفة الحالية',new:'العرض الجديد',old_tag:'الحالي',new_tag:'المقترح',
       company:'اسم الجهة (اختياري)',company_old:'مثال: جهة عملي الحالية',company_new:'مثال: الشركة الجديدة',
@@ -70,7 +70,7 @@
       page_title:'Job Offer Comparison',brand_sub:'Salary comparison tool',lang:'عربي',theme:'Switch appearance',
       eyebrow:'Make a clearer career decision',hero:'Compare job offers with clarity',
       hero_desc:'Enter your current compensation and the new offer to see monthly and yearly differences without unnecessary complexity.',
-      sample:'Try an example',reset:'Clear data',first_step:'Enter both offers',
+      sample:'Try an example',reset:'Clear data',restore_old:'Restore previous data',restored_old:'Previous comparison restored. Review grouped allowances.',restore_confirm:'Restore your saved comparison? Some old allowance fields may be combined.',first_step:'Enter both offers',
       first_hint:'Start with base pay and allowances. Totals update automatically.',
       old:'Current job',new:'New offer',old_tag:'Current',new_tag:'Proposed',
       company:'Employer name (optional)',company_old:'e.g. Current employer',company_new:'e.g. New employer',
@@ -327,6 +327,81 @@
     try{lang=localStorage.getItem('tools-offer-clean-lang')==='en'?'en':'ar';}catch(_){}
     try{theme=localStorage.getItem('tools-offer-clean-theme')==='dark'?'dark':'light';}catch(_){}
   }
+
+  // Opt-in migration, leaves the previous version untouched for recovery.
+  function migrateLegacy(){
+    try{
+      const raw=localStorage.getItem('offer_v31');
+      if(!raw)return false;
+      const old=JSON.parse(raw);
+      if(!old || !Array.isArray(old.A) || !Array.isArray(old.B))return false;
+      if(!confirm(t('restore_confirm')))return false;
+      const restored={};
+      for(const [side,oldSide] of [['a','A'],['b','B']]){
+        const all=old[oldSide],out=initialOffer();
+        out.company=clean(side==='a'?old.coA:old.coB);
+        const resolve=(f,seen=new Set())=>{
+          if(!f || f.enabled===false || seen.has(f.id))return 0;
+          if(!f.isPct)return num(f.value);
+          seen.add(f.id);
+          const total=[f.pctRef,f.pctRef2].filter(Boolean).reduce((sum,id)=>sum+resolve(all.find(x=>x.id===id),seen),0);
+          seen.delete(f.id);
+          return total*num(f.pct)/100;
+        };
+        const active=all.filter(f=>f && f.enabled!==false);
+        const byName=(name)=>active.find(f=>String(f.name||'').toLowerCase().includes(name));
+        const base=byName('basic salary')||active.find(f=>/basic/i.test(f.name||'')&&!f.isDeduction);
+        out.basic=base?String(resolve(base)):'';
+        const allowanceTo=(name,key)=>{
+          const f=byName(name);
+          if(!f)return;
+          if(f.isPct && f.pctRef===base?.id && !f.pctRef2){out[key]=String(num(f.pct));out[key+'Unit']='pct';}
+          else {out[key]=String(resolve(f));out[key+'Unit']='sar';}
+        };
+        allowanceTo('housing','housing');
+        allowanceTo('transport','transport');
+        let other=0,deductions=0,guaranteed=0,benefits=0,bonusTarget=0,bonusExpected=0;
+        for(const f of active){
+          if([base?.id,byName('housing')?.id,byName('transport')?.id].includes(f.id))continue;
+          if(f.isGosi || /^gosi$/i.test(f.name||''))continue;
+          const v=resolve(f);
+          if(f.isDeduction){if(!f.isAnnual)deductions+=v;continue;}
+          const category=String(f.category||'').toLowerCase();
+          if(f.isAnnual){
+            if(category==='variable'||/bonus/i.test(f.name||'')){
+              bonusTarget+=v;bonusExpected+=v*Math.min(100,num(f.payout==null?50:f.payout))/100;
+            }else if(category==='reimbursement'||category==='noncash'||/insurance|education|ticket|phone bill/i.test(f.name||'')){
+              benefits+=v*Math.min(100,num(f.usage==null?100:f.usage))/100;
+            }else guaranteed+=v;
+          }else other+=v;
+        }
+        out.other=other?String(other):'';
+        out.deduction=deductions?String(deductions):'';
+        out.annualGuaranteed=guaranteed?String(guaranteed):'';
+        out.nonCash=benefits?String(benefits):'';
+        out.bonus=bonusTarget?String(bonusTarget):'';
+        out.bonusChance=bonusTarget?String(Math.round(bonusExpected/bonusTarget*10000)/100):'50';
+        const payroll=old.payroll?.[oldSide];
+        if(payroll?.coverage==='none'||old.nationality?.[oldSide]==='nonsaudi')out.gosi='none';
+        else if(payroll?.override!=='' && payroll?.override!=null){out.gosi='custom';out.gosiCustom=String(num(payroll.override));}
+        else if(payroll?.coverage==='new')out.gosi='newcomer';
+        const transition=old.transition?.[oldSide]||{};
+        out.signOn=transition.signOn?String(num(transition.signOn)):'';
+        const cost=num(transition.relocation)+num(transition.lostBonus)+num(transition.repayment)+num(transition.unpaidGap);
+        out.switchCost=cost?String(cost):'';
+        const vac=old[side==='a'?'vacA':'vacB'];
+        if(vac!=null)out.vacation=String(num(vac));
+        const hours=old[side==='a'?'hoursA':'hoursB'];
+        if(hours!=null)out.hours=String(num(hours));
+        const commute=old[side==='a'?'commuteA':'commuteB'];
+        if(commute!=null)out.commute=String(num(commute));
+        restored[side]=out;
+      }
+      state=restored;fill();render();save();$('legacyBtn').hidden=true;
+      message(t('restored_old'));return true;
+    }catch(_){return false;}
+  }
+
   function sample(){
     if(hasData() && !confirm(t('confirm_sample')))return;
     state={
@@ -345,6 +420,7 @@
   function init(){
     loadInitial();fill();
     setTheme(theme);setLanguage(lang);
+    try{$('legacyBtn').hidden=!localStorage.getItem('offer_v31');}catch(_){}
     document.addEventListener('input',event=>{
       const el=event.target;
       if(!el.matches('[data-side][data-key]') || el.tagName==='SELECT')return;
@@ -363,6 +439,7 @@
     $('langBtn').addEventListener('click',()=>setLanguage(lang==='ar'?'en':'ar'));
     $('themeBtn').addEventListener('click',()=>setTheme(theme==='light'?'dark':'light'));
     $('sampleBtn').addEventListener('click',sample);
+    $('legacyBtn').addEventListener('click',migrateLegacy);
     $('resetBtn').addEventListener('click',reset);
     $('shareBtn').addEventListener('click',copyShare);
     $('exportBtn').addEventListener('click',downloadCSV);
