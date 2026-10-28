@@ -30,7 +30,8 @@ async function main(){
     if(box)assert.ok(box.width >= (cfg.width<=340?75:cfg.width<=420?100:80),'Input is too narrow: '+await el.getAttribute('id')+' '+box.width);
    }
    const dimensions=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,width:innerWidth}));
-   assert.ok(dimensions.scroll<=dimensions.width+1,'Horizontal overflow: '+JSON.stringify(dimensions));
+   const offenders=await page.evaluate(()=>[...document.querySelectorAll('*')].map(el=>{const b=el.getBoundingClientRect();return {tag:el.tagName,id:el.id,cls:String(el.className).slice(0,80),x:Math.round(b.x),right:Math.round(b.right),width:Math.round(b.width)}}).filter(el=>el.x < -1 || el.right > innerWidth+1).slice(0,22));
+   assert.ok(dimensions.scroll<=dimensions.width+1,'Horizontal overflow: '+JSON.stringify(dimensions)+' Offenders: '+JSON.stringify(offenders));
    await page.screenshot({path:'test-output/'+cfg.name+'.png',fullPage:true,animations:'disabled'});
    await page.locator('#langBtn').click();
    assert.equal(await page.locator('html').getAttribute('lang'),'en','Language switches');
