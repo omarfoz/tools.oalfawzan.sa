@@ -119,7 +119,7 @@
   };
   const t = key => (words[lang] && words[lang][key]) || words.ar[key] || key;
   const num = v => {const n = Number(v); return Number.isFinite(n) ? Math.max(0,n) : 0;};
-  const money = n => new Intl.NumberFormat(lang==='ar'?'en-SA':'en-US',{maximumFractionDigits:2,minimumFractionDigits:0}).format(Number.isFinite(n)?n:0);
+  const money = n => {const value=Number.isFinite(n)?n:0;const decimals=Math.abs(value-Math.round(value))>0.00001?2:0;return new Intl.NumberFormat(lang==='ar'?'en-SA':'en-US',{maximumFractionDigits:2,minimumFractionDigits:decimals}).format(value);};
   const signed = n => (n>0?'+':n<0?'−':'') + money(Math.abs(n));
   const pair = (n,withUnit=true) => money(n) + (withUnit?' '+t('riyal'):'');
   const clean = v => (v==null?'':String(v)).slice(0,120);
