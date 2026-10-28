@@ -1,4 +1,4 @@
-const {chromium} = require('playwright');
+const {chromium,webkit} = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const BASE = process.env.OFFER_TEST_URL || 'http://127.0.0.1:4173/offer/';
@@ -65,6 +65,30 @@ async function main(){
   assert.equal(await p.locator('[data-side="a"][data-key="housingUnit"]').inputValue(),'pct');
   console.log('PASS legacy recovery');
   await legacy.close();
+
+  const safari=await webkit.launch({headless:true});
+  try {
+    const mobile=await safari.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,locale:'ar-SA'});
+    const p=await mobile.newPage();
+    const errors=[];
+    p.on('pageerror',e=>errors.push(e.message));
+    const resp=await p.goto(BASE,{waitUntil:'networkidle'});
+    assert.equal(resp.status(),200,'WebKit page responds');
+    await p.locator('#abasicInput').fill('12000');
+    await p.locator('#bbasicInput').fill('15000');
+    assert.equal(await p.locator('#resultContent').isVisible(),true,'Safari results rendered');
+    await expectText(p.locator('#verdictTitle'),'العرض الجديد أعلى ماليًا');
+    await p.locator('#advanced').evaluate(el=>el.open=true);
+    await p.locator('#abonusInput').fill('15000');
+    await p.locator('#abonusChanceInput').fill('60');
+    const dims=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
+    assert.ok(dims.scroll<=dims.width+1,'Safari horizontal overflow '+JSON.stringify(dims));
+    await p.screenshot({path:'test-output/mobile-webkit.png',fullPage:true,animations:'disabled'});
+    assert.equal(errors.length,0,'Safari JS errors '+errors.join('; '));
+    await mobile.close();
+    console.log('PASS WebKit mobile Safari engine: results, input, layout, advanced');
+  } finally { await safari.close(); }
+
  }finally{await browser.close();}
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});
