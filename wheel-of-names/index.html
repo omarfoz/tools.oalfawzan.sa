@@ -8,8 +8,7 @@
 <script src="/assets/js/theme-init.js"></script>
   <meta name="theme-color" content="#010204">
   <meta name="description" content="عجلة أسماء تفاعلية لاختيار اسم عشوائي بعدالة وسهولة.">
-  <link rel="stylesheet" href="/assets/css/pages/wheel-of-names.css?v=20260915a">
-  <link rel="stylesheet" href="/assets/css/pages/wheel-refinements.css?v=20260915a">
+  <link rel="stylesheet" href="/assets/css/pages/wheel-of-names.css?v=20261111a">
   <link rel="stylesheet" href="/assets/css/platform.css?v=20260915a">
   <link id="oalfawzan-theme" rel="stylesheet" href="/assets/css/oalfawzan-theme.css?v=20261010c">
 </head>
@@ -38,8 +37,8 @@
     <section class="wheel-app" aria-label="عجلة الأسماء">
       <div class="wheel-column">
         <div class="wheel-stage" id="wheelStage">
-          <div class="pointer" aria-hidden="true"></div>
           <button class="wheel-hit-area" id="wheelHitArea" type="button" aria-label="لف العجلة">
+            <span class="pointer" aria-hidden="true"></span>
             <canvas id="wheelCanvas" width="720" height="720"></canvas>
             <span class="spin-center" id="spinCenter"><strong id="spinCenterText">لف</strong><small id="spinHint">اضغط هنا</small></span>
           </button>
@@ -93,7 +92,7 @@
     </section>
   </div>
   <div class="sr-only" id="liveResult" role="status" aria-live="assertive"></div>
-  <script defer src="/assets/js/pages/wheel-of-names.js?v=20260915a"></script>
+  <script defer src="/assets/js/pages/wheel-of-names.js?v=20261111c"></script>
   <script defer src="/assets/js/platform.js?v=20261010b"></script>
 </body>
 </html>
