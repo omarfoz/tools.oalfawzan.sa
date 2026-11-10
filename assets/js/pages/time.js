@@ -69,7 +69,7 @@ function formatTimeForDisplay(value){
   const [h,m]=value.split(':').map(Number);
   const dt=new Date(Date.UTC(2000,0,1,h,m));
   const locale=currentLang==='ar'?'ar-SA':'en-GB';
-  return new Intl.DateTimeFormat(locale,{hour:'2-digit',minute:'2-digit',hour12:currentLang==='ar'}).format(dt);
+  return new Intl.DateTimeFormat(locale,{hour:'2-digit',minute:'2-digit',hour12:currentLang==='ar',timeZone:'UTC'}).format(dt);
 }
 
 function refreshPickerDisplay(input){

@@ -9,9 +9,29 @@ function buildVCard(){const first=$('contactFirstName').value.trim(),last=$('con
 function getPayload(){return currentMode==='contact'?buildVCard():(qrText.value.trim()||null)}
 function clearQr(){output.replaceChildren()}
 let qrLibraryPromise;
-function qrAvailable(){return typeof window.QRCode==='function'}
-function ensureQrLibrary(){if(qrAvailable())return Promise.resolve(window.QRCode);if(!qrLibraryPromise){qrLibraryPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js';s.async=true;s.onload=()=>qrAvailable()?resolve(window.QRCode):reject(new Error('QR library unavailable'));s.onerror=()=>reject(new Error('QR library unavailable'));document.head.appendChild(s)})}return qrLibraryPromise}
-function drawQr(value){if(!qrAvailable())throw new Error('QR library unavailable');clearQr();new window.QRCode(output,{text:value,width:320,height:320,colorDark:'#000000',colorLight:'#ffffff',correctLevel:window.QRCode.CorrectLevel.M});const media=output.querySelector('canvas,img');if(media){media.style.width='100%';media.style.height='auto';media.style.display='block'}}
+/* qrcode-generator encodes UTF-8 correctly (Arabic, emoji); qrcodejs@1.0.0 did not. */
+function qrAvailable(){return typeof window.qrcode==='function'&&!!window.qrcode.stringToBytesFuncs}
+function ensureQrLibrary(){if(qrAvailable())return Promise.resolve(window.qrcode);if(!qrLibraryPromise){qrLibraryPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js';s.async=true;s.onload=()=>qrAvailable()?resolve(window.qrcode):reject(new Error('QR library unavailable'));s.onerror=()=>{qrLibraryPromise=null;reject(new Error('QR library unavailable'))};document.head.appendChild(s)})}return qrLibraryPromise}
+function drawQr(value){
+  if(!qrAvailable())throw new Error('QR library unavailable');
+  const lib=window.qrcode;
+  lib.stringToBytes=lib.stringToBytesFuncs['UTF-8'];
+  const qr=lib(0,'M');
+  qr.addData(value,'Byte');
+  qr.make();
+  const count=qr.getModuleCount(),quiet=4,cell=Math.max(4,Math.ceil(320/(count+quiet*2))),size=(count+quiet*2)*cell;
+  const canvas=document.createElement('canvas');
+  canvas.width=size;canvas.height=size;
+  canvas.setAttribute('role','img');
+  canvas.setAttribute('aria-label','QR code');
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,size,size);
+  ctx.fillStyle='#000000';
+  for(let r=0;r<count;r++)for(let c=0;c<count;c++)if(qr.isDark(r,c))ctx.fillRect((c+quiet)*cell,(r+quiet)*cell,cell,cell);
+  clearQr();
+  canvas.style.width='100%';canvas.style.height='auto';canvas.style.display='block';
+  output.append(canvas);
+}
 function renderValue(showSuccess=true){statusEl.classList.remove('error');const value=getPayload();if(!value){statusEl.textContent=currentMode==='contact'?STRINGS[currentLang].contactEmpty:STRINGS[currentLang].empty;statusEl.classList.add('error');clearQr();return Promise.resolve(false)}return ensureQrLibrary().then(()=>{drawQr(value);if(showSuccess)statusEl.textContent=currentMode==='contact'?STRINGS[currentLang].contactOk:STRINGS[currentLang].ok;return true}).catch(err=>{console.error('QR render failed',err);clearQr();statusEl.textContent=qrAvailable()?STRINGS[currentLang].renderFail:STRINGS[currentLang].libraryFail;statusEl.classList.add('error');return false})}
 async function generate(){await renderValue(true)}
 async function download(){if(!await renderValue(false))return;const canvas=output.querySelector('canvas'),img=output.querySelector('img'),a=document.createElement('a');a.href=canvas?canvas.toDataURL('image/png'):img?.src;if(!a.href)return;a.download=`${currentMode==='contact'?'vcard':'qr'}-${new Date().toISOString().slice(0,10)}.png`;document.body.append(a);a.click();a.remove();statusEl.textContent=STRINGS[currentLang].downloaded}

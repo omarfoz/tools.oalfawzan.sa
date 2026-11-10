@@ -212,21 +212,26 @@
     const doc = parseSvgDoc(source);
     const svg = doc.documentElement;
     if (!svg || svg.localName.toLowerCase() !== 'svg') throw new Error('no-svg');
+    const cleanAttrs = (el) => {
+      [...el.attributes].forEach(attr => {
+        const aName = attr.localName;
+        if (/^on/i.test(aName)) { el.removeAttribute(attr.name); return; }
+        if (!ALLOWED_ATTRS.has(aName) && !ALLOWED_ATTRS.has(attr.name)) { el.removeAttribute(attr.name); return; }
+        if (URL_ATTRS.has(aName) && !SAFE_URL_RE.test(attr.value.trim())) { el.removeAttribute(attr.name); return; }
+        if (aName === 'style' && /javascript\s*:|expression\s*\(|\burl\s*\(\s*['"]?\s*(?!data:|https?:|#)/i.test(attr.value)) {
+          el.removeAttribute(attr.name);
+        }
+      });
+    };
     const walk = (node) => {
       [...node.children].forEach(child => {
         if (!ALLOWED_TAGS.has(child.localName)) { child.remove(); return; }
-        [...child.attributes].forEach(attr => {
-          const aName = attr.localName;
-          if (/^on/i.test(aName)) { child.removeAttribute(attr.name); return; }
-          if (!ALLOWED_ATTRS.has(aName) && !ALLOWED_ATTRS.has(attr.name)) { child.removeAttribute(attr.name); return; }
-          if (URL_ATTRS.has(aName) && !SAFE_URL_RE.test(attr.value.trim())) { child.removeAttribute(attr.name); return; }
-          if (aName === 'style' && /javascript\s*:|expression\s*\(|\burl\s*\(\s*['"]?\s*(?!data:|https?:|#)/i.test(attr.value)) {
-            child.removeAttribute(attr.name);
-          }
-        });
+        cleanAttrs(child);
         walk(child);
       });
     };
+    // The root <svg> needs the same attribute checks as its descendants (e.g. <svg onload>).
+    cleanAttrs(svg);
     walk(svg);
     let out = new XMLSerializer().serializeToString(svg);
     if (!/xmlns=/.test(out)) out = out.replace(/<svg\b/i, m => m + ' xmlns="' + SVG_NS + '"');
