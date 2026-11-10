@@ -262,3 +262,28 @@ html[data-theme="dark"] .text-input,html[data-theme="dark"] .number-input,html[d
   #langBtn{min-width:60px;padding-inline:5px;font-size:.72rem}
   #themeBtn{width:34px;height:36px}
 }
+
+/* Phase 1: tenure, provided housing, expat levy, low-basic warning, end of service. */
+:root{--warn:#8a5a00;--warn-bg:#fff6e0}
+html[data-theme="dark"]{--warn:#ffd27a;--warn-bg:#3d3220}
+.tenure-field{margin-top:15px}
+.number-input:disabled{background:var(--soft);color:var(--muted);cursor:not-allowed}
+.dependents-field{max-width:none;display:flex;flex-direction:column;gap:6px}
+.dependents-field .number-input{max-width:190px}
+.dependents-field[hidden]{display:none}
+.dependents-info{font-weight:700;color:var(--text)}
+.basic-warning{margin:18px 0 0;padding:11px 13px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-size:.78rem;line-height:1.7;font-weight:620}
+.eos-block{margin-top:22px;padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--soft)}
+.eos-block h4{margin:0;font-size:.95rem;font-weight:820}
+.eos-desc{margin:5px 0 0;color:var(--muted);font-size:.8rem;line-height:1.6}
+.eos-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:15px}
+.eos-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:850px){
+  .eos-controls{grid-template-columns:1fr}
+  .eos-metrics{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .eos-block{padding:14px}
+}
+/* Number inputs are LTR, so in RTL the unit sits on their left: pad that side instead. */
+html[dir="rtl"] .value-wrap .number-input{padding-left:46px;padding-right:12px}

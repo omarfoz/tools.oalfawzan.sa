@@ -2,13 +2,15 @@
   'use strict';
   const KEY = 'tools-offer-clean-v1';
   const $ = id => document.getElementById(id);
-  const keys = ['company','basic','housing','housingUnit','transport','transportUnit','other','deduction','gosi','gosiCustom','annualGuaranteed','bonus','bonusChance','nonCash','signOn','switchCost','vacation','hours','commute'];
+  const Model = window.OfferModel;
+  const keys = ['company','tenure','basic','housing','housingUnit','housingRent','transport','transportUnit','other','deduction','gosi','gosiCustom','dependents','annualGuaranteed','bonus','bonusChance','nonCash','signOn','switchCost','vacation','hours','commute'];
   const initialOffer = () => ({
-    company:'',basic:'',housing:'',housingUnit:'sar',transport:'',transportUnit:'sar',
-    other:'',deduction:'',gosi:'legacy',gosiCustom:'',annualGuaranteed:'',bonus:'',bonusChance:'50',
+    company:'',tenure:'',basic:'',housing:'',housingUnit:'sar',housingRent:'',transport:'',transportUnit:'sar',
+    other:'',deduction:'',gosi:'legacy',gosiCustom:'',dependents:'',annualGuaranteed:'',bonus:'',bonusChance:'50',
     nonCash:'',signOn:'',switchCost:'',vacation:'',hours:'8',commute:'0'
   });
-  let state = {a:initialOffer(),b:initialOffer()};
+  const initialSettings = () => ({stayYears:'5',exitType:'resign',eosBasis:'actual'});
+  let state = {a:initialOffer(),b:initialOffer(),settings:initialSettings()};
   let lang = 'ar';
   let theme = 'light';
   let toastHandle;
@@ -64,7 +66,27 @@
       confirm_sample:'سيتم استبدال البيانات الحالية بالمثال الافتراضي. هل تريد المتابعة؟',
       expected_hint:'الحساب السنوي المتوقع يشمل نسبة المكافأة التي أدخلتها. لا يساوي الراتب الشهري الفعلي.',
       share_error:'لا يمكن إنشاء رابط المشاركة لهذه البيانات',export_error:'أدخل الراتب الأساسي للعرضين أولًا',
-      compare_label:'المقارنة المالية'
+      compare_label:'المقارنة المالية',
+      tenure:'سنوات خدمتك في هذه الجهة',years_unit:'سنة',tenure_hint:'تُستخدم لحساب مكافأة نهاية الخدمة عند البقاء أو الانتقال.',
+      housing_company:'مؤمّن',housing_type:'نوع بدل السكن',housing_rent:'إيجار سكن مماثل سنويًا',
+      housing_rent_hint:'السكن المؤمّن لا يدخل في صافي الراتب، وقيمته تُضاف للقيمة السنوية الكاملة. للتأمينات ونهاية الخدمة يُحتسب بأجر شهرين أساسي سنويًا.',
+      housing_inkind:'قيمة عينية للتأمينات',
+      expat:'غير سعودي (بدون استقطاع)',dependents:'عدد المرافقين على حسابك',
+      dependents_hint:'رسوم المرافقين 400 ر.س شهريًا لكل مرافق تُخصم من صافيك. أدخل 0 إذا كانت الجهة تتحملها.',
+      dependents_fee:'رسوم المرافقين',
+      low_basic:'الأساسي يمثل {p}% فقط من الإجمالي. الأساسي المنخفض يقلل مكافأة نهاية الخدمة والتأمينات، فاطلب رفعه قبل التوقيع.',
+      eos_title:'نهاية الخدمة وإجمالي المدة',eos_desc:'قارن البقاء في وظيفتك الحالية بالانتقال الآن، على نفس عدد السنوات.',
+      stay_years:'كم سنة تتوقع أن تبقى؟',exit_type:'طريقة انتهاء العلاقة لاحقًا',exit_resign:'استقالة',exit_end:'انتهاء العقد أو إنهاء من الجهة',
+      eos_basis:'أجر احتساب المكافأة',basis_actual:'الأجر الفعلي (الإجمالي)',basis_basic_housing:'الأساسي + السكن',basis_basic:'الأساسي فقط',
+      eos_award:'مكافأة نهاية الخدمة',period_total:'إجمالي النقد خلال المدة',
+      stay_label:'البقاء في الحالية',switch_label:'الانتقال للعرض الجديد',switch_diff:'الفرق (الانتقال − البقاء)',
+      eos_switch_explain:'إذا انتقلت الآن (مدة خدمتك {t} سنة) تستحق {s} مكافأة نهاية الخدمة من جهتك الحالية: {v}.',
+      eos_switch_none:'إذا انتقلت الآن (مدة خدمتك {t} سنة) لا تستحق مكافأة نهاية خدمة من جهتك الحالية، لأن الاستقالة قبل سنتين لا تُستحق عنها مكافأة.',
+      eos_no_tenure:'أدخل سنوات خدمتك في الوظيفة الحالية لحساب ما تستحقه عند الانتقال الآن.',
+      share_third:'ثلث',share_two:'ثلثي',share_full:'كامل',
+      eos_rules:'نصف شهر عن كل سنة من أول خمس سنوات وشهر عن كل سنة بعدها. عند الاستقالة: لا شيء قبل سنتين، الثلث من 2 إلى 5 سنوات، الثلثان من 5 إلى 10، وكاملة بعد 10. الحساب بدون زيادات سنوية، فتأكد من عقدك ونظام العمل.',
+      total_value:'القيمة السنوية الكاملة (نقد + مزايا + سكن)',
+      eos_leave_now:'مستحقات الحالية عند الانتقال الآن',eos_stay_row:'نهاية الخدمة عند البقاء',eos_new_row:'نهاية الخدمة من الجهة الجديدة'
     },
     en:{
       page_title:'Job Offer Comparison',brand_sub:'Salary comparison tool',lang:'عربي',theme:'Switch appearance',
@@ -114,10 +136,31 @@
       confirm_reset:'Clear the locally saved comparison?',confirm_sample:'Replace your current data with the sample?',
       expected_hint:'Expected annual cash includes the selected bonus payout probability. It is not your actual monthly salary.',
       share_error:'Unable to create a link for this data',export_error:'Enter base pay for both offers first',
-      compare_label:'Financial comparison'
+      compare_label:'Financial comparison',
+      tenure:'Years of service with this employer',years_unit:'yrs',tenure_hint:'Used to estimate end-of-service pay if you stay or switch.',
+      housing_company:'Provided',housing_type:'Housing allowance type',housing_rent:'Annual rent of similar housing',
+      housing_rent_hint:'Provided housing is not part of take-home pay; its value is added to the full annual value. For GOSI and end of service it counts as two months of base pay per year.',
+      housing_inkind:'In-kind value for GOSI',
+      expat:'Non-Saudi (no deduction)',dependents:'Dependents on your iqama',
+      dependents_hint:'The dependent levy is SAR 400 per dependent per month and is deducted from your take-home. Enter 0 if the employer pays it.',
+      dependents_fee:'Dependent levy',
+      low_basic:'Base pay is only {p}% of the package. A low base reduces end-of-service pay and social insurance, so ask for a higher base before signing.',
+      eos_title:'End of service and multi-year total',eos_desc:'Compare staying in your current job with switching now, over the same number of years.',
+      stay_years:'How many years do you expect to stay?',exit_type:'How the job would end',exit_resign:'Resignation',exit_end:'Contract end or employer termination',
+      eos_basis:'Wage used for the award',basis_actual:'Actual wage (total)',basis_basic_housing:'Base + housing',basis_basic:'Base only',
+      eos_award:'End-of-service award',period_total:'Total cash over the period',
+      stay_label:'Stay in current job',switch_label:'Switch to new offer',switch_diff:'Difference (switch − stay)',
+      eos_switch_explain:'If you switch now after {t} years of service, you receive {s} of your current end-of-service award: {v}.',
+      eos_switch_none:'If you switch now after {t} years of service, you receive no end-of-service award from your current employer, because resigning before 2 years earns none.',
+      eos_no_tenure:'Enter your years of service in the current job to see what you would receive if you switch now.',
+      share_third:'one third',share_two:'two thirds',share_full:'the full amount',
+      eos_rules:'Half a month per year for the first five years and a full month per year after. On resignation: nothing before 2 years, one third for 2 to 5 years, two thirds for 5 to 10, and the full amount after 10. No annual raises are assumed; confirm against your contract and the Labor Law.',
+      total_value:'Full annual value (cash + benefits + housing)',
+      eos_leave_now:'Current-job award if you switch now',eos_stay_row:'End of service if you stay',eos_new_row:'End of service from new employer'
     }
   };
   const t = key => (words[lang] && words[lang][key]) || words.ar[key] || key;
+  const tf = (key, vars) => t(key).replace(/\{(\w+)\}/g, (_, name) => vars[name] ?? '');
   const num = v => {const n = Number(v); return Number.isFinite(n) ? Math.max(0,n) : 0;};
   const money = n => {const value=Number.isFinite(n)?n:0;const decimals=Math.abs(value-Math.round(value))>0.00001?2:0;return new Intl.NumberFormat(lang==='ar'?'en-SA':'en-US',{maximumFractionDigits:2,minimumFractionDigits:decimals}).format(value);};
   const signed = n => (n>0?'+':n<0?'−':'') + money(Math.abs(n));
@@ -127,46 +170,35 @@
     const obj = initialOffer();
     if(input && typeof input==='object'){
       keys.forEach(k=>{if(Object.prototype.hasOwnProperty.call(input,k)) obj[k]=clean(input[k]);});
-      if(!['sar','pct'].includes(obj.housingUnit))obj.housingUnit='sar';
+      if(!['sar','pct','company'].includes(obj.housingUnit))obj.housingUnit='sar';
       if(!['sar','pct'].includes(obj.transportUnit))obj.transportUnit='sar';
-      if(!['legacy','newcomer','none','custom'].includes(obj.gosi))obj.gosi='legacy';
+      if(!['legacy','newcomer','none','expat','custom'].includes(obj.gosi))obj.gosi='legacy';
     }
     return obj;
   };
+  const parseSettings = input => {
+    const obj = initialSettings();
+    if(input && typeof input==='object'){
+      if(Number(input.stayYears)>0)obj.stayYears=clean(input.stayYears);
+      if(['resign','end'].includes(input.exitType))obj.exitType=input.exitType;
+      if(['actual','basic_housing','basic'].includes(input.eosBasis))obj.eosBasis=input.eosBasis;
+    }
+    return obj;
+  };
+  const parseState = input => ({a:parseOffer(input&&input.a),b:parseOffer(input&&input.b),settings:parseSettings(input&&input.settings)});
   function save(){
     try{localStorage.setItem(KEY,JSON.stringify(state));}catch(_){}
   }
-  function rateNew(){
-    const date = new Date();
-    const year = date.getFullYear(), month = date.getMonth();
-    const steps = Math.max(0,Math.min(4,year-2024-(month<6?1:0)));
-    return 9.75 + steps*.5;
-  }
-  function compute(o) {
-    const base=num(o.basic);
-    const allowance = (v,unit) => unit==='pct' ? base*num(v)/100 : num(v);
-    const housing=allowance(o.housing,o.housingUnit);
-    const transport=allowance(o.transport,o.transportUnit);
-    const other=num(o.other);
-    const gross=base+housing+transport+other;
-    const rate=o.gosi==='none'?0:o.gosi==='legacy'?9.75:o.gosi==='newcomer'?rateNew():Math.min(100,num(o.gosiCustom));
-    const gosi = Math.min(45000,base+housing)*rate/100;
-    const deduction=num(o.deduction);
-    const net=gross-gosi-deduction;
-    const guaranteed=net*12+num(o.annualGuaranteed);
-    const expectedBonus=num(o.bonus)*Math.min(100,num(o.bonusChance))/100;
-    const expected=guaranteed+expectedBonus;
-    const firstYear=expected+num(o.signOn)-num(o.switchCost);
-    const benefits=num(o.nonCash);
-    const hours=num(o.hours)||8;
-    const commute=num(o.commute);
-    const hourly=net/(22*(hours+commute/60));
-    return {base,housing,transport,other,gross,rate,gosi,deduction,net,guaranteed,expectedBonus,expected,firstYear,benefits,signOn:num(o.signOn),switchCost:num(o.switchCost),vacation:num(o.vacation),hourly};
-  }
+  const compute = o => Model.computeOffer(o,{eosBasis:state.settings.eosBasis});
+  const horizon = (a,b) => Model.compareHorizon(a,b,{...state.settings,tenure:state.a.tenure});
   function ready(){return num(state.a.basic)>0 && num(state.b.basic)>0;}
   function fill(){
     document.querySelectorAll('[data-side][data-key]').forEach(el=>{
       const v=state[el.dataset.side][el.dataset.key];
+      if(el.value!==v) el.value=v;
+    });
+    document.querySelectorAll('[data-setting]').forEach(el=>{
+      const v=state.settings[el.dataset.setting];
       if(el.value!==v) el.value=v;
     });
     updateGosiControls();
@@ -182,7 +214,7 @@
     $('themeBtn').setAttribute('aria-label',t('theme'));
     $('themeBtn').title=t('theme');
     document.querySelectorAll('[data-i18n-aria]').forEach(el=>{el.setAttribute('aria-label',t(el.dataset.i18nAria));});
-    document.querySelectorAll('[data-choice-new]').forEach(el=>{el.textContent=t('newcomer')+' ('+money(rateNew())+'%)';});
+    document.querySelectorAll('[data-choice-new]').forEach(el=>{el.textContent=t('newcomer')+' ('+money(Model.newcomerRate())+'%)';});
     render();
     try{localStorage.setItem('tools-offer-clean-lang',lang);}catch(_){}
   }
@@ -198,6 +230,10 @@
     ['a','b'].forEach(side=>{
       const o=state[side];
       $(side+'GosiCustomWrap').hidden=o.gosi!=='custom';
+      $(side+'DependentsWrap').hidden=o.gosi!=='expat';
+      const company=o.housingUnit==='company';
+      $(side+'HousingRentWrap').hidden=!company;
+      $(side+'housingInput').disabled=company;
     });
   }
   function deltaClass(n){return n>0.005?'positive':n<-.005?'negative':'neutral';}
@@ -216,17 +252,21 @@
     const tr=document.createElement('tr');
     if(cls) tr.className=cls;
     const l=document.createElement('td');l.textContent=t(label);tr.append(l);
-    [a,b].forEach(n=>{const c=document.createElement('td');c.textContent=pair(n);tr.append(c);});
+    [a,b].forEach(n=>{const c=document.createElement('td');c.textContent=n==null?'—':pair(n);tr.append(c);});
     body.append(tr);
   }
   function render() {
     const a=compute(state.a),b=compute(state.b);
     ['a','b'].forEach(side=>{
-      const o=state[side],r=side==='a'?a:b;
+      const r=side==='a'?a:b;
       $(side+'Preview').textContent=pair(r.net);
-      $(side+'HousingEffective').textContent=pair(r.housing);
+      $(side+'HousingEffective').textContent=r.companyHousing ? t('housing_inkind')+': '+pair(r.housingInKind) : pair(r.housing);
       $(side+'TransportEffective').textContent=pair(r.transport);
-      $(side+'GosiInfo').textContent=money(r.rate)+'% × '+pair(Math.min(45000,r.base+r.housing))+' = '+pair(r.gosi);
+      $(side+'GosiInfo').textContent=money(r.rate)+'% × '+pair(r.gosiBase)+' = '+pair(r.gosi);
+      $(side+'DependentsInfo').textContent=t('dependents_fee')+': '+pair(r.dependentsFee);
+      const warn=$(side+'BasicWarning');
+      warn.hidden=!r.lowBasic;
+      warn.textContent=r.lowBasic?tf('low_basic',{p:Math.round(r.basicShare*100)}):'';
     });
     const ok=ready();
     $('resultEmpty').hidden=ok;
@@ -247,23 +287,39 @@
     metric('expect',a.expected,b.expected);
     metric('yearOne',a.firstYear,b.firstYear);
     metric('noncash',a.benefits,b.benefits);
+    metric('totalValue',a.totalValue,b.totalValue);
+    const h=horizon(a,b);
+    $('eosStay').textContent=pair(h.stayEos);
+    $('eosSwitch').textContent=pair(h.switchEos);
+    setDelta('eosD',h.switchEos-h.stayEos);
+    $('periodStay').textContent=pair(h.stayTotal);
+    $('periodSwitch').textContent=pair(h.switchTotal);
+    setDelta('periodD',h.switchTotal-h.stayTotal);
+    const shareKey=h.leaveNowShare<.5?'share_third':h.leaveNowShare<1?'share_two':'share_full';
+    const tenureText=new Intl.NumberFormat('en-US',{maximumFractionDigits:1}).format(h.tenure);
+    $('eosExplain').textContent=h.tenure<=0 ? t('eos_no_tenure')
+      : h.leaveNowShare===0 ? tf('eos_switch_none',{t:tenureText})
+      : tf('eos_switch_explain',{t:tenureText,s:t(shareKey),v:pair(h.leaveNowEos)});
     $('vacationDiff').textContent=signed(b.vacation-a.vacation)+' '+(lang==='ar'?'يوم':'days');
     $('hourlyA').textContent=pair(a.hourly)+' / '+(lang==='ar'?'ساعة':'hr');
     $('hourlyB').textContent=pair(b.hourly)+' / '+(lang==='ar'?'ساعة':'hr');
     const body=$('breakdownBody');body.replaceChildren();
     [
       ['basic',a.base,b.base],['housing',a.housing,b.housing],['transport',a.transport,b.transport],['total_other',a.other,b.other],
-      ['gross',a.gross,b.gross,'emphasis'],['social',a.gosi,b.gosi],['other_deductions',a.deduction,b.deduction],
+      ['gross',a.gross,b.gross,'emphasis'],['social',a.gosi,b.gosi],['dependents_fee',a.dependentsFee,b.dependentsFee],
+      ['other_deductions',a.deduction,b.deduction],
       ['monthly_net',a.net,b.net,'emphasis'],['guaranteed',num(state.a.annualGuaranteed),num(state.b.annualGuaranteed)],
       ['annual_bonus',a.expectedBonus,b.expectedBonus],['guaranteed_cash',a.guaranteed,b.guaranteed],
       ['expected_cash',a.expected,b.expected,'emphasis'],['first_year',a.firstYear,b.firstYear],
-      ['benefits',a.benefits,b.benefits]
+      ['benefits',a.benefits,b.benefits],['total_value',a.totalValue,b.totalValue,'emphasis'],
+      ['eos_stay_row',h.stayEos,null],['eos_leave_now',null,h.leaveNowEos],['eos_new_row',null,h.newEos],
+      ['period_total',h.stayTotal,h.switchTotal,'emphasis']
     ].forEach(([k,x,y,cls])=>breakdownRow(body,k,x,y,cls));
     $('breakdownA').textContent=state.a.company||t('old');
     $('breakdownB').textContent=state.b.company||t('new');
   }
   function hasData(){
-    return ['a','b'].some(side=>['company','basic','housing','transport','other','deduction','annualGuaranteed','bonus','nonCash','signOn','switchCost'].some(k=>state[side][k]!==''));
+    return ['a','b'].some(side=>['company','tenure','basic','housing','housingRent','transport','other','deduction','dependents','annualGuaranteed','bonus','nonCash','signOn','switchCost'].some(k=>state[side][k]!==''));
   }
   function message(text){
     const el=$('toast');
@@ -298,27 +354,30 @@
   }
   function downloadCSV(){
     if(!ready()){message(t('export_error'));return;}
-    const a=compute(state.a),b=compute(state.b);
+    const a=compute(state.a),b=compute(state.b),h=horizon(a,b);
     const lines=[[t('item'),state.a.company||t('old'),state.b.company||t('new')],
-      [t('basic'),a.base,b.base],[t('housing'),a.housing,b.housing],[t('transport'),a.transport,b.transport],
+      [t('basic'),a.base,b.base],[t('housing'),a.housing,b.housing],[t('housing_rent'),a.housingRent,b.housingRent],
+      [t('transport'),a.transport,b.transport],
       [t('other'),a.other,b.other],[t('gross'),a.gross,b.gross],
-      [t('social'),a.gosi,b.gosi],[t('other_deductions'),a.deduction,b.deduction],
+      [t('social'),a.gosi,b.gosi],[t('dependents_fee'),a.dependentsFee,b.dependentsFee],[t('other_deductions'),a.deduction,b.deduction],
       [t('monthly_net'),a.net,b.net],[t('guaranteed_cash'),a.guaranteed,b.guaranteed],
       [t('annual_bonus'),a.expectedBonus,b.expectedBonus],[t('expected_cash'),a.expected,b.expected],
       [t('first_year'),a.firstYear,b.firstYear],[t('benefits'),a.benefits,b.benefits],
-      [t('vacation'),a.vacation,b.vacation],[t('hourly'),a.hourly,b.hourly]];
+      [t('vacation'),a.vacation,b.vacation],[t('hourly'),a.hourly,b.hourly],
+      [t('total_value'),a.totalValue,b.totalValue],[t('stay_years'),h.years,h.years],
+      [t('eos_stay_row'),h.stayEos,''],[t('eos_leave_now'),'',h.leaveNowEos],[t('eos_new_row'),'',h.newEos],
+      [t('period_total'),h.stayTotal,h.switchTotal]];
     const csv='\uFEFFsep=,\r\n'+lines.map(row=>row.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
     const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
     const aTag=document.createElement('a');aTag.href=url;aTag.download='job-offer-comparison.csv';document.body.append(aTag);aTag.click();aTag.remove();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
   function loadInitial(){
-    try{const raw=localStorage.getItem(KEY);if(raw){const obj=JSON.parse(raw);state={a:parseOffer(obj.a),b:parseOffer(obj.b)};}}catch(_){}
+    try{const raw=localStorage.getItem(KEY);if(raw)state=parseState(JSON.parse(raw));}catch(_){}
     try{
       const encoded=new URL(location.href).searchParams.get('data');
       if(encoded && encoded.length<16000){
-        const shared=fromBase64url(encoded);
-        state={a:parseOffer(shared.a),b:parseOffer(shared.b)};
+        state=parseState(fromBase64url(encoded));
         history.replaceState(null,'',location.pathname+location.hash);
         save();
         setTimeout(()=>message(t('alert_import')),150);
@@ -382,7 +441,8 @@
         out.bonus=bonusTarget?String(bonusTarget):'';
         out.bonusChance=bonusTarget?String(Math.round(bonusExpected/bonusTarget*10000)/100):'50';
         const payroll=old.payroll?.[oldSide];
-        if(payroll?.coverage==='none'||old.nationality?.[oldSide]==='nonsaudi')out.gosi='none';
+        if(old.nationality?.[oldSide]==='nonsaudi')out.gosi='expat';
+        else if(payroll?.coverage==='none')out.gosi='none';
         else if(payroll?.override!=='' && payroll?.override!=null){out.gosi='custom';out.gosiCustom=String(num(payroll.override));}
         else if(payroll?.coverage==='new')out.gosi='newcomer';
         const transition=old.transition?.[oldSide]||{};
@@ -397,7 +457,7 @@
         if(commute!=null)out.commute=String(num(commute));
         restored[side]=out;
       }
-      state=restored;fill();render();save();$('legacyBtn').hidden=true;
+      state={...restored,settings:state.settings||initialSettings()};fill();render();save();$('legacyBtn').hidden=true;
       message(t('restored_old'));return true;
     }catch(_){return false;}
   }
@@ -405,14 +465,15 @@
   function sample(){
     if(hasData() && !confirm(t('confirm_sample')))return;
     state={
-      a:{...initialOffer(),company:lang==='ar'?'الوظيفة الحالية':'Current job',basic:'15000',housing:'25',housingUnit:'pct',transport:'1000',other:'500',bonus:'20000',bonusChance:'75',vacation:'25',commute:'60'},
-      b:{...initialOffer(),company:lang==='ar'?'العرض الجديد':'New offer',basic:'19000',housing:'25',housingUnit:'pct',transport:'1500',other:'250',bonus:'35000',bonusChance:'50',signOn:'10000',switchCost:'5000',vacation:'30',commute:'35'}
+      a:{...initialOffer(),company:lang==='ar'?'الوظيفة الحالية':'Current job',tenure:'4',basic:'15000',housing:'25',housingUnit:'pct',transport:'1000',other:'500',bonus:'20000',bonusChance:'75',vacation:'25',commute:'60'},
+      b:{...initialOffer(),company:lang==='ar'?'العرض الجديد':'New offer',basic:'19000',housing:'25',housingUnit:'pct',transport:'1500',other:'250',bonus:'35000',bonusChance:'50',signOn:'10000',switchCost:'5000',vacation:'30',commute:'35'},
+      settings:initialSettings()
     };
     fill();render();save();message(t('alert_sample'));
   }
   function reset(){
     if(hasData() && !confirm(t('confirm_reset')))return;
-    state={a:initialOffer(),b:initialOffer()};
+    state={a:initialOffer(),b:initialOffer(),settings:initialSettings()};
     fill();render();
     try{localStorage.removeItem(KEY);}catch(_){}
     message(t('alert_reset'));
@@ -423,6 +484,7 @@
     try{$('legacyBtn').hidden=!localStorage.getItem('offer_v31');}catch(_){}
     document.addEventListener('input',event=>{
       const el=event.target;
+      if(el.matches('[data-setting]') && el.tagName!=='SELECT'){state.settings[el.dataset.setting]=el.value;render();save();return;}
       if(!el.matches('[data-side][data-key]') || el.tagName==='SELECT')return;
       const {side,key}=el.dataset;
       state[side][key]=el.value;
@@ -430,6 +492,7 @@
     });
     document.addEventListener('change',event=>{
       const el=event.target;
+      if(el.matches('[data-setting]')){state.settings[el.dataset.setting]=el.value;render();save();return;}
       if(!el.matches('[data-side][data-key]'))return;
       const {side,key}=el.dataset;
       state[side][key]=el.value;
