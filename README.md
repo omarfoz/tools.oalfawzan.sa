@@ -97,6 +97,7 @@ See repository licensing information before reuse or redistribution.
 - Provided (company) housing adds no cash. For GOSI and end of service it is valued at two months of base pay per year; the entered market rent is added to the full annual value.
 - The non-Saudi profile has no employee GOSI deduction and subtracts the SAR 400 monthly dependent levy per dependent the employee pays.
 - A warning appears when base pay is under 60% of the monthly package, because base pay drives GOSI and end of service.
+- Weighted criteria (section 03) follow the job-comparison criteria sheet: 16 criteria with editable default weights (total 95), each rated 0-10 for both jobs. Score = sum of weight × rating over the highest possible sum, counting only criteria rated for both jobs; the advantage is the score difference over the average of both scores. Unlike the sheet, each weight is applied once on a common 0-10 scale instead of also capping each rating at its weight.
 - Excel export uses the same model as the screen and includes field, payroll, bonus, benefit, and transition assumptions.
 
 Run offer-model regression checks with `node scripts/offer-calculation.test.cjs`, JavaScript syntax checks with `node --check` on the three `assets/js/pages/offer*.js` files, and the repository audit with `python scripts/repo_audit.py`.

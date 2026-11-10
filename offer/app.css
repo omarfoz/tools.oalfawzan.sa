@@ -287,3 +287,52 @@ html[data-theme="dark"]{--warn:#ffd27a;--warn-bg:#3d3220}
 }
 /* Number inputs are LTR, so in RTL the unit sits on their left: pad that side instead. */
 html[dir="rtl"] .value-wrap .number-input{padding-left:46px;padding-right:12px}
+
+/* Weighted criteria (section 03). Series colors validated for CVD and contrast on both surfaces. */
+:root{--series-a:#c46a1a;--series-b:#1468d4}
+html[data-theme="dark"]{--series-a:#c97830;--series-b:#4489e6}
+.series-a{background:var(--series-a)}
+.series-b{background:var(--series-b)}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:3px;flex:none}
+.score-card{border:1px solid var(--line);border-radius:15px;background:var(--soft);padding:20px}
+.score-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.score-head h3{margin:0;font-size:1.12rem;font-weight:850;line-height:1.5}
+.score-head p{margin:4px 0 0;font-size:.79rem;color:var(--muted)}
+.score-bars{display:grid;gap:12px;margin-top:18px}
+.score-row{display:grid;grid-template-columns:minmax(96px,auto) minmax(0,1fr) 62px;align-items:center;gap:12px}
+.score-name{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;color:var(--text);min-width:0}
+.score-track{height:14px;border-radius:4px;background:var(--line);overflow:hidden}
+.score-fill{height:100%;width:0;border-radius:4px;transition:width .2s ease}
+.score-value{font-size:1rem;font-weight:850;text-align:end}
+.criteria-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 10px;flex-wrap:wrap}
+.legend{display:flex;gap:14px;flex-wrap:wrap}
+.legend-item{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--text)}
+.weight-total{font-size:.76rem;color:var(--muted);font-weight:650}
+.criteria-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.crit-row{border:1px solid var(--line);border-radius:14px;padding:13px;background:var(--surface);display:grid;gap:10px;min-width:0}
+.crit-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.crit-name{font-size:.84rem;font-weight:780;line-height:1.45;min-width:0}
+.crit-weight{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted);font-weight:650;flex:none}
+.weight-input{width:62px;height:44px;padding:6px 8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);text-align:center;font-size:.92rem;font-weight:720;direction:ltr;font-variant-numeric:tabular-nums;outline:none}
+.weight-input:focus{border-color:var(--accent);box-shadow:var(--focus)}
+.weight-input::placeholder{color:var(--muted);opacity:.72;font-weight:420}
+.crit-lines{display:grid;gap:6px}
+.crit-bar-line{display:grid;grid-template-columns:58px 70px minmax(0,1fr);align-items:center;gap:10px}
+.rate-label{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;color:var(--muted);min-width:0}
+.rate-select{height:44px;padding:6px 8px;font-size:.95rem;font-weight:780}
+.crit-track{height:10px;border-radius:4px;background:var(--soft);overflow:hidden}
+.crit-fill{height:100%;width:0;border-radius:4px;transition:width .2s ease}
+.crit-row.is-muted .crit-track{opacity:.45}
+.criteria-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:850px){
+  .criteria-list{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .score-card{padding:15px}
+  .score-head{flex-direction:column;gap:6px}
+  .score-head .verdict-delta{text-align:start;min-width:0}
+  .score-row{grid-template-columns:minmax(0,1fr) 56px;row-gap:5px}
+  .score-name{grid-column:1/-1}
+  .crit-row{padding:12px}
+}
+@media print{.criteria-actions{display:none}}

@@ -115,8 +115,50 @@
     };
   }
 
+  // Weighted decision matrix. Default weights come from the job-comparison criteria sheet.
+  const CRITERIA = [
+    {id: 'salary', weight: 15}, {id: 'stability', weight: 10}, {id: 'growth', weight: 8},
+    {id: 'culture', weight: 7}, {id: 'bonus', weight: 5}, {id: 'training', weight: 5},
+    {id: 'flexibility', weight: 5}, {id: 'balance', weight: 5}, {id: 'title', weight: 5},
+    {id: 'size', weight: 5}, {id: 'international', weight: 5}, {id: 'location', weight: 4},
+    {id: 'medical', weight: 4}, {id: 'hours', weight: 4}, {id: 'rotation', weight: 4},
+    {id: 'travel', weight: 4}
+  ];
+  const RATING_MAX = 10;
+  const isRated = v => v !== '' && v != null && Number.isFinite(Number(v));
+
+  // Each criterion is rated 0-10 for both jobs and weighted once. A criterion counts only
+  // when it has a positive weight and both jobs are rated, so the two scores stay comparable.
+  function scoreCriteria(weights = {}, ratingsA = {}, ratingsB = {}) {
+    const rows = CRITERIA.map(c => {
+      const weight = weights[c.id] === undefined || weights[c.id] === '' ? c.weight : num(weights[c.id]);
+      const ra = ratingsA[c.id], rb = ratingsB[c.id];
+      const rated = isRated(ra) && isRated(rb);
+      return {
+        id: c.id, weight, rated: rated && weight > 0,
+        a: isRated(ra) ? clamp(num(ra), 0, RATING_MAX) : null,
+        b: isRated(rb) ? clamp(num(rb), 0, RATING_MAX) : null
+      };
+    });
+    const counted = rows.filter(r => r.rated);
+    const totalWeight = rows.reduce((sum, r) => sum + r.weight, 0);
+    const countedWeight = counted.reduce((sum, r) => sum + r.weight, 0);
+    const max = countedWeight * RATING_MAX;
+    const sumA = counted.reduce((sum, r) => sum + r.weight * r.a, 0);
+    const sumB = counted.reduce((sum, r) => sum + r.weight * r.b, 0);
+    const scoreA = max > 0 ? sumA / max * 100 : 0;
+    const scoreB = max > 0 ? sumB / max * 100 : 0;
+    const average = (scoreA + scoreB) / 2;
+    return {
+      rows, totalWeight, countedWeight, ratedCount: counted.length, scoreA, scoreB,
+      // Same advantage measure as the sheet: difference over the average of both scores.
+      advantage: average > 0 ? (scoreB - scoreA) / average * 100 : 0,
+      winner: counted.length === 0 ? null : Math.abs(scoreB - scoreA) < 0.05 ? 'tie' : scoreB > scoreA ? 'b' : 'a'
+    };
+  }
+
   return {
-    GOSI_CAP, DEPENDENT_FEE, BASIC_SHARE_WARNING, IN_KIND_HOUSING_MONTHS,
-    num, newcomerRate, gosiRate, eosFull, resignationShare, eosPayout, computeOffer, compareHorizon
+    GOSI_CAP, DEPENDENT_FEE, BASIC_SHARE_WARNING, IN_KIND_HOUSING_MONTHS, CRITERIA, RATING_MAX,
+    num, newcomerRate, gosiRate, eosFull, resignationShare, eosPayout, computeOffer, compareHorizon, scoreCriteria
   };
 });

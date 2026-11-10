@@ -9,9 +9,9 @@
 <meta property="og:description" content="احسب الفرق بين وظيفتك الحالية وعرض جديد بوضوح.">
 <link rel="canonical" href="https://tools.oalfawzan.sa/offer/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./app.css?v=20261110c">
-<script src="./model.js?v=20261110a" defer></script>
-<script src="./app.js?v=20261110d" defer></script>
+<link rel="stylesheet" href="./app.css?v=20261110f">
+<script src="./model.js?v=20261110b" defer></script>
+<script src="./app.js?v=20261110g" defer></script>
 <title>مقارنة عروض العمل | tools.oalfawzan.sa</title>
 </head>
 <body>
@@ -391,6 +391,32 @@
    </div>
   </div>
   <p class="privacy"><span data-i18n="privacy">تُحفظ بياناتك في هذا المتصفح فقط. عند مشاركة الرابط ستُضمّن بيانات الرواتب داخله.</span> · <a href="https://awareness.gosi.gov.sa/businessJourney.html" target="_blank" rel="noopener noreferrer" data-i18n="official">المرجع الرسمي للتأمينات</a></p>
+ </section>
+
+ <section class="criteria" aria-labelledby="criteriaTitle">
+  <div class="section-head"><span class="step" aria-hidden="true">03</span><div><h2 id="criteriaTitle" data-i18n="criteria_step">قيّم ما لا تقيسه الأرقام</h2><p data-i18n="criteria_hint">قيّم كل معيار من 0 إلى 10 لكل وظيفة، وعدّل الأوزان حسب أولوياتك.</p></div></div>
+  <div class="result-block criteria-block">
+   <div class="score-card">
+    <div class="score-head">
+     <div><div class="verdict-kicker" data-i18n="criteria_kicker">المقارنة الشاملة بالمعايير</div><h3 id="criteriaVerdict">—</h3><p id="criteriaMeta"></p></div>
+     <div class="verdict-delta"><strong id="criteriaAdvantage" class="number">—</strong><p data-i18n="advantage_label">أفضلية العرض الجديد</p></div>
+    </div>
+    <div class="score-bars" id="scoreBars" role="img" aria-label="">
+     <div class="score-row"><span class="score-name"><i class="swatch series-a" aria-hidden="true"></i><span data-i18n="old">الوظيفة الحالية</span></span><div class="score-track"><div class="score-fill series-a" id="scoreFillA"></div></div><strong class="number score-value" id="scoreA">—</strong></div>
+     <div class="score-row"><span class="score-name"><i class="swatch series-b" aria-hidden="true"></i><span data-i18n="new">العرض الجديد</span></span><div class="score-track"><div class="score-fill series-b" id="scoreFillB"></div></div><strong class="number score-value" id="scoreB">—</strong></div>
+    </div>
+   </div>
+   <div class="criteria-toolbar">
+    <div class="legend" aria-hidden="true"><span class="legend-item"><i class="swatch series-a"></i><span data-i18n="current_label">الحالي</span></span><span class="legend-item"><i class="swatch series-b"></i><span data-i18n="new_label">الجديد</span></span></div>
+    <span class="weight-total" id="weightTotal"></span>
+   </div>
+   <div class="criteria-list" id="criteriaList"></div>
+   <div class="criteria-actions">
+    <button type="button" class="btn-link" id="resetWeightsBtn" data-i18n="reset_weights">استعادة الأوزان الافتراضية</button>
+    <button type="button" class="btn-link" id="clearRatingsBtn" data-i18n="clear_ratings">مسح التقييمات</button>
+   </div>
+   <p class="note" data-i18n="criteria_note">النتيجة = مجموع (الوزن × التقييم) مقسومًا على أعلى مجموع ممكن.</p>
+  </div>
  </section>
 </main>
 <footer class="topbar"><div class="shell footer"><span>tools.oalfawzan.sa · 2026</span><span><span data-i18n="by">صنع بواسطة</span> <a href="https://oalfawzan.sa">Omar Alfawzan</a></span></div></footer>

@@ -75,4 +75,23 @@ near(h.stayTotal, a.expected * 5 + h.stayEos, 'stay total');
 near(h.switchTotal, b.expected * 5 + 5000 - 1000 + h.switchEos, 'switch total');
 assert.equal(M.compareHorizon(a, b, {}).years, 5, 'default horizon 5 years');
 
+// Weighted criteria.
+assert.equal(M.CRITERIA.length, 16, '16 criteria');
+assert.equal(M.CRITERIA.reduce((s, c) => s + c.weight, 0), 95, 'sheet default weights total 95');
+const none = M.scoreCriteria({}, {}, {});
+assert.equal(none.winner, null, 'no ratings, no winner');
+assert.equal(none.ratedCount, 0);
+const two = M.scoreCriteria({}, { salary: '10', stability: '2' }, { salary: '8', stability: '9' });
+// weights 15 and 10: A = (150 + 20) / 250, B = (120 + 90) / 250
+near(two.scoreA, 68, 'score A');
+near(two.scoreB, 84, 'score B');
+assert.equal(two.winner, 'b');
+near(two.advantage, (84 - 68) / 76 * 100, 'advantage over average');
+const oneSided = M.scoreCriteria({}, { salary: '10', growth: '5' }, { salary: '10' });
+assert.equal(oneSided.ratedCount, 1, 'criterion rated on one side only is skipped');
+const zeroWeight = M.scoreCriteria({ salary: '0' }, { salary: '10', stability: '5' }, { salary: '0', stability: '5' });
+assert.equal(zeroWeight.winner, 'tie', 'zero weight removes the criterion');
+near(M.scoreCriteria({}, { salary: '15' }, { salary: '-3' }).scoreA, 100, 'ratings clamp to 0-10');
+assert.equal(M.scoreCriteria({}, { salary: '0' }, { salary: '0' }).winner, 'tie', 'zero ratings still count');
+
 console.log('offer model: all checks passed');

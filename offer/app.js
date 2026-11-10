@@ -10,7 +10,8 @@
     nonCash:'',signOn:'',switchCost:'',vacation:'',hours:'8',commute:'0'
   });
   const initialSettings = () => ({stayYears:'5',exitType:'resign',eosBasis:'actual'});
-  let state = {a:initialOffer(),b:initialOffer(),settings:initialSettings()};
+  const initialCriteria = () => ({weights:{},a:{},b:{}});
+  let state = {a:initialOffer(),b:initialOffer(),settings:initialSettings(),criteria:initialCriteria()};
   let lang = 'ar';
   let theme = 'light';
   let toastHandle;
@@ -86,7 +87,22 @@
       share_third:'ثلث',share_two:'ثلثي',share_full:'كامل',
       eos_rules:'نصف شهر عن كل سنة من أول خمس سنوات وشهر عن كل سنة بعدها. عند الاستقالة: لا شيء قبل سنتين، الثلث من 2 إلى 5 سنوات، الثلثان من 5 إلى 10، وكاملة بعد 10. الحساب بدون زيادات سنوية، فتأكد من عقدك ونظام العمل.',
       total_value:'القيمة السنوية الكاملة (نقد + مزايا + سكن)',
-      eos_leave_now:'مستحقات الحالية عند الانتقال الآن',eos_stay_row:'نهاية الخدمة عند البقاء',eos_new_row:'نهاية الخدمة من الجهة الجديدة'
+      eos_leave_now:'مستحقات الحالية عند الانتقال الآن',eos_stay_row:'نهاية الخدمة عند البقاء',eos_new_row:'نهاية الخدمة من الجهة الجديدة',
+      criteria_step:'قيّم ما لا تقيسه الأرقام',criteria_hint:'قيّم كل معيار من 0 إلى 10 لكل وظيفة، وعدّل الأوزان حسب أولوياتك.',
+      criteria_kicker:'المقارنة الشاملة بالمعايير',advantage_label:'أفضلية العرض الجديد',
+      criteria_empty:'قيّم معيارًا واحدًا على الأقل في الوظيفتين لعرض النتيجة.',
+      criteria_b:'العرض الجديد أفضل حسب أولوياتك',criteria_a:'الوظيفة الحالية أفضل حسب أولوياتك',criteria_tie:'الوظيفتان متساويتان حسب أولوياتك',
+      criteria_meta:'{n} من {m} معيارًا مقيّمًا',weight:'الوزن',weight_total:'مجموع الأوزان: {w}',
+      reset_weights:'استعادة الأوزان الافتراضية',clear_ratings:'مسح التقييمات',not_rated:'غير مقيّم',
+      criteria_note:'النتيجة = مجموع (الوزن × التقييم) مقسومًا على أعلى مجموع ممكن. المعيار يدخل في الحساب فقط إذا قيّمته في الوظيفتين. الأوزان نسبية ولا يلزم أن يكون مجموعها 100.',
+      score_aria:'النتيجة: الحالية {a}%، الجديدة {b}%',rate_of:'{v} من 10',
+      criteria_score:'نتيجة المعايير',
+      crit_salary:'الراتب الأساسي والمزايا المالية',crit_stability:'استقرار الشركة وسمعتها',crit_growth:'النمو والمسار الوظيفي',
+      crit_culture:'بيئة العمل والثقافة',crit_bonus:'المكافآت والحوافز السنوية',crit_training:'التدريب والتطوير',
+      crit_flexibility:'مرونة العمل والعمل عن بُعد',crit_balance:'التوازن بين العمل والحياة',crit_title:'المسمى الوظيفي والمسؤوليات',
+      crit_size:'حجم الشركة',crit_international:'فروع دولية وفرص الانتقال',crit_location:'الموقع وسهولة الوصول',
+      crit_medical:'التأمين الطبي والبدلات',crit_hours:'ساعات العمل الفعلية',crit_rotation:'التدوير الوظيفي والمشاريع',
+      crit_travel:'السفر والخبرة الدولية'
     },
     en:{
       page_title:'Job Offer Comparison',brand_sub:'Salary comparison tool',lang:'عربي',theme:'Switch appearance',
@@ -156,7 +172,22 @@
       share_third:'one third',share_two:'two thirds',share_full:'the full amount',
       eos_rules:'Half a month per year for the first five years and a full month per year after. On resignation: nothing before 2 years, one third for 2 to 5 years, two thirds for 5 to 10, and the full amount after 10. No annual raises are assumed; confirm against your contract and the Labor Law.',
       total_value:'Full annual value (cash + benefits + housing)',
-      eos_leave_now:'Current-job award if you switch now',eos_stay_row:'End of service if you stay',eos_new_row:'End of service from new employer'
+      eos_leave_now:'Current-job award if you switch now',eos_stay_row:'End of service if you stay',eos_new_row:'End of service from new employer',
+      criteria_step:'Rate what numbers miss',criteria_hint:'Rate each criterion from 0 to 10 for both jobs, and adjust the weights to your priorities.',
+      criteria_kicker:'Weighted criteria comparison',advantage_label:'New offer advantage',
+      criteria_empty:'Rate at least one criterion for both jobs to see the result.',
+      criteria_b:'The new offer fits your priorities better',criteria_a:'Your current job fits your priorities better',criteria_tie:'Both jobs fit your priorities equally',
+      criteria_meta:'{n} of {m} criteria rated',weight:'Weight',weight_total:'Total weight: {w}',
+      reset_weights:'Reset default weights',clear_ratings:'Clear ratings',not_rated:'Not rated',
+      criteria_note:'Score = sum of (weight × rating) divided by the highest possible sum. A criterion counts only when both jobs are rated. Weights are relative and do not need to add up to 100.',
+      score_aria:'Score: current {a}%, new {b}%',rate_of:'{v} of 10',
+      criteria_score:'Criteria score',
+      crit_salary:'Base salary & financial benefits',crit_stability:'Company stability & reputation',crit_growth:'Career growth & path',
+      crit_culture:'Work environment & culture',crit_bonus:'Bonuses & annual incentives',crit_training:'Training & development',
+      crit_flexibility:'Flexibility & remote work',crit_balance:'Work-life balance',crit_title:'Job title & responsibilities',
+      crit_size:'Company size',crit_international:'International branches / relocation',crit_location:'Location & accessibility',
+      crit_medical:'Medical insurance & allowances',crit_hours:'Actual working hours',crit_rotation:'Job rotation & projects',
+      crit_travel:'Travel & global exposure'
     }
   };
   const t = key => (words[lang] && words[lang][key]) || words.ar[key] || key;
@@ -185,7 +216,18 @@
     }
     return obj;
   };
-  const parseState = input => ({a:parseOffer(input&&input.a),b:parseOffer(input&&input.b),settings:parseSettings(input&&input.settings)});
+  const parseCriteria = input => {
+    const out = initialCriteria();
+    if(!input || typeof input!=='object')return out;
+    Model.CRITERIA.forEach(({id})=>{
+      ['weights','a','b'].forEach(group=>{
+        const v=input[group]&&input[group][id];
+        if(v!==undefined && v!=='' && Number.isFinite(Number(v)))out[group][id]=String(Math.min(group==='weights'?100:Model.RATING_MAX,Math.max(0,Number(v))));
+      });
+    });
+    return out;
+  };
+  const parseState = input => ({a:parseOffer(input&&input.a),b:parseOffer(input&&input.b),settings:parseSettings(input&&input.settings),criteria:parseCriteria(input&&input.criteria)});
   function save(){
     try{localStorage.setItem(KEY,JSON.stringify(state));}catch(_){}
   }
@@ -216,6 +258,7 @@
     document.querySelectorAll('[data-i18n-aria]').forEach(el=>{el.setAttribute('aria-label',t(el.dataset.i18nAria));});
     document.querySelectorAll('[data-choice-new]').forEach(el=>{el.textContent=t('newcomer')+' ('+money(Model.newcomerRate())+'%)';});
     render();
+    buildCriteria();
     try{localStorage.setItem('tools-offer-clean-lang',lang);}catch(_){}
   }
   function setTheme(next){
@@ -318,8 +361,79 @@
     $('breakdownA').textContent=state.a.company||t('old');
     $('breakdownB').textContent=state.b.company||t('new');
   }
+  function el(tag,cls,text){const node=document.createElement(tag);if(cls)node.className=cls;if(text!=null)node.textContent=text;return node;}
+  // Builds one row per criterion: name, weight, two 0-10 ratings and a paired bar.
+  function buildCriteria(){
+    const list=$('criteriaList');
+    list.replaceChildren();
+    Model.CRITERIA.forEach(({id,weight})=>{
+      const name=t('crit_'+id);
+      const row=el('div','crit-row');row.dataset.crit=id;
+      const head=el('div','crit-head');
+      const title=el('span','crit-name',name);title.id='crit-'+id+'-name';
+      const wLabel=el('label','crit-weight');
+      wLabel.append(el('span',null,t('weight')));
+      const wInput=el('input','weight-input');
+      Object.assign(wInput,{type:'number',min:'0',max:'100',step:'1',inputMode:'numeric',placeholder:String(weight)});
+      wInput.dataset.weight=id;
+      wInput.setAttribute('aria-label',t('weight')+': '+name);
+      wInput.value=state.criteria.weights[id]??'';
+      wLabel.append(wInput);
+      head.append(title,wLabel);
+      // One line per job: label, 0-10 rating, and its bar, so a row stays short on phones.
+      const lines=el('div','crit-lines');
+      ['a','b'].forEach(side=>{
+        const line=el('div','crit-bar-line');line.dataset.side=side;
+        const tag=el('span','rate-label');
+        tag.append(el('i','swatch series-'+side),el('span',null,t(side==='a'?'current_label':'new_label')));
+        const select=el('select','select-input rate-select');
+        select.dataset.rateSide=side;select.dataset.critId=id;
+        select.setAttribute('aria-label',name+': '+t(side==='a'?'old':'new'));
+        select.append(el('option',null,'—'));select.options[0].value='';
+        for(let v=0;v<=Model.RATING_MAX;v++){const o=el('option',null,String(v));o.value=String(v);select.append(o);}
+        select.value=state.criteria[side][id]??'';
+        const track=el('div','crit-track');
+        track.append(el('div','crit-fill series-'+side));
+        line.append(tag,select,track);
+        lines.append(line);
+      });
+      row.append(head,lines);
+      list.append(row);
+    });
+    renderCriteria();
+  }
+  function renderCriteria(){
+    const s=Model.scoreCriteria(state.criteria.weights,state.criteria.a,state.criteria.b);
+    s.rows.forEach(r=>{
+      const row=document.querySelector('.crit-row[data-crit="'+r.id+'"]');
+      if(!row)return;
+      row.classList.toggle('is-muted',!r.rated);
+      ['a','b'].forEach(side=>{
+        const v=r[side];
+        const line=row.querySelector('.crit-bar-line[data-side="'+side+'"]');
+        line.querySelector('.crit-fill').style.width=(v==null?0:v/Model.RATING_MAX*100)+'%';
+        line.querySelector('.crit-track').title=(side==='a'?t('current_label'):t('new_label'))+': '+(v==null?t('not_rated'):tf('rate_of',{v}))+' · '+t('weight')+' '+money(r.weight);
+      });
+    });
+    $('weightTotal').textContent=tf('weight_total',{w:money(s.totalWeight)});
+    const has=s.ratedCount>0;
+    $('criteriaVerdict').textContent=has?t(s.winner==='tie'?'criteria_tie':s.winner==='b'?'criteria_b':'criteria_a'):t('criteria_empty');
+    $('criteriaMeta').textContent=tf('criteria_meta',{n:s.ratedCount,m:Model.CRITERIA.length});
+    const adv=$('criteriaAdvantage');
+    adv.textContent=has?signed(s.advantage)+'%':'—';
+    adv.className='number '+(has?deltaClass(s.advantage):'neutral');
+    const pct=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:1}).format(n);
+    adv.textContent=has?(s.advantage>0?'+':s.advantage<0?'−':'')+pct(Math.abs(s.advantage))+'%':'—';
+    [['A',s.scoreA],['B',s.scoreB]].forEach(([k,v])=>{
+      $('scoreFill'+k).style.width=(has?v:0)+'%';
+      $('score'+k).textContent=has?pct(v)+'%':'—';
+    });
+    $('scoreBars').setAttribute('aria-label',has?tf('score_aria',{a:pct(s.scoreA),b:pct(s.scoreB)}):t('criteria_empty'));
+    return s;
+  }
   function hasData(){
-    return ['a','b'].some(side=>['company','tenure','basic','housing','housingRent','transport','other','deduction','dependents','annualGuaranteed','bonus','nonCash','signOn','switchCost'].some(k=>state[side][k]!==''));
+    const rated=['a','b','weights'].some(g=>Object.keys(state.criteria[g]).length>0);
+    return rated || ['a','b'].some(side=>['company','tenure','basic','housing','housingRent','transport','other','deduction','dependents','annualGuaranteed','bonus','nonCash','signOn','switchCost'].some(k=>state[side][k]!==''));
   }
   function message(text){
     const el=$('toast');
@@ -367,6 +481,9 @@
       [t('total_value'),a.totalValue,b.totalValue],[t('stay_years'),h.years,h.years],
       [t('eos_stay_row'),h.stayEos,''],[t('eos_leave_now'),'',h.leaveNowEos],[t('eos_new_row'),'',h.newEos],
       [t('period_total'),h.stayTotal,h.switchTotal]];
+    const s=Model.scoreCriteria(state.criteria.weights,state.criteria.a,state.criteria.b);
+    s.rows.forEach(r=>lines.push([t('crit_'+r.id)+' ('+t('weight')+' '+r.weight+')',r.a??'',r.b??'']));
+    lines.push([t('criteria_score')+' %',Math.round(s.scoreA*10)/10,Math.round(s.scoreB*10)/10]);
     const csv='\uFEFFsep=,\r\n'+lines.map(row=>row.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
     const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
     const aTag=document.createElement('a');aTag.href=url;aTag.download='job-offer-comparison.csv';document.body.append(aTag);aTag.click();aTag.remove();
@@ -457,7 +574,7 @@
         if(commute!=null)out.commute=String(num(commute));
         restored[side]=out;
       }
-      state={...restored,settings:state.settings||initialSettings()};fill();render();save();$('legacyBtn').hidden=true;
+      state={...restored,settings:state.settings||initialSettings(),criteria:state.criteria||initialCriteria()};fill();render();save();$('legacyBtn').hidden=true;
       message(t('restored_old'));return true;
     }catch(_){return false;}
   }
@@ -467,14 +584,18 @@
     state={
       a:{...initialOffer(),company:lang==='ar'?'الوظيفة الحالية':'Current job',tenure:'4',basic:'15000',housing:'25',housingUnit:'pct',transport:'1000',other:'500',bonus:'20000',bonusChance:'75',vacation:'25',commute:'60'},
       b:{...initialOffer(),company:lang==='ar'?'العرض الجديد':'New offer',basic:'19000',housing:'25',housingUnit:'pct',transport:'1500',other:'250',bonus:'35000',bonusChance:'50',signOn:'10000',switchCost:'5000',vacation:'30',commute:'35'},
-      settings:initialSettings()
+      settings:initialSettings(),
+      // Sample ratings from the criteria sheet, rescaled to 0-10.
+      criteria:{weights:{},
+        a:{salary:'10',stability:'2',growth:'6',culture:'10',bonus:'8',training:'10',flexibility:'10',balance:'2',title:'6',size:'6',international:'2',location:'10',medical:'10',hours:'10',rotation:'8',travel:'8'},
+        b:{salary:'10',stability:'9',growth:'9',culture:'9',bonus:'10',training:'10',flexibility:'10',balance:'10',title:'10',size:'10',international:'8',location:'8',medical:'10',hours:'0',rotation:'8',travel:'8'}}
     };
-    fill();render();save();message(t('alert_sample'));
+    fill();render();buildCriteria();save();message(t('alert_sample'));
   }
   function reset(){
     if(hasData() && !confirm(t('confirm_reset')))return;
-    state={a:initialOffer(),b:initialOffer(),settings:initialSettings()};
-    fill();render();
+    state={a:initialOffer(),b:initialOffer(),settings:initialSettings(),criteria:initialCriteria()};
+    fill();render();buildCriteria();
     try{localStorage.removeItem(KEY);}catch(_){}
     message(t('alert_reset'));
   }
@@ -482,8 +603,14 @@
     loadInitial();fill();
     setTheme(theme);setLanguage(lang);
     try{$('legacyBtn').hidden=!localStorage.getItem('offer_v31');}catch(_){}
+    const setCriteria=(group,id,value)=>{
+      if(value==='')delete state.criteria[group][id];
+      else state.criteria[group][id]=value;
+      renderCriteria();save();
+    };
     document.addEventListener('input',event=>{
       const el=event.target;
+      if(el.matches('[data-weight]')){setCriteria('weights',el.dataset.weight,el.value);return;}
       if(el.matches('[data-setting]') && el.tagName!=='SELECT'){state.settings[el.dataset.setting]=el.value;render();save();return;}
       if(!el.matches('[data-side][data-key]') || el.tagName==='SELECT')return;
       const {side,key}=el.dataset;
@@ -492,6 +619,8 @@
     });
     document.addEventListener('change',event=>{
       const el=event.target;
+      if(el.matches('[data-rate-side]')){setCriteria(el.dataset.rateSide,el.dataset.critId,el.value);return;}
+      if(el.matches('[data-weight]'))return;
       if(el.matches('[data-setting]')){state.settings[el.dataset.setting]=el.value;render();save();return;}
       if(!el.matches('[data-side][data-key]'))return;
       const {side,key}=el.dataset;
@@ -507,6 +636,8 @@
     $('shareBtn').addEventListener('click',copyShare);
     $('exportBtn').addEventListener('click',downloadCSV);
     $('printBtn').addEventListener('click',()=>window.print());
+    $('resetWeightsBtn').addEventListener('click',()=>{state.criteria.weights={};buildCriteria();save();});
+    $('clearRatingsBtn').addEventListener('click',()=>{state.criteria.a={};state.criteria.b={};buildCriteria();save();});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
